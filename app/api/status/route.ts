@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isOrderingOpen, getNextDeadline, getTimeUntilDeadline } from '@/lib/orderPeriod';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/status
  * Get ordering status and deadline info
