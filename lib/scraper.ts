@@ -1,4 +1,3 @@
-import puppeteer from 'puppeteer';
 import prisma from './prisma';
 
 interface ScrapedProduct {
@@ -18,10 +17,27 @@ export async function scrapeProducts(): Promise<ScrapedProduct[]> {
 
     console.log(`🔍 Launching browser to scrape: ${url}`);
 
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    let browser;
+    const isVercel = process.env.VERCEL === '1';
+
+    if (isVercel) {
+        // Vercel specific puppeteer configuration
+        const puppeteer = require('puppeteer-core');
+        const chromium = require('@sparticuz/chromium');
+        browser = await puppeteer.launch({
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
+        });
+    } else {
+        // Local dev configuration
+        const puppeteer = require('puppeteer');
+        browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
+    }
 
     try {
         const page = await browser.newPage();
