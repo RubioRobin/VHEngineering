@@ -2,9 +2,9 @@
 
 export const dynamic = 'force-dynamic';
 
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
-const CartContainer = dynamic(() => import('@/components/CartContainer'), {
+const CartContainer = nextDynamic(() => import('@/components/CartContainer'), {
     ssr: false,
     loading: () => (
         <div className="min-h-screen flex items-center justify-center">
