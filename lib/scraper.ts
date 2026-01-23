@@ -1,0 +1,242 @@
+import puppeteer from 'puppeteer';
+import prisma from './prisma';
+
+interface ScrapedProduct {
+    name: string;
+    price: number | null;
+    description: string | null;
+    imageUrl: string | null;
+    sourceUrl: string | null;
+}
+
+/**
+ * Scrape products from brood-shop.nl using Puppeteer
+ * Handles infinite scroll to load all products dynamically
+ */
+export async function scrapeProducts(): Promise<ScrapedProduct[]> {
+    const url = process.env.SCRAPER_URL || 'https://www.brood-shop.nl/assortiment/belegde-broodjes/';
+
+    console.log(`🔍 Launching browser to scrape: ${url}`);
+
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+
+    try {
+        const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+
+        console.log('📄 Loading page...');
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+
+        console.log('🔄 Scrolling to load all products (infinite scroll)...');
+
+        // Scroll to bottom multiple times to trigger infinite scroll
+        let previousProductCount = 0;
+        let currentProductCount = 0;
+        let scrollAttempts = 0;
+        const maxScrollAttempts = 10;
+
+        do {
+            previousProductCount = currentProductCount;
+
+            // Scroll to bottom
+            await page.evaluate(() => {
+                window.scrollTo(0, document.body.scrollHeight);
+            });
+
+            // Wait for new products to load (Promise-based delay for Puppeteer v21+)
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Count products
+            currentProductCount = await page.evaluate(() => {
+                return document.querySelectorAll('div.product').length;
+            });
+
+            console.log(`  Products loaded: ${currentProductCount}`);
+            scrollAttempts++;
+
+        } while (currentProductCount > previousProductCount && scrollAttempts < maxScrollAttempts);
+
+        console.log(`✅ Finished scrolling. Total products found: ${currentProductCount}`);
+
+        // Extract product data using page.evaluate
+        const products = await page.evaluate(() => {
+            const productElements = document.querySelectorAll('div.product');
+            const results: any[] = [];
+
+            productElements.forEach((element) => {
+                try {
+                    // Extract name from h4
+                    const nameElement = element.querySelector('h4');
+                    const name = nameElement?.textContent?.trim() || '';
+
+                    // Extract price from .product__price bdi
+                    let price: number | null = null;
+                    const priceElement = element.querySelector('.product__price bdi');
+                    if (priceElement) {
+                        const priceText = priceElement.textContent?.trim() || '';
+                        // Extract first number (e.g., "€ 4,85 t/m € 4,95" -> 4.85)
+                        const priceMatch = priceText.match(/[\d,\.]+/);
+                        if (priceMatch) {
+                            price = parseFloat(priceMatch[0].replace(',', '.'));
+                        }
+                    }
+
+                    // Extract image URL
+                    let imageUrl: string | null = null;
+                    const imgElement = element.querySelector('.product__img img');
+                    if (imgElement) {
+                        imageUrl = imgElement.getAttribute('src') ||
+                            imgElement.getAttribute('data-src') ||
+                            null;
+                    }
+
+                    // Extract product URL
+                    let sourceUrl: string | null = null;
+                    const linkElement = element.querySelector('a.product__lnk');
+                    if (linkElement) {
+                        sourceUrl = linkElement.getAttribute('href') || null;
+                    }
+
+                    // Only add valid products (skip categories like 'Belegde Broodjes' and items without price)
+                    if (name && name.length > 3 && price !== null && name.toLowerCase() !== 'belegde broodjes') {
+                        results.push({
+                            name,
+                            price,
+                            description: null, // Not available in listing
+                            imageUrl,
+                            sourceUrl,
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error parsing product:', err);
+                }
+            });
+
+            return results;
+        });
+
+        console.log(`\n✅ Successfully scraped ${products.length} products`);
+        products.forEach((p: ScrapedProduct) => {
+            console.log(`  ✓ ${p.name} - €${p.price || '?'}`);
+        });
+
+        return products;
+
+    } catch (error) {
+        console.error('❌ Scraping error:', error);
+        throw error;
+    } finally {
+        await browser.close();
+    }
+}
+
+/**
+ * Save scraped products to database
+ * Updates existing products or creates new ones
+ */
+export async function saveScrapedProducts(products: ScrapedProduct[]): Promise<number> {
+    let savedCount = 0;
+
+    for (const product of products) {
+        try {
+            // Check if product exists by name
+            const existing = await prisma.product.findFirst({
+                where: { name: product.name },
+            });
+
+            if (existing) {
+                // Update existing product
+                await prisma.product.update({
+                    where: { id: existing.id },
+                    data: {
+                        price: product.price,
+                        description: product.description,
+                        imageUrl: product.imageUrl,
+                        sourceUrl: product.sourceUrl,
+                    },
+                });
+                console.log(`  ↻ Updated: ${product.name}`);
+            } else {
+                // Create new product
+                await prisma.product.create({
+                    data: product,
+                });
+                console.log(`  + Added: ${product.name}`);
+            }
+            savedCount++;
+        } catch (err) {
+            console.error(`Error saving product "${product.name}":`, err);
+        }
+    }
+
+    return savedCount;
+}
+
+/**
+ * Run full scraping process and log results
+ */
+export async function runScraper(): Promise<{ success: boolean; message: string; count: number }> {
+    try {
+        console.log('\n🚀 Starting scraper...\n');
+        const products = await scrapeProducts();
+
+        if (products.length === 0) {
+            const errorMsg = 'No products found - website structure may have changed or is blocking requests';
+            console.log(`⚠️ ${errorMsg}`);
+
+            await prisma.scraperLog.create({
+                data: {
+                    status: 'error',
+                    message: errorMsg,
+                    productsFound: 0,
+                },
+            });
+
+            return {
+                success: false,
+                message: errorMsg,
+                count: 0,
+            };
+        }
+
+        console.log(`\n💾 Saving ${products.length} products to database...\n`);
+        const savedCount = await saveScrapedProducts(products);
+
+        await prisma.scraperLog.create({
+            data: {
+                status: savedCount === products.length ? 'success' : 'partial',
+                message: `Saved ${savedCount}/${products.length} products`,
+                productsFound: savedCount,
+            },
+        });
+
+        console.log(`\n✅ Scraping complete! Saved ${savedCount} products\n`);
+
+        return {
+            success: true,
+            message: `Successfully scraped and saved ${savedCount} products from brood-shop.nl`,
+            count: savedCount,
+        };
+
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`\n❌ Scraper failed: ${errorMessage}\n`);
+
+        await prisma.scraperLog.create({
+            data: {
+                status: 'error',
+                message: errorMessage,
+                productsFound: 0,
+            },
+        });
+
+        return {
+            success: false,
+            message: errorMessage,
+            count: 0,
+        };
+    }
+}

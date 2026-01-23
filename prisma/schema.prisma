@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Product model - scraped sandwiches from brood-shop.nl
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  price       Float?      // Optional, may not always be available
+  description String?     // Short description if available
+  imageUrl    String?     // Product image URL
+  sourceUrl   String?     // Link to detail page
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  orderItems  OrderItem[]
+}
+
+// Order Period model - manages weekly ordering periods
+model OrderPeriod {
+  id          String    @id @default(cuid())
+  weekId      String    @unique // Format: YYYY-WW (ISO week number)
+  startDate   DateTime  // Monday 00:00
+  endDate     DateTime  // Sunday 23:59
+  deadline    DateTime  // Thursday 14:00
+  
+  createdAt   DateTime  @default(now())
+  
+  orders      Order[]
+}
+
+// Order model - individual customer orders
+model Order {
+  id              String      @id @default(cuid())
+  personName      String
+  department      String?     // Optional department
+  clientToken     String      @default("") // Token stored in user's localStorage
+  
+  orderPeriodId   String
+  orderPeriod     OrderPeriod @relation(fields: [orderPeriodId], references: [id])
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  orderItems      OrderItem[]
+}
+
+// OrderItem model - line items in an order
+model OrderItem {
+  id          String   @id @default(cuid())
+  quantity    Int      @default(1)
+  comment     String?  // Optional comment per item (e.g., "no sauce")
+  
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  
+  createdAt   DateTime @default(now())
+}
+
+// ScraperLog model - logs scraping runs and errors
+model ScraperLog {
+  id          String   @id @default(cuid())
+  status      String   // "success" | "error" | "partial"
+  message     String?  // Error message or summary
+  productsFound Int    @default(0)
+  
+  createdAt   DateTime @default(now())
+}
+// GlobalSetting model - for application-wide configurations
+model GlobalSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g., "DEADLINE_DAY", "DEADLINE_HOUR"
+  value       String   // All values stored as strings
+  
+  updatedAt   DateTime @updatedAt
+}
