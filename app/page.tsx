@@ -134,10 +134,12 @@ export default function HomePage() {
             {/* Header */}
             <header className="bg-white border-b border-gray-200">
                 <div className="container mx-auto px-4 py-6">
-                    {/* Toast Notification - Below countdown */}
+                    {/* Toast Notification - Floating centered */}
                     {toast && (
-                        <div className="mb-4 px-6 py-3 rounded-lg bg-green-500 text-white font-semibold text-center">
-                            {toast}
+                        <div className="absolute top-24 left-0 right-0 flex justify-center z-50 pointer-events-none">
+                            <div className="px-6 py-2 rounded-full shadow-lg bg-green-500 text-white font-bold animate-bounce">
+                                {toast}
+                            </div>
                         </div>
                     )}
 
