@@ -3,6 +3,8 @@ import { checkAdminAuth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { getCurrentPeriodId } from '@/lib/orderPeriod';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/admin/orders
  * Fetch all orders (admin only)

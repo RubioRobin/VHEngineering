@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { isOrderingOpen } from '@/lib/orderPeriod';
 import { checkAdminAuth } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * PATCH /api/orders/[id] - Update an order
  */

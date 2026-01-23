@@ -9,22 +9,27 @@ interface CountdownTimerProps {
 
 export default function CountdownTimer({ deadline, isOpen }: CountdownTimerProps) {
     const [timeRemaining, setTimeRemaining] = useState<number>(0);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
+
+        const targetTime = new Date(deadline).getTime();
+        if (isNaN(targetTime)) return;
+
         // Initial calculation
-        setTimeRemaining(new Date(deadline).getTime() - Date.now());
+        setTimeRemaining(targetTime - Date.now());
 
         // Update every second
         const interval = setInterval(() => {
-            const remaining = new Date(deadline).getTime() - Date.now();
-            setTimeRemaining(remaining);
+            setTimeRemaining(targetTime - Date.now());
         }, 1000);
 
         return () => clearInterval(interval);
     }, [deadline]);
 
     const formatTime = (ms: number): string => {
-        if (ms <= 0) return 'Gesloten';
+        if (isNaN(ms) || ms <= 0) return 'Gesloten';
 
         const days = Math.floor(ms / (1000 * 60 * 60 * 24));
         const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -42,28 +47,42 @@ export default function CountdownTimer({ deadline, isOpen }: CountdownTimerProps
         }
     };
 
+    const formattedDeadline = () => {
+        const d = new Date(deadline);
+        if (isNaN(d.getTime())) return 'Onbekend';
+        return d.toLocaleString('nl-NL', {
+            weekday: 'long',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    }
+
+    if (!mounted) {
+        return (
+            <div className="sticky top-0 z-50 bg-primary-700 text-white shadow-lg h-[84px]"></div>
+        );
+    }
+
     return (
         <div
             className={`sticky top-0 z-50 ${isOpen
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600'
-                    : 'bg-gradient-to-r from-red-500 to-rose-600'
+                ? 'bg-gradient-to-r from-green-500 to-emerald-600'
+                : 'bg-gradient-to-r from-red-500 to-rose-600'
                 } text-white shadow-lg`}
         >
             <div className="container mx-auto px-4 py-4">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
-                        <div className="text-2xl">🕐</div>
+                        <svg className="w-8 h-8 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         <div>
                             <h2 className="font-bold text-lg">
                                 {isOpen ? 'Bestellen kan nog' : 'Bestellen gesloten'}
                             </h2>
                             <p className="text-sm opacity-90">
                                 {isOpen
-                                    ? `Tot ${new Date(deadline).toLocaleString('nl-NL', {
-                                        weekday: 'long',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                    })}`
+                                    ? `Tot ${formattedDeadline()}`
                                     : 'De deadline is verstreken'}
                             </p>
                         </div>
@@ -75,7 +94,7 @@ export default function CountdownTimer({ deadline, isOpen }: CountdownTimerProps
                             </div>
                         ) : (
                             <div className="text-lg font-semibold">
-                                Opens weer volgende week
+                                Opent weer volgende week
                             </div>
                         )}
                     </div>

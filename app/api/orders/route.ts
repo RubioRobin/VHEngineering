@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { isOrderingOpen, getCurrentOrderPeriod } from '@/lib/orderPeriod';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/orders
  * Create a new order with items

@@ -3,6 +3,8 @@ import { checkAdminAuth } from '@/lib/auth';
 import { generateOrdersExcel } from '@/lib/excel';
 import { getCurrentPeriodId } from '@/lib/orderPeriod';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/admin/export
  * Generate and download Excel file (admin only)

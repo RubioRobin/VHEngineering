@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkAdminAuth } from '@/lib/auth';
 import { getCurrentPeriodId, getAllOrderPeriods } from '@/lib/orderPeriod';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/admin/periods
  * Get all order periods for dropdown

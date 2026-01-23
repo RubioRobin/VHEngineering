@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { getDeadlineConfig } from '@/lib/orderPeriod';
 import { checkAdminAuth } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/admin/settings
  * Fetch current deadline settings

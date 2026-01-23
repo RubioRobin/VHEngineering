@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CountdownTimer from '@/components/CountdownTimer';
@@ -66,17 +68,20 @@ export default function HomePage() {
     const fetchProducts = async () => {
         try {
             const res = await fetch('/api/products');
+            if (!res.ok) throw new Error('Network response was not ok');
             const data = await res.json();
             setProducts(data);
             setFilteredProducts(data);
         } catch (error) {
             console.error('Error fetching products:', error);
+            setProducts([]);
         }
     };
 
     const fetchOrderStatus = async () => {
         try {
             const res = await fetch('/api/status');
+            if (!res.ok) throw new Error('Network response was not ok');
             const data = await res.json();
             setOrderStatus(data);
         } catch (error) {
