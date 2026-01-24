@@ -137,7 +137,8 @@ export const CartSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 onClose();
                 showToast("Bestelling succesvol geplaatst! Bedankt.", "success");
             } else {
-                showToast("Er ging iets mis bij het plaatsen van de bestelling.", "error");
+                const data = await res.json();
+                showToast(data.error || "Er ging iets mis bij het plaatsen van de bestelling.", "error");
             }
         } catch (error) {
             console.error(error);
