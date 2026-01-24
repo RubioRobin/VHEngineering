@@ -385,27 +385,7 @@ export default function HomePage() {
                     </div>
                 </DashboardCard>
 
-                {/* Quick Stats */}
-                <DashboardCard className="flex-1 bg-white">
-                    <div className="flex items-center gap-4 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-accent-pink/10 flex items-center justify-center text-accent-pink">
-                            <ShoppingBag className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-text-secondary text-xs uppercase font-bold">Mijn Bestelling</p>
-                            <h3 className="text-2xl font-bold text-text-primary">Bestelling Plaatsen</h3>
-                        </div>
-                    </div>
-                    <p className="text-text-muted text-sm mt-2">
-                        Vergeet niet je bestelling definitief te maken in het winkelmandje.
-                    </p>
-                    <button
-                        onClick={() => setIsCartOpen(true)}
-                        className="mt-4 text-sm font-semibold text-primary hover:underline"
-                    >
-                        Nu afronden →
-                    </button>
-                </DashboardCard>
+
 
                 {/* Recent Order - Reorder */}
                 {lastOrder && (
@@ -498,8 +478,8 @@ export default function HomePage() {
                                                         setIsCategoryDropdownOpen(false);
                                                     }}
                                                     className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === cat
-                                                            ? 'bg-indigo-600 text-white'
-                                                            : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
                                                         }`}
                                                 >
                                                     {cat}

@@ -1,10 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, Clock, Settings, Menu, X, History, FolderOpen } from "lucide-react";
+import { LayoutDashboard, Clock, Settings, Menu, X, History, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useUser } from "../providers/UserProvider";
+import { useUI } from "../providers/UIProvider";
 
 const menuItems = [
     { icon: LayoutDashboard, label: 'Het assortiment', href: '/' },
@@ -14,7 +15,7 @@ const menuItems = [
 ];
 
 export const Sidebar = () => {
-    const [collapsed, setCollapsed] = useState(false);
+    const { isSidebarCollapsed: collapsed, toggleSidebar } = useUI();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { user } = useUser();
 
@@ -63,24 +64,35 @@ export const Sidebar = () => {
                 className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-border shadow-soft flex flex-col md:z-40"
             >
                 {/* User Profile Area (replaces logo) */}
-                <div className="h-20 flex items-center px-6 border-b border-border/50">
-                    {/* Mobile Close Button */}
-                    <button
-                        onClick={() => setMobileOpen(false)}
-                        className="md:hidden absolute top-6 right-4 p-2 hover:bg-gray-100 rounded-lg"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
+                <div className="h-20 flex items-center justify-between px-6 border-b border-border/50">
+                    <div className="flex items-center">
+                        {/* Mobile Close Button */}
+                        <button
+                            onClick={() => setMobileOpen(false)}
+                            className="md:hidden absolute top-6 right-4 p-2 hover:bg-gray-100 rounded-lg"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
 
-                    <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
-                        {user?.name?.charAt(0).toUpperCase() || 'G'}
+                        <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
+                            {user?.name?.charAt(0).toUpperCase() || 'G'}
+                        </div>
+                        {!collapsed && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ml-3">
+                                <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
+                                <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
+                            </motion.div>
+                        )}
                     </div>
-                    {!collapsed && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ml-3">
-                            <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
-                            <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
-                        </motion.div>
-                    )}
+
+                    {/* Desktop Collapse Toggle */}
+                    <button
+                        onClick={toggleSidebar}
+                        className="hidden md:flex w-8 h-8 items-center justify-center rounded-lg hover:bg-background text-text-muted transition-colors"
+                        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    >
+                        {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+                    </button>
                 </div>
 
                 {/* Menu */}
