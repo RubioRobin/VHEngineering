@@ -82,8 +82,18 @@ export default function HomePage() {
 
     // Listen for order-placed event to refresh the orders list
     useEffect(() => {
-        const handleOrderPlaced = () => {
-            fetchAllCurrentWeekOrders();
+        const handleOrderPlaced = async () => {
+            console.log('Order placed event received, refreshing orders...');
+            try {
+                const res = await fetch('/api/orders/period/current/all');
+                if (res.ok) {
+                    const data = await res.json();
+                    setAllCurrentWeekOrders(data.orders || []);
+                    console.log('Orders refreshed:', data.orders?.length || 0);
+                }
+            } catch (error) {
+                console.error('Error fetching all current week orders:', error);
+            }
         };
 
         window.addEventListener('order-placed', handleOrderPlaced);

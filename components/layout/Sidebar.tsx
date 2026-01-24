@@ -86,15 +86,6 @@ export const Sidebar = () => {
                     </div>
                 </div>
 
-                {/* Desktop Collapse Toggle - Floating in middle */}
-                <button
-                    onClick={toggleSidebar}
-                    className="hidden md:flex absolute top-1/2 -translate-y-1/2 -right-4 w-8 h-12 items-center justify-center rounded-r-lg bg-primary hover:bg-primary-dark text-white border-l-0 border border-primary/20 hover:border-primary/30 transition-all duration-200 shadow-lg z-10"
-                    title={collapsed ? "Uitklappen" : "Inklappen"}
-                >
-                    {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                </button>
-
                 {/* Menu */}
                 <nav className="flex-1 py-8 px-4 space-y-2">
                     {menuItems.map((item) => (
@@ -112,8 +103,18 @@ export const Sidebar = () => {
                     ))}
                 </nav>
 
-                {/* Bottom Actions - Only show on desktop */}
+                {/* Bottom Actions */}
                 <div className="p-4 border-t border-border/50 space-y-2 hidden md:block">
+                    {/* Collapse Toggle */}
+                    <button
+                        onClick={toggleSidebar}
+                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
+                        title={collapsed ? "Sidebar uitklappen" : "Sidebar inklappen"}
+                    >
+                        {collapsed ? <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" /> : <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />}
+                        {!collapsed && <span className="font-medium text-sm">Inklappen</span>}
+                    </button>
+
                     <Link href="/settings" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
                         <Settings className="w-5 h-5" />
                         {!collapsed && <span className="font-medium text-sm">Settings</span>}
