@@ -425,7 +425,7 @@ export default function HomePage() {
                             {showOnlyFavorites ? 'Jouw Favorieten' : 'Ons Assortiment'}
                         </h2>
                         <p className="text-slate-500 font-medium text-base mt-2">
-                            {filteredProducts.length} {showOnlyFavorites ? 'favoriete items' : 'verse producten, dagelijks bereid'}
+                            {filteredProducts.length} {showOnlyFavorites ? 'favoriete producten' : 'producten'}
                         </p>
                     </div>
 

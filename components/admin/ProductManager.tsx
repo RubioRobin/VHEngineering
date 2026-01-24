@@ -24,9 +24,11 @@ export function ProductManager() {
 
     // New Product State
     const [isCreating, setIsCreating] = useState(false);
-    const [newProduct, setNewProduct] = useState({ name: '', price: '' });
+    const [newProduct, setNewProduct] = useState({ name: '', price: '', category: 'Belegde broodjes', imageUrl: '' });
 
     const { showToast, showConfirm } = useToast();
+
+    const CATEGORIES = ["Belegde broodjes", "Snacks", "Banket", "Frisdrank", "Salades", "Overig", "Anders..."];
 
     useEffect(() => {
         fetchProducts();
@@ -34,13 +36,6 @@ export function ProductManager() {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('/api/admin/products/list'); // We need to create this or use existing getter?
-            // Existing app doesn't have a specific ALL products endpoint for admin that is public often, but /api/orders uses prisma.
-            // Let's assume we can fetch from /api/products if it exists, but the user is admin.
-            // Wait, we don't have a simple GET all products endpoint yet other than the scraper one.
-            // Let's create a simple server action or just fetch from a new endpoint.
-            // I'll create a simple GET endpoint in the same POST file: app/api/admin/products/route.ts
-
             const listRes = await fetch('/api/admin/products');
             if (listRes.ok) {
                 const data = await listRes.json();
@@ -55,7 +50,10 @@ export function ProductManager() {
 
     const handleEditClick = (product: Product) => {
         setEditingId(product.id);
-        setEditForm({ ...product });
+        setEditForm({
+            ...product,
+            description: product.description || 'Overig'
+        });
     };
 
     const handleCancelEdit = () => {
@@ -125,6 +123,12 @@ export function ProductManager() {
             return;
         }
 
+        // Prevent saving "Anders..." as the actual category
+        if (newProduct.category === 'Anders...') {
+            showToast('Vul een categorie naam in', 'warning');
+            return;
+        }
+
         const adminCode = prompt("Admin Code:");
         if (!adminCode) return;
 
@@ -138,9 +142,8 @@ export function ProductManager() {
                 body: JSON.stringify({
                     name: newProduct.name,
                     price: parseFloat(newProduct.price),
-                    description: 'Handmatig toegevoegd',
-                    imageUrl: null, // Optional for now
-                    category: 'Overig'
+                    description: newProduct.category, // Map category to description
+                    imageUrl: newProduct.imageUrl || null,
                 })
             });
 
@@ -148,7 +151,7 @@ export function ProductManager() {
                 const data = await res.json();
                 setProducts([data.product, ...products]);
                 setIsCreating(false);
-                setNewProduct({ name: '', price: '' });
+                setNewProduct({ name: '', price: '', category: 'Belegde broodjes', imageUrl: '' });
                 showToast('Product aangemaakt!', 'success');
             } else {
                 showToast('Fout bij aanmaken', 'error');
@@ -196,17 +199,18 @@ export function ProductManager() {
 
             {/* Create Form */}
             {isCreating && (
-                <div className="mb-6 p-4 bg-white rounded-xl border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-top-2">
-                    <h3 className="font-bold text-gray-700 mb-2">Nieuw Product Toevoegen</h3>
-                    <div className="flex flex-col md:flex-row gap-3">
+                <div className="mb-6 p-4 bg-white rounded-xl border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-top-2 space-y-3">
+                    <h3 className="font-bold text-gray-700">Nieuw Product Toevoegen</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {/* Name & Price inputs */}
                         <input
                             type="text"
                             placeholder="Product naam"
                             value={newProduct.name}
                             onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
-                            className="flex-1 px-4 py-2 border rounded-lg"
+                            className="w-full px-4 py-2 border rounded-lg"
                         />
-                        <div className="relative w-32">
+                        <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">€</span>
                             <input
                                 type="number"
@@ -216,6 +220,47 @@ export function ProductManager() {
                                 className="w-full pl-8 pr-4 py-2 border rounded-lg"
                             />
                         </div>
+
+                        {/* Custom Category Logic for Create */}
+                        {newProduct.category === 'Anders...' || !CATEGORIES.includes(newProduct.category) ? (
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Eigen categorie..."
+                                    value={newProduct.category === 'Anders...' ? '' : newProduct.category}
+                                    onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+                                    className="w-full px-4 py-2 border rounded-lg border-indigo-300 focus:ring-2 focus:ring-indigo-100"
+                                    autoFocus
+                                />
+                                <button
+                                    onClick={() => setNewProduct({ ...newProduct, category: 'Belegde broodjes' })}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-indigo-600 bg-white px-1"
+                                    title="Terug naar lijst"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ) : (
+                            <select
+                                value={newProduct.category}
+                                onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+                                className="w-full px-4 py-2 border rounded-lg bg-white appearance-none"
+                            >
+                                {CATEGORIES.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                        )}
+
+                        <input
+                            type="text"
+                            placeholder="Afbeelding URL (optioneel)"
+                            value={newProduct.imageUrl}
+                            onChange={e => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+                            className="w-full px-4 py-2 border rounded-lg"
+                        />
+                    </div>
+                    <div className="flex justify-end">
                         <DashboardButton onClick={handleCreate} className="bg-emerald-600">Opslaan</DashboardButton>
                     </div>
                 </div>
@@ -232,19 +277,58 @@ export function ProductManager() {
                         <div key={product.id} className="bg-white p-3 rounded-xl border border-indigo-50 flex items-center justify-between group hover:border-indigo-200 transition-colors">
                             {editingId === product.id ? (
                                 // Edit Mode
-                                <div className="flex-1 flex gap-3 items-center">
-                                    <input
-                                        value={editForm.name || ''}
-                                        onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                                        className="flex-1 px-3 py-1 border rounded"
-                                    />
-                                    <input
-                                        type="number"
-                                        value={editForm.price || 0}
-                                        onChange={e => setEditForm({ ...editForm, price: parseFloat(e.target.value) || 0 })}
-                                        className="w-24 px-3 py-1 border rounded"
-                                    />
-                                    <div className="flex gap-1">
+                                <div className="flex-1 flex flex-col gap-2">
+                                    <div className="flex gap-2">
+                                        <input
+                                            value={editForm.name || ''}
+                                            onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                                            className="flex-1 px-3 py-1 border rounded"
+                                            placeholder="Naam"
+                                        />
+                                        <input
+                                            type="number"
+                                            value={editForm.price || 0}
+                                            onChange={e => setEditForm({ ...editForm, price: parseFloat(e.target.value) || 0 })}
+                                            className="w-24 px-3 py-1 border rounded"
+                                            placeholder="Prijs"
+                                        />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        {/* Custom Category Logic for Edit */}
+                                        {(editForm.description === 'Anders...' || !CATEGORIES.includes(editForm.description || '')) ? (
+                                            <div className="flex-1 relative">
+                                                <input
+                                                    value={editForm.description === 'Anders...' ? '' : (editForm.description || '')}
+                                                    onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                                                    className="w-full px-3 py-1 border rounded border-indigo-300"
+                                                    placeholder="Categorie..."
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => setEditForm({ ...editForm, description: 'Overig' })}
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-indigo-600 bg-white px-1"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <select
+                                                value={editForm.description || ''}
+                                                onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                                                className="flex-1 px-3 py-1 border rounded bg-white"
+                                            >
+                                                {CATEGORIES.map(cat => (
+                                                    <option key={cat} value={cat}>{cat}</option>
+                                                ))}
+                                            </select>
+                                        )}
+
+                                        <input
+                                            value={editForm.imageUrl || ''}
+                                            onChange={e => setEditForm({ ...editForm, imageUrl: e.target.value })}
+                                            className="flex-1 px-3 py-1 border rounded"
+                                            placeholder="Afbeelding URL"
+                                        />
                                         <button onClick={handleSaveEdit} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded"><Save className="w-4 h-4" /></button>
                                         <button onClick={handleCancelEdit} className="p-2 text-red-500 hover:bg-red-50 rounded"><X className="w-4 h-4" /></button>
                                     </div>
@@ -262,7 +346,11 @@ export function ProductManager() {
                                         </div>
                                         <div>
                                             <p className="font-semibold text-gray-800">{product.name}</p>
-                                            <p className="text-sm text-indigo-600 font-bold">€ {product.price?.toFixed(2)}</p>
+                                            <div className="flex gap-2 text-sm text-gray-500">
+                                                <span className="font-bold text-indigo-600">€ {product.price?.toFixed(2)}</span>
+                                                <span>•</span>
+                                                <span className="italic">{product.description || 'Overig'}</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
