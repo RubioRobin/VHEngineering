@@ -62,10 +62,11 @@ export const Sidebar = () => {
                 }}
                 transition={{
                     type: "tween",
-                    duration: 0.3,
+                    duration: 0.25,
                     ease: [0.4, 0.0, 0.2, 1]
                 }}
-                className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-border shadow-soft flex flex-col md:z-40"
+                style={{ willChange: 'width' }}
+                className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-border shadow-soft flex flex-col md:z-40 overflow-hidden"
             >
                 {/* User Profile Area (replaces logo) */}
                 <div className="h-20 flex items-center px-6 border-b border-border/50">
@@ -83,11 +84,11 @@ export const Sidebar = () => {
                     <AnimatePresence mode="wait">
                         {!collapsed && (
                             <motion.div
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
-                                transition={{ duration: 0.2 }}
-                                className="ml-3"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                                className="ml-3 overflow-hidden"
                             >
                                 <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
                                 <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
@@ -109,11 +110,11 @@ export const Sidebar = () => {
                             <AnimatePresence mode="wait">
                                 {!collapsed && (
                                     <motion.span
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -10 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="font-medium text-sm"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="font-medium text-sm overflow-hidden"
                                     >
                                         {item.label}
                                     </motion.span>
@@ -130,11 +131,11 @@ export const Sidebar = () => {
                         <AnimatePresence mode="wait">
                             {!collapsed && (
                                 <motion.span
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="font-medium text-sm"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="font-medium text-sm overflow-hidden"
                                 >
                                     Settings
                                 </motion.span>
@@ -150,11 +151,11 @@ export const Sidebar = () => {
                         <AnimatePresence mode="wait">
                             {!collapsed && (
                                 <motion.span
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="font-medium text-sm"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="font-medium text-sm overflow-hidden"
                                 >
                                     Inklappen
                                 </motion.span>
