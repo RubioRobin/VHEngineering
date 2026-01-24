@@ -333,7 +333,6 @@ export default function HomePage() {
     }
 
     return (
-    return (
         <div className="min-h-screen pb-20 relative">
             <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
             <FloatingCartButton onClick={() => setIsCartOpen(true)} />
