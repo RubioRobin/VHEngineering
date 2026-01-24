@@ -1,0 +1,1101 @@
+[
+  {
+    "name": "Diems broodje gezond",
+    "price": 4.85,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40120-DIEMS-BROODJE-GEZOND.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Gesorteerd luxe belegd broodje",
+    "price": 4.75,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40175-GESORTLUXE-BELEGDE-BROODJES.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano kip-kerrie",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40155-MILANO-KIP-KERRIE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano brie coburger ham",
+    "price": 5.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40135-MILANO-BRIE-COBURGER.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodtaart (bestel min.1 dag van te voren!)",
+    "price": 29.95,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-25000-BROODTAART-WALDKORN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano zalm",
+    "price": 5.5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40245-MILANO-ZALM.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano chili-kip speciaal",
+    "price": 5.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40154-MILANO-CHILI-KIP-SPECIAAL.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano rosbief speciaal",
+    "price": 5.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40241-MILANO-ROSBIEF-SPECIAAL.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet gezond",
+    "price": 4.95,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40122-PISTOLET-GEZOND.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodje kaas",
+    "price": 3.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40178-BROODJE-KAAS.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Ciabatta brie speciaal",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40186-CIABATTA-BRIE-SPECIAAL.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano filet americain",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40146-MILANO-FILET-AMERICAIN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano tonijn",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40145-MILANO-TONIJN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Wit zacht broodje gezond",
+    "price": 4.75,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40125-WIT-ZACHT-BROODJE-GEZOND.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodje ham",
+    "price": 3.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40179-BROODJE-HAM.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet filet americain",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40165-PISTOLET-FILET-AMERICAIN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Tijgerbolletje chili-kip",
+    "price": 5.2,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40153-TIJGERBOLLETJE-CHILI-KIP.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodje rosbief",
+    "price": 3.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40183-BROODJE-ROSBIEF.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet brie coburger ham",
+    "price": 5.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40130-PISTOLET-BRIE-COBURGER.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet kip-kerrie",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40138-PISTOLET-KIP-KERRIE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Krentenbol met boter",
+    "price": 1.35,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-47120-KRENTENBOLLEN-MET-BOTER.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Rozijnenbol met boter",
+    "price": 1.25,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-48120-ROZIJNENBOLLEN-MET-BOTER.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodje filet americain",
+    "price": 4.75,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40160-BROODJE-FILET-AMERICAIN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet rosbief",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40134-PISTOLET-ROSBIEF.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano kaas",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40148-MILANO-KAAS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Flesje jus d’ orange (1 pers.)",
+    "price": 2.1,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-50600-FLESJE-JUS-D-ORANGE-1-PERS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Luxe belegd brunchbroodje",
+    "price": 3.85,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/themes/bs/static/img/placeholders/brood_placeholder_600.png",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Fles jus d’ orange 1 ltr",
+    "price": 3.75,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-50601-FLES-JUS-D-ORANGE-1-LTR.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet tonijn",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40137-PISTOLET-TONIJN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodje tonijn",
+    "price": 4.75,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40185-BROODJE-TONIJN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodje brie coburger ham",
+    "price": 4.75,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40182-BROODJE-BRIE-COBURGER-HAM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Halfvolle melk 1 ltr",
+    "price": 1.95,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-50665-HALFVOLLE-MELK-1-LTR.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet kaas",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40133-PISTOLET-KAAS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Tijgerbolletje filet americain",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40503-TIJGERBOLLETJE-FILET-AMERICAIN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Puntje tonijn",
+    "price": 4.75,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40140-PUNTJE-TONIJN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Broodje snijworst",
+    "price": 3.4,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40184-BROODJE-SNIJWORST.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Piccolo rosbief speciaal",
+    "price": 5.2,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-V40240-PICCOLO-ROSBIEF-SPECIAAL.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano rosbief",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40149-MILANO-ROSBIEF.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Duits broodje kip-kerrie",
+    "price": 5,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40150-DUITS-BROODJE-KIPKERRIE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Glutenvrije belegde",
+    "price": 6.25,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40105-GLUTENVRIJE-BELEGDE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano ham",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40147-MILANO-HAM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet ham",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40132-PISTOLET-HAM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Pistolet snijworst",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40136-PISTOLET-SNIJWORST.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Karnemelk 1 ltr",
+    "price": 1.95,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-50670-KARNEMELK-1-LTR.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Milano snijworst",
+    "price": 3.9,
+    "description": "Broodjes",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-40139-MILANO-SNIJWORST.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+  },
+  {
+    "name": "Saucijzenbroodje",
+    "price": 2.35,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60100-SAUCIJZEN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Appelflap",
+    "price": 2.4,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60200-APPELFLAPPEN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Appelmeisje",
+    "price": 2.35,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60210-APPELMEISJES.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Kaassoufflé",
+    "price": 2.45,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-45025-KAAS-SOUFFLEES.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Worstenbroodje",
+    "price": 2.15,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60120-WORSTENBROODJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Brunch meisje assorti",
+    "price": 1.8,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60207-BRUNCH-MEISJE-ASSORTI.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Half saucijzenbroodje",
+    "price": 1.35,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60105-12-SAUCIJS.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Pizzabroodje",
+    "price": 2.95,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-46000-PIZZA-BROODJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Frikandelbroodje met curry",
+    "price": 2.6,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-45055-FRIKANDEL-MET-CURRY.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Ragoutbroodje",
+    "price": 2.45,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60110-RAGOUT-BROODJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Mini saucijzenbroodje",
+    "price": 0.9,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60115-MINI-SAUCIJZEN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Satébroodje",
+    "price": 2.45,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60130-SATE-BROODJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Doosje hartige hapjes",
+    "price": 9.25,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60170-DOOSJE-HARTIGE-HAPJES.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Appelkanjer",
+    "price": 2.45,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-67141-APPELKANJER.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Doosje mini saucijzen",
+    "price": 9.25,
+    "description": "Snacks",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60160-DOOSJE-MINISAUCIJZEN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+  },
+  {
+    "name": "Saucijzenbroodje",
+    "price": 2.35,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60100-SAUCIJZEN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appelflap",
+    "price": 2.4,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60200-APPELFLAPPEN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Gesorteerd gebak",
+    "price": 3.15,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-64000-GESORTEERD-GEBAK.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Mini donuts",
+    "price": 0.7,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-45136-MINI-DONUTS.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appelmeisje",
+    "price": 2.35,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60210-APPELMEISJES.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Kaassoufflé",
+    "price": 2.45,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-45025-KAAS-SOUFFLEES.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Worstenbroodje",
+    "price": 2.15,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60120-WORSTENBROODJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Brunch meisje assorti",
+    "price": 1.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60207-BRUNCH-MEISJE-ASSORTI.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Gesorteerd paul+ gebak",
+    "price": 3.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-64009-PAUL-GEBAK-ASSORTI.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Roombroodje",
+    "price": 2.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-41700-ROOMBROODJES.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Slagroomsoesje",
+    "price": 0.7,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-68910-SLAGROOMSOESJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Half saucijzenbroodje",
+    "price": 1.35,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60105-12-SAUCIJS.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Pizzabroodje",
+    "price": 2.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-46000-PIZZA-BROODJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Vierkante slagroomtaart",
+    "price": 30.6,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-68612-SLAGROOMTAART-VIERK-12-PERS.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Frikandelbroodje met curry",
+    "price": 2.6,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-45055-FRIKANDEL-MET-CURRY.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Ragoutbroodje",
+    "price": 2.45,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60110-RAGOUT-BROODJE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Gevulde koek",
+    "price": 2.35,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-61200-GEVULDE-KOEKEN.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Slagroomcake",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-63203-SLAGROOMCAKE.jpg.webp",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Gesorteerd slagroomgebak",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63000-SLAGROOMGEBAK-GESORTEERD.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "5 kwarkbolletjes",
+    "price": 4.6,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-34615-5-KWARKBOLLETJES.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Mini saucijzenbroodje",
+    "price": 0.9,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60115-MINI-SAUCIJZEN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Satébroodje",
+    "price": 2.45,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60130-SATE-BROODJE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Donut",
+    "price": 1.7,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-45135-DONUT.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Ontbijtkoek",
+    "price": 4.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-80100-ONTBIJTKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Doosje hartige hapjes",
+    "price": 9.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60170-DOOSJE-HARTIGE-HAPJES.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "5 eierkoeken",
+    "price": 4.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-73105-5-EIERKOEKEN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Liemers monchou",
+    "price": 3.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-67016-LIEMERS-MONCHOU.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Zakje speltkoeken",
+    "price": 5.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-71410-ZAKJE-SPELT-KOEKEN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Boerencake",
+    "price": 5.75,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-71110-BOERENCAKE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Hazelnoot-crème gebak",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-64005-HAZELNOOTCREME-GEBAK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Gesorteerd demi gebak",
+    "price": 2.3,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-64004-GESORTEERD-DEMI-GEBAK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Mokka slagroomcake",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63150-MOKKA-SLAGROOMCAKE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Slagroomstammetje",
+    "price": 12.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68010-SLAGROOMSTAMMETJE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appeltaart 12 personen gesneden",
+    "price": 28.45,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-62112-APPELTAART-12-PERSONEN-GESNEDEN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appelkanjer",
+    "price": 2.45,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-67141-APPELKANJER.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Doosje mini saucijzen",
+    "price": 9.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60160-DOOSJE-MINISAUCIJZEN.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Tompouce",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63100-TOMPOUCE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Notenkoek",
+    "price": 4.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-80140-NOTENKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Slagroomtaart",
+    "price": 16.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68112-SLAGROOMTAART-12-PERS-ROND.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Snickersnit",
+    "price": 14.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68011-SNICKERSNIT.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Chocoladecake",
+    "price": 5.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-71120-CHOCOLADECAKE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Winterkoek",
+    "price": 6.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-80700-WINTERKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Diemse torenkoek",
+    "price": 5.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-80600-DIEMSE-TORENKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appelpunt",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-67100-APPELPUNT.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Pakje liemers liesje",
+    "price": 5.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-61500-PAKJE-LIEMERS-LIESJE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Rozijnenkoek",
+    "price": 4.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-80110-ROZIJNENKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Aardbeienfruffi slof",
+    "price": 14.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-69000-AARDBEIENFRUFFI-SLOF.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "+ yoghurt framboos",
+    "price": 3.35,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-95160-YOGHURT-FRAMBOOS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Bossche bol",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63200-BOSSCHE-BOL.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Halve kaassoufflee",
+    "price": 1.3,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-45026-HALVE-KAASSOUFFLEE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Bananensoes",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63210-BANANENSOES.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appel kaneel strip",
+    "price": 3.05,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-64017-APPEL-KANEEL-STRIP.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Kersenfantasie taart",
+    "price": 31.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68812-KERSENFANTASIE-12-PERS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Aardbeienbavarois gebak",
+    "price": 3.1,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-65101-AARDBEIENBAVAROIS-GEBAK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Graafschap letter melk",
+    "price": 9.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-91155-GRAAFSCHAP-LETTER-MELK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Hazelnoot slagroomschuimtaart",
+    "price": 34.2,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68502-HAZELNOOT-SLAGROOMSCHUIMTAART-12-PERS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Hazelnoot slagroomschuimtaart 6 pers.",
+    "price": 16.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68510-HAZELNOOT-SLAGROOMSCHUIMTAART-6-PERS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Mokkaslagroom stam",
+    "price": 14.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68020-MOKKASLAGROOM-STAM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Kersenslof",
+    "price": 14.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-69100-KERSENSLOF.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Maatje fruit",
+    "price": 2.65,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60470-MAATJE-FRUIT.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Vruchtenslof",
+    "price": 15.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-69510-VRUCHTENSLOF.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Demi slagroomcake",
+    "price": 2.3,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63207-DEMI-SLAGROOMCAKE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Kersenvlaai 12 pers",
+    "price": 23.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-69101-KERSENVLAAI-12-PERS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Blokjes walnoot boterkoek",
+    "price": 6.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60454-BLOKJES-WALNOOT-BOTERKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Vruchtenschelp",
+    "price": 3.45,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60463-VRUCHTENSCHELP.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Blokjes boterkoek",
+    "price": 5.75,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60453-BLOKJES-BOTERKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Chocolate chip cookie 4 st",
+    "price": 5.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-71415-CHOCOLATE-CHIP-COOKIE-4-ST.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Winterschelp",
+    "price": 3.45,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/03/Product-60490-WINTERSCHELP.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appeltaart slof",
+    "price": 13.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-67201-APPELTAART-SLOF.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Liemers monchou taartje 6 pers",
+    "price": 16.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68046-LIEMERS-MONCHOU-TAARTJE-6-PERS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Mokka slagroomtaart vierkant",
+    "price": 31.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-68312-MOKKA-SLAGROOMTAART-VIERKANT-12-PERS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Demi mokka cremé",
+    "price": 2.3,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63208-DEMI-MOKKA-CREME.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Graafschap letter wit",
+    "price": 9.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-91156-GRAAFSCHAP-LETTER-WIT.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Blokjes arretjescake",
+    "price": 5.75,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60455-BLOKJES-ARRETJESCAKE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Lactose/glutenvrij aardbei",
+    "price": 3.85,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63001-LACTOSEGLUTENVRIJ-AARDBEI.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Smokkelkoek",
+    "price": 5.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-72150-SMOKKELKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Rb kaas sticks 150 gram",
+    "price": 5.75,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60483-RB-KAAS-STICKS-150-GRAM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Graafschaptaart 12 personen",
+    "price": 34.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-62118-GRAAFSCHAPTAART-12P.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Harde bodem",
+    "price": 7.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-70000-HARDE-BODEM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Herfst chocolade assorti",
+    "price": 11.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-83045-HERFST-CHOCOLADE-ASSORTI.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Appelpunt met slagroom",
+    "price": 3.2,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-67105-APPELPUNT-MET-SLAGROOM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Kandijkoek",
+    "price": 4.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-80160-KANDIJKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Herfstslof",
+    "price": 15.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-61132-HERFSTSLOF.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Doosje bonbons 250 gram",
+    "price": 14.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63121-DOOSJE-BONBONS-250-GRAM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Oma’s hartjes 170 gram",
+    "price": 3.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60409-OMAS-HARTJES-170-GRAM.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Bonbons per 4",
+    "price": 5.75,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63122-BONBONS-PER-4.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "+ tiramisu",
+    "price": 3.35,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-95161-TIRAMISU.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Karamel slofje",
+    "price": 3.2,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60458-KARAMEL-SLOFJE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Graafschap letter puur",
+    "price": 9.25,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-91157-GRAAFSCHAP-LETTER-PUUR.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Suikervrije soes",
+    "price": 4.35,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60480-SUIKERVRIJE-SOES.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Zwitserse truffels",
+    "price": 13.95,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-83097-ZWITSERSE-TRUFFELS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Vegan aardbeien mousse gebakje",
+    "price": 3.85,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-60466-VEGAN-AARDBEIEN-MOUSSE-GEBAKJE.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Art koker 10 stuks",
+    "price": 12.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-83096-ART-KOKER-10-STUKS.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Gemberkoek",
+    "price": 4.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-80150-GEMBERKOEK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Mokka slagroomtaartje 6 pers",
+    "price": 16.5,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/themes/bs/static/img/placeholders/brood_placeholder_600.png",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Demi chipolata gebak",
+    "price": 2.3,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/uploads/2025/12/Product-63206-DEMI-CHIPOLATA-GEBAK.jpg",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  },
+  {
+    "name": "Mokka slagroomtaart rond",
+    "price": 31.8,
+    "description": "Banket",
+    "imageUrl": "https://www.brood-shop.nl/app/themes/bs/static/img/placeholders/brood_placeholder_600.png",
+    "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+  }
+]
