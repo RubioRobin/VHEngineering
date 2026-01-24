@@ -84,16 +84,16 @@ export const Sidebar = () => {
                             </motion.div>
                         )}
                     </div>
-
-                    {/* Desktop Collapse Toggle */}
-                    <button
-                        onClick={toggleSidebar}
-                        className="hidden md:flex w-9 h-9 items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 hover:border-primary/30 transition-all duration-200 hover:scale-105 shadow-sm"
-                        title={collapsed ? "Uitklappen" : "Inklappen"}
-                    >
-                        {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-                    </button>
                 </div>
+
+                {/* Desktop Collapse Toggle - Floating in middle */}
+                <button
+                    onClick={toggleSidebar}
+                    className="hidden md:flex absolute top-1/2 -translate-y-1/2 -right-4 w-8 h-12 items-center justify-center rounded-r-lg bg-primary hover:bg-primary-dark text-white border-l-0 border border-primary/20 hover:border-primary/30 transition-all duration-200 shadow-lg z-10"
+                    title={collapsed ? "Uitklappen" : "Inklappen"}
+                >
+                    {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                </button>
 
                 {/* Menu */}
                 <nav className="flex-1 py-8 px-4 space-y-2">

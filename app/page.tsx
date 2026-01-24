@@ -80,6 +80,16 @@ export default function HomePage() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Listen for order-placed event to refresh the orders list
+    useEffect(() => {
+        const handleOrderPlaced = () => {
+            fetchAllCurrentWeekOrders();
+        };
+
+        window.addEventListener('order-placed', handleOrderPlaced);
+        return () => window.removeEventListener('order-placed', handleOrderPlaced);
+    }, []);
+
     // Update timer when deadline changes
     useEffect(() => {
         if (!deadline) return;
@@ -407,7 +417,7 @@ export default function HomePage() {
                         </div>
                         <div>
                             <p className="text-text-secondary text-xs uppercase font-bold">Deze Week</p>
-                            <h3 className="text-lg font-bold text-text-primary">Recent Besteld</h3>
+                            <h3 className="text-lg font-bold text-text-primary">Recent besteld</h3>
                         </div>
                     </div>
 
