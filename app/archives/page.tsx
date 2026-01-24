@@ -7,11 +7,14 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { useToast } from '@/components/providers/ToastProvider';
+import { PasswordModal } from '@/components/modals/PasswordModal';
 
 export default function ArchivesPage() {
     const [periods, setPeriods] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const { showToast } = useToast();
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+    const { showToast, showConfirm } = useToast();
 
     useEffect(() => {
         fetchArchives();
@@ -35,29 +38,39 @@ export default function ArchivesPage() {
         e.preventDefault();
         e.stopPropagation();
 
-        const code = prompt('Voer de admin code in om dit archief te verwijderen:');
-        if (!code) return;
+        setPendingDeleteId(id);
+        setShowPasswordModal(true);
+    };
 
-        if (!confirm('Weet je zeker dat je dit gehele archief wilt verwijderen?')) return;
+    const confirmDeleteArchive = async (password: string) => {
+        setShowPasswordModal(false);
 
-        try {
-            const res = await fetch(`/api/archives/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${code}`
+        if (!pendingDeleteId) return;
+
+        showConfirm({
+            message: 'Weet je zeker dat je dit gehele archief wilt verwijderen?',
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(`/api/archives/${pendingDeleteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${password}`
+                        }
+                    });
+
+                    if (res.ok) {
+                        showToast('Archief verwijderd', 'success');
+                        fetchArchives();
+                    } else {
+                        const data = await res.json();
+                        showToast(data.error || 'Er is een fout opgetreden.', 'error');
+                    }
+                } catch (error) {
+                    showToast('Kon het archief niet verwijderen.', 'error');
                 }
-            });
-
-            if (res.ok) {
-                showToast('Archief verwijderd', 'success');
-                fetchArchives();
-            } else {
-                const data = await res.json();
-                showToast(data.error || 'Er is een fout opgetreden.', 'error');
+                setPendingDeleteId(null);
             }
-        } catch (error) {
-            showToast('Kon het archief niet verwijderen.', 'error');
-        }
+        });
     };
 
     if (loading) {
@@ -132,6 +145,17 @@ export default function ArchivesPage() {
                     </div>
                 )}
             </div>
+
+            <PasswordModal
+                isOpen={showPasswordModal}
+                onClose={() => {
+                    setShowPasswordModal(false);
+                    setPendingDeleteId(null);
+                }}
+                onSubmit={confirmDeleteArchive}
+                title="Archief verwijderen"
+                description="Voer de admin code in om door te gaan"
+            />
         </div>
     );
 }

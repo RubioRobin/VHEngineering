@@ -9,13 +9,17 @@ import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { useToast } from '@/components/providers/ToastProvider';
 import { formatName } from '@/lib/utils';
+import { PasswordModal } from '@/components/modals/PasswordModal';
 
 export default function ArchiveDetailPage({ params }: { params: { id: string } }) {
     const [period, setPeriod] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [deleteAction, setDeleteAction] = useState<'archive' | 'order' | null>(null);
+    const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
     const router = useRouter();
-    const { showToast } = useToast();
+    const { showToast, showConfirm } = useToast();
 
     useEffect(() => {
         fetchArchiveDetail();
@@ -36,60 +40,75 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
     };
 
     const handleDeleteArchive = async () => {
-        const code = prompt('Voer de admin code in om dit archief te verwijderen:');
-        if (!code) return;
-
-        if (!confirm('Weet je zeker dat je dit gehele archief wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
-
-        setDeleting(true);
-        try {
-            const res = await fetch(`/api/archives/${params.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${code}`
-                }
-            });
-
-            if (res.ok) {
-                showToast('Archief verwijderd', 'success');
-                router.push('/archives');
-            } else {
-                const data = await res.json();
-                showToast(data.error || 'Er is een fout opgetreden.', 'error');
-            }
-        } catch (error) {
-            showToast('Kon het archief niet verwijderen.', 'error');
-        } finally {
-            setDeleting(false);
-        }
+        setDeleteAction('archive');
+        setShowPasswordModal(true);
     };
 
     const handleDeleteOrder = async (orderId: string) => {
-        const code = prompt('Voer de admin code in om deze bestelling te verwijderen:');
-        if (!code) return;
+        setPendingOrderId(orderId);
+        setDeleteAction('order');
+        setShowPasswordModal(true);
+    };
 
-        if (!confirm('Weet je zeker dat je deze bestelling wilt verwijderen?')) return;
+    const confirmDelete = async (password: string) => {
+        setShowPasswordModal(false);
 
-        try {
-            const res = await fetch(`/api/orders/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${code}`
-                },
-                body: JSON.stringify({ orderId })
+        if (deleteAction === 'archive') {
+            showConfirm({
+                message: 'Weet je zeker dat je dit gehele archief wilt verwijderen? Dit kan niet ongedaan worden gemaakt.',
+                onConfirm: async () => {
+                    setDeleting(true);
+                    try {
+                        const res = await fetch(`/api/archives/${params.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${password}`
+                            }
+                        });
+
+                        if (res.ok) {
+                            showToast('Archief verwijderd', 'success');
+                            router.push('/archives');
+                        } else {
+                            const data = await res.json();
+                            showToast(data.error || 'Er is een fout opgetreden.', 'error');
+                        }
+                    } catch (error) {
+                        showToast('Kon het archief niet verwijderen.', 'error');
+                    } finally {
+                        setDeleting(false);
+                    }
+                }
             });
+        } else if (deleteAction === 'order' && pendingOrderId) {
+            showConfirm({
+                message: 'Weet je zeker dat je deze bestelling wilt verwijderen?',
+                onConfirm: async () => {
+                    try {
+                        const res = await fetch(`/api/orders/delete`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${password}`
+                            },
+                            body: JSON.stringify({ orderId: pendingOrderId })
+                        });
 
-            if (res.ok) {
-                showToast('Bestelling verwijderd', 'success');
-                fetchArchiveDetail();
-            } else {
-                const data = await res.json();
-                showToast(data.error || 'Er is een fout opgetreden.', 'error');
-            }
-        } catch (error) {
-            showToast('Kon de bestelling niet verwijderen.', 'error');
+                        if (res.ok) {
+                            showToast('Bestelling verwijderd', 'success');
+                            fetchArchiveDetail();
+                        } else {
+                            const data = await res.json();
+                            showToast(data.error || 'Er is een fout opgetreden.', 'error');
+                        }
+                    } catch (error) {
+                        showToast('Kon de bestelling niet verwijderen.', 'error');
+                    }
+                    setPendingOrderId(null);
+                }
+            });
         }
+        setDeleteAction(null);
     };
 
     if (loading) {
@@ -254,6 +273,18 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                     )}
                 </div>
             </div>
+
+            <PasswordModal
+                isOpen={showPasswordModal}
+                onClose={() => {
+                    setShowPasswordModal(false);
+                    setDeleteAction(null);
+                    setPendingOrderId(null);
+                }}
+                onSubmit={confirmDelete}
+                title={deleteAction === 'archive' ? 'Archief verwijderen' : 'Bestelling verwijderen'}
+                description="Voer de admin code in om door te gaan"
+            />
         </div>
     );
 }
