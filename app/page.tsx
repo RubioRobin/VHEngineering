@@ -456,7 +456,11 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    {allCurrentWeekOrders.length === 0 ? (
+                    {(() => {
+                        console.log('🎨 Rendering Recent Orders card. Length:', allCurrentWeekOrders.length);
+                        console.log('📋 Orders data:', allCurrentWeekOrders);
+                        return allCurrentWeekOrders.length === 0;
+                    })() ? (
                         <div className="flex flex-col items-center justify-center py-6 text-center">
                             <div className="text-4xl mb-2">🎯</div>
                             <p className="text-text-primary font-bold text-lg">Wees de eerste!</p>

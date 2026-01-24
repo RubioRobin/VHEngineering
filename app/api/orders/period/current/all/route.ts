@@ -32,6 +32,12 @@ export async function GET(request: NextRequest) {
             orderBy: { createdAt: 'desc' }
         });
 
+        console.log('📊 Found period:', period.id, 'Week:', period.weekId);
+        console.log('📦 Total orders found:', orders.length);
+        orders.forEach((order: any) => {
+            console.log('  - Order:', order.personName, '|', order.department, '| Items:', order.orderItems?.length);
+        });
+
         return NextResponse.json({ orders });
     } catch (error) {
         console.error('Error fetching current period orders:', error);
