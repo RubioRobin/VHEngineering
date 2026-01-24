@@ -13,6 +13,7 @@ import { CartSidebar } from '@/components/cart/CartSidebar';
 import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
 import { useUser } from '@/components/providers/UserProvider';
 import { useToast } from '@/components/providers/ToastProvider';
+import { TimerBanner } from '@/components/TimerBanner';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
@@ -409,102 +410,13 @@ export default function HomePage() {
                 </svg>
             </motion.button>
 
-            {/* Dashboard Header & Timer */}
-            <div className="flex flex-col md:flex-row items-stretch gap-6">
-                {/* Timer Card */}
-                <DashboardCard className={`flex-1 text-white border-none shadow-lg relative overflow-hidden ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
-                    ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/30'
-                    : 'bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-500/20'
-                    }`}>
-                    {/* Decorative background pattern */}
-                    <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl transform translate-x-32 -translate-y-32"></div>
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full blur-3xl transform -translate-x-24 translate-y-24"></div>
-                    </div>
+            {/* Timer Banner */}
+            <TimerBanner timeLeft={timeLeft} deadline={deadline} />
 
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-3 opacity-90 mb-6">
-                            <ClockIcon />
-                            <span className="text-sm font-medium uppercase tracking-wider">
-                                {timeLeft && (timeLeft.d === 0 && timeLeft.h < 4) ? '🚨 SPOED!' : 'Bestellen Sluit Over'}
-                            </span>
-                        </div>
-
-                        {timeLeft ? (
-                            <>
-                                <div className="flex items-baseline gap-3 mb-4">
-                                    <span className="text-5xl font-mono font-bold">{timeLeft.d}d</span>
-                                    <span className="text-5xl font-mono font-bold">{timeLeft.h}u</span>
-                                    <span className="text-5xl font-mono font-bold">{timeLeft.m}m</span>
-                                </div>
-                                {deadline && (
-                                    <p className="text-white/80 text-sm font-medium mb-6">
-                                        📅 {format(deadline, 'EEEE d MMMM', { locale: nl })} om {format(deadline, 'HH:mm', { locale: nl })} uur
-                                    </p>
-                                )}
-
-                                {/* Progress indicator */}
-                                {deadline && (() => {
-                                    const now = new Date();
-                                    const start = new Date(deadline);
-                                    start.setDate(start.getDate() - 7); // Assume 7 day period
-                                    const total = deadline.getTime() - start.getTime();
-                                    const elapsed = now.getTime() - start.getTime();
-                                    const progress = Math.min(100, Math.max(0, (elapsed / total) * 100));
-
-                                    return (
-                                        <div className="mb-6">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <span className="text-xs font-medium opacity-80">Voortgang periode</span>
-                                                <span className="text-xs font-bold">{Math.round(progress)}%</span>
-                                            </div>
-                                            <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
-                                                <div
-                                                    className="bg-white h-full rounded-full transition-all duration-500"
-                                                    style={{ width: `${progress}%` }}
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    );
-                                })()}
-
-                                {/* Statistics */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <svg className="w-4 h-4 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                            </svg>
-                                            <span className="text-xs opacity-80">Deelnemers</span>
-                                        </div>
-                                        <p className="text-2xl font-bold">{allCurrentWeekOrders.length}</p>
-                                    </div>
-
-                                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <svg className="w-4 h-4 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                            </svg>
-                                            <span className="text-xs opacity-80">Items</span>
-                                        </div>
-                                        <p className="text-2xl font-bold">
-                                            {allCurrentWeekOrders.reduce((sum, order) => sum + (order.orderItems?.length || 0), 0)}
-                                        </p>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="text-center py-8">
-                                <span className="text-3xl font-bold">Gesloten</span>
-                                <p className="text-white/70 text-sm mt-2">De bestelperiode is afgesloten</p>
-                            </div>
-                        )}
-                    </div>
-                </DashboardCard>
-
-
+            {/* Dashboard Cards */}
+            <div className="flex flex-col gap-6">
                 {/* Recent Orders - Current Week */}
-                <DashboardCard className="flex-1 bg-white border-gray-200">
+                <DashboardCard className="bg-white border-gray-200">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
