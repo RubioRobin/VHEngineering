@@ -58,12 +58,19 @@ export async function runScraper(): Promise<{ success: boolean; message: string;
     try {
         console.log('\n🚀 Resetting to standard assortment (Seed Data)...\n');
 
-        const products = SEED_PRODUCTS.map(p => ({
-            ...p,
-            sourceUrl: p.sourceUrl || null
-        }));
+        const uniqueProducts = new Map<string, any>();
+        SEED_PRODUCTS.forEach(p => {
+            if (!uniqueProducts.has(p.name)) {
+                uniqueProducts.set(p.name, {
+                    ...p,
+                    sourceUrl: p.sourceUrl || null
+                });
+            }
+        });
 
-        console.log(`\n💾 Saving ${products.length} products to database...\n`);
+        const products = Array.from(uniqueProducts.values());
+
+        console.log(`\n💾 Saving ${products.length} unique products to database...\n`);
         const savedCount = await saveScrapedProducts(products);
 
         await prisma.scraperLog.create({
