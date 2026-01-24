@@ -66,7 +66,7 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
-                fgColor: { argb: 'FF1E293B' }, // Slate-800
+                fgColor: { argb: 'FFD4A017' }, // Bakery Gold
             };
             cell.font = {
                 bold: true,
@@ -108,7 +108,7 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
 
             // Center quantity and format currency
             row.getCell('quantity').alignment = { horizontal: 'center' };
-            row.getCell('price').numFmt = '€ #,##0.00';
+            row.getCell('price').numFmt = '"€" #,##0.00';
 
             // Add borders to all cells
             row.eachCell((cell) => {
@@ -173,8 +173,8 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
         });
 
         row.getCell('totalQuantity').alignment = { horizontal: 'center' };
-        row.getCell('unitPrice').numFmt = '€ #,##0.00';
-        row.getCell('totalPrice').numFmt = '€ #,##0.00';
+        row.getCell('unitPrice').numFmt = '"€" #,##0.00';
+        row.getCell('totalPrice').numFmt = '"€" #,##0.00';
 
         row.eachCell((cell) => {
             addBorders(cell);
@@ -206,14 +206,14 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
         cell.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: 'FFE2E8F0' }, // Light gray
+            fgColor: { argb: 'FFF5E6D3' }, // Very light beige/gold to match
         };
         addBorders(cell);
         cell.alignment = { vertical: 'middle' };
     });
 
     totalRow.getCell('totalQuantity').alignment = { horizontal: 'center', vertical: 'middle' };
-    totalRow.getCell('totalPrice').numFmt = '€ #,##0.00_'; // Accounting format
+    totalRow.getCell('totalPrice').numFmt = '"€" #,##0.00'; // Accounting format
 
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
