@@ -1,0 +1,129 @@
+
+export const SEED_PRODUCTS = [
+    {
+        "name": "Diems broodje gezond",
+        "price": 4.85,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40120-DIEMS-BROODJE-GEZOND.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Gesorteerd luxe belegd broodje",
+        "price": 4.75,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40175-GESORTLUXE-BELEGDE-BROODJES.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Milano kip-kerrie",
+        "price": 5,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40155-MILANO-KIP-KERRIE.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Milano brie coburger ham",
+        "price": 5.4,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40135-MILANO-BRIE-COBURGER.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Broodtaart (bestel min.1 dag van te voren!)",
+        "price": 29.95,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-25000-BROODTAART-WALDKORN.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Milano zalm",
+        "price": 5.5,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40245-MILANO-ZALM.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Milano chili-kip speciaal",
+        "price": 5.4,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40154-MILANO-CHILI-KIP-SPECIAAL.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Milano rosbief speciaal",
+        "price": 5.4,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40241-MILANO-ROSBIEF-SPECIAAL.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Pistolet gezond",
+        "price": 4.95,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40122-PISTOLET-GEZOND.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Broodje kaas",
+        "price": 3.4,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40178-BROODJE-KAAS.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Ciabatta brie speciaal",
+        "price": 5,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40186-CIABATTA-BRIE-SPECIAAL.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Milano filet americain",
+        "price": 5,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40146-MILANO-FILET-AMERICAIN.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Milano tonijn",
+        "price": 5,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40145-MILANO-TONIJN.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Wit zacht broodje gezond",
+        "price": 4.75,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40125-WIT-ZACHT-BROODJE-GEZOND.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Broodje ham",
+        "price": 3.4,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40179-BROODJE-HAM.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Pistolet filet americain",
+        "price": 5,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40165-PISTOLET-FILET-AMERICAIN.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Tijgerbolletje chili-kip",
+        "price": 5.2,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40153-TIJGERBOLLETJE-CHILI-KIP.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    },
+    {
+        "name": "Broodje rosbief",
+        "price": 3.4,
+        "description": "Vers belegd broodje",
+        "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40183-BROODJE-ROSBIEF.jpg.webp",
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+    }
+];

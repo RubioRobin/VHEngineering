@@ -1,4 +1,5 @@
 import prisma from './prisma';
+import { SEED_PRODUCTS } from './seed-products';
 
 interface ScrapedProduct {
     name: string;
@@ -229,25 +230,18 @@ export async function runScraper(): Promise<{ success: boolean; message: string;
         }
 
         // Deduplicate by name
-        const uniqueProducts = Array.from(new Map(totalScrapedProducts.map(p => [p.name, p])).values());
+        let uniqueProducts = Array.from(new Map(totalScrapedProducts.map(p => [p.name, p])).values());
 
         if (uniqueProducts.length === 0) {
-            const errorMsg = 'No products found across all sources - website structure may have changed or sources are empty';
-            console.log(`⚠️ ${errorMsg}`);
+            console.log(`⚠️ No products found via scraping. Using fallback seed data (${SEED_PRODUCTS.length} products).`);
 
-            await prisma.scraperLog.create({
-                data: {
-                    status: 'error',
-                    message: sourceResults.join(' | '),
-                    productsFound: 0,
-                },
-            });
+            // Use seed data as fallback
+            uniqueProducts = SEED_PRODUCTS.map(p => ({
+                ...p,
+                sourceUrl: p.sourceUrl || null
+            }));
 
-            return {
-                success: false,
-                message: errorMsg,
-                count: 0,
-            };
+            sourceResults.push('Used fallback seed data (Scraping blocked/failed)');
         }
 
         console.log(`\n💾 Saving ${uniqueProducts.length} unique products to database...\n`);

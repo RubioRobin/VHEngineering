@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
+import { ProductManager } from '@/components/admin/ProductManager';
 import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info } from 'lucide-react';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
@@ -492,10 +493,10 @@ export default function AdminPage() {
                     <div>
                         <div className="flex items-center gap-4 mb-4 text-cyan-600">
                             <Database className="w-8 h-8" />
-                            <h2 className="text-xl font-bold">Producten beheren</h2>
+                            <h2 className="text-xl font-bold">Producten Scrapen</h2>
                         </div>
                         <p className="text-text-secondary mb-4 text-sm">
-                            Haal de nieuwste broodjes op van brood-shop.nl. Dit kan even duren.
+                            Haal de nieuwste broodjes op van brood-shop.nl (Automatisch).
                         </p>
                     </div>
                     <DashboardButton
@@ -504,7 +505,7 @@ export default function AdminPage() {
                         className="w-full bg-cyan-600 hover:bg-cyan-700 font-semibold"
                         icon={<RefreshCcw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
                     >
-                        {refreshing ? 'Producten ophalen...' : 'Assortiment vernieuwen'}
+                        {refreshing ? 'Producten ophalen...' : 'Assortiment vernieuwen (Scrape)'}
                     </DashboardButton>
                 </DashboardCard>
 
@@ -527,6 +528,9 @@ export default function AdminPage() {
                         Start nieuwe week
                     </DashboardButton>
                 </DashboardCard>
+
+                {/* Product Manager (FULL WIDTH) */}
+                <ProductManager />
             </div>
 
             {/* Email Management */}
