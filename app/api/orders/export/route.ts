@@ -14,7 +14,7 @@ export async function GET() {
         const weekId = getCurrentWeekId();
         const buffer = await generateOrdersExcel(weekId);
 
-        return new NextResponse(buffer, {
+        return new NextResponse(buffer as unknown as BodyInit, {
             headers: {
                 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'Content-Disposition': `attachment; filename="Bestellijst_Week_${getISOWeek(new Date())}.xlsx"`,
