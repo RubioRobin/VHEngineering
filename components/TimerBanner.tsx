@@ -24,7 +24,7 @@ export const TimerBanner = ({ timeLeft, deadline }: TimerBannerProps) => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <span className="text-white/90 text-sm font-semibold uppercase tracking-wider">
-                                {isUrgent ? '🚨 Spoed!' : 'Bestellen sluit over'}
+                                {isUrgent ? 'SPOED!' : 'Bestellen sluit over'}
                             </span>
                         </div>
                         {timeLeft ? (
