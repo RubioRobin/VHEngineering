@@ -375,8 +375,8 @@ export default function AdminPage() {
 
     if (isCheckingAuth) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Loader2 className="w-12 h-12 text-indigo-500 animate-spin" />
             </div>
         );
     }

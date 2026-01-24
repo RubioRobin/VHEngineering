@@ -8,9 +8,9 @@ import { Loader2 } from 'lucide-react';
 const CartContainer = nextDynamic(() => import('@/components/CartContainer'), {
     ssr: false,
     loading: () => (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-[60vh] flex items-center justify-center">
             <div className="text-center">
-                <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto mb-4" />
+                <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
                 <p className="text-gray-600">Winkelmandje laden...</p>
             </div>
         </div>
