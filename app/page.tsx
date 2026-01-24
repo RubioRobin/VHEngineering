@@ -42,7 +42,7 @@ export default function HomePage() {
     // Helper to clean up categories
     const getCategory = (p: Product) => {
         const cat = p.description || 'Overig';
-        return cat === 'Handmatig toegevoegd' ? 'Snacks' : cat;
+        return cat.toLowerCase().includes('handmatig') ? 'Snacks' : cat;
     };
 
     // Timer State
