@@ -105,7 +105,7 @@ export const Sidebar = () => {
                             onClick={() => setMobileOpen(false)}
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
                         >
-                            <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            <item.icon className="w-5 h-5 transition-colors" />
                             <AnimatePresence mode="wait">
                                 {!collapsed && (
                                     <motion.span
