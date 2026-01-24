@@ -560,23 +560,22 @@ export default function HomePage() {
 
                                 return (
                                     <section key={category} id={`cat-${category}`} className="scroll-mt-32">
-                                        {/* Icon & Color Mapping */}
+                                        {/* Minimalist Design with Dynamic Colors */}
                                         {(() => {
-                                            // Define a rich palette of colors for known and future categories
+                                            // Palette with strong accent colors for the line
                                             const colorPalette = [
-                                                { bg: 'bg-orange-100', border: 'border-orange-200', text: 'text-orange-800', badge: 'bg-orange-100 text-orange-700 border-orange-200' }, // Broodjes
-                                                { bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-800', badge: 'bg-red-100 text-red-700 border-red-200' },    // Snacks
-                                                { bg: 'bg-amber-100', border: 'border-amber-200', text: 'text-amber-800', badge: 'bg-amber-100 text-amber-700 border-amber-200' },  // Banket
-                                                { bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-800', badge: 'bg-blue-100 text-blue-700 border-blue-200' },    // Frisdrank
-                                                { bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-800', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Salades
-                                                { bg: 'bg-purple-100', border: 'border-purple-200', text: 'text-purple-800', badge: 'bg-purple-100 text-purple-700 border-purple-200' },
-                                                { bg: 'bg-pink-100', border: 'border-pink-200', text: 'text-pink-800', badge: 'bg-pink-100 text-pink-700 border-pink-200' },
-                                                { bg: 'bg-cyan-100', border: 'border-cyan-200', text: 'text-cyan-800', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
-                                                { bg: 'bg-indigo-100', border: 'border-indigo-200', text: 'text-indigo-800', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-                                                { bg: 'bg-lime-100', border: 'border-lime-200', text: 'text-lime-800', badge: 'bg-lime-100 text-lime-700 border-lime-200' },
+                                                { line: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 border-orange-200' }, // Broodjes
+                                                { line: 'bg-red-500', badge: 'bg-red-100 text-red-700 border-red-200' },    // Snacks
+                                                { line: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200' },  // Banket
+                                                { line: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 border-blue-200' },    // Frisdrank
+                                                { line: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Salades
+                                                { line: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 border-purple-200' },
+                                                { line: 'bg-pink-500', badge: 'bg-pink-100 text-pink-700 border-pink-200' },
+                                                { line: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
+                                                { line: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+                                                { line: 'bg-lime-500', badge: 'bg-lime-100 text-lime-700 border-lime-200' },
                                             ];
 
-                                            // Explicit mapping for core categories
                                             const knownCategories: Record<string, number> = {
                                                 'Belegde broodjes': 0, 'Broodjes': 0,
                                                 'Snacks': 1,
@@ -586,10 +585,8 @@ export default function HomePage() {
                                                 'Overig': 5
                                             };
 
-                                            // Determine index: use known index OR hash string for consistent random color
                                             let colorIndex = knownCategories[category];
                                             if (colorIndex === undefined) {
-                                                // Simple hash to pick a color from the remaining palette
                                                 const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
                                                 colorIndex = 6 + (hash % (colorPalette.length - 6));
                                             }
@@ -598,15 +595,14 @@ export default function HomePage() {
                                             const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
 
                                             return (
-                                                <div className={`flex items-center gap-4 mb-8 p-6 rounded-2xl border ${style.bg} ${style.border} shadow-sm`}>
-                                                    <div className="flex-1">
-                                                        <h3 className={`text-3xl font-extrabold ${style.text} flex items-center gap-4`}>
-                                                            {displayName}
-                                                            <span className={`text-sm font-bold px-3 py-1 rounded-full border ${style.badge}`}>
-                                                                {productsInCat.length}
-                                                            </span>
-                                                        </h3>
-                                                    </div>
+                                                <div className="flex items-center gap-4 mb-6 pt-4">
+                                                    <div className={`h-8 w-1.5 rounded-full ${style.line}`}></div>
+                                                    <h3 className="text-2xl font-bold text-slate-800">
+                                                        {displayName}
+                                                    </h3>
+                                                    <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${style.badge}`}>
+                                                        {productsInCat.length}
+                                                    </span>
                                                 </div>
                                             );
                                         })()}
