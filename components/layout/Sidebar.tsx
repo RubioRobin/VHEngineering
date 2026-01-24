@@ -60,7 +60,11 @@ export const Sidebar = () => {
                     width: collapsed ? 80 : 280,
                     x: mobileOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 768 ? -280 : 0)
                 }}
-                transition={{ type: "spring", stiffness: 260, damping: 25, mass: 0.8 }}
+                transition={{
+                    type: "tween",
+                    duration: 0.3,
+                    ease: [0.4, 0.0, 0.2, 1]
+                }}
                 className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-border shadow-soft flex flex-col md:z-40"
             >
                 {/* User Profile Area (replaces logo) */}
