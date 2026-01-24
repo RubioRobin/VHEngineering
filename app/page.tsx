@@ -39,6 +39,12 @@ export default function HomePage() {
     const [currentWeekOrder, setCurrentWeekOrder] = useState<any>(null);
     const { showToast } = useToast();
 
+    // Helper to clean up categories
+    const getCategory = (p: Product) => {
+        const cat = p.description || 'Overig';
+        return cat === 'Handmatig toegevoegd' ? 'Snacks' : cat;
+    };
+
     // Timer State
     const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
     const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
@@ -264,7 +270,7 @@ export default function HomePage() {
         }
 
         if (selectedCategory) {
-            filtered = filtered.filter(p => (p.description || 'Overig') === selectedCategory);
+            filtered = filtered.filter(p => getCategory(p) === selectedCategory);
         }
 
         setFilteredProducts(filtered);
@@ -444,10 +450,10 @@ export default function HomePage() {
                                         const val = e.target.value;
                                         setSelectedCategory(val === '' ? null : val);
                                     }}
-                                    className="appearance-none w-full pl-4 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200"
+                                    className="appearance-none w-full pl-4 pr-10 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200"
                                 >
                                     <option value="">Alle Categorieën</option>
-                                    {Array.from(new Set(products.map(p => p.description || 'Overig')))
+                                    {Array.from(new Set(products.map(p => getCategory(p))))
                                         .sort((a, b) => {
                                             const order = { 'Belegde broodjes': 1, 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
                                             return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
@@ -520,14 +526,14 @@ export default function HomePage() {
                         </div>
                     ) : (
                         /* Default: Group by Category */
-                        Array.from(new Set(filteredProducts.map(p => p.description || 'Overig')))
+                        Array.from(new Set(filteredProducts.map(p => getCategory(p))))
                             .sort((a, b) => {
                                 // Custom sorting: Broodjes first, then Snacks, then Banket
                                 const order = { 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Overig': 4 };
                                 return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
                             })
                             .map(category => {
-                                const productsInCat = filteredProducts.filter(p => (p.description || 'Overig') === category);
+                                const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
                                 if (productsInCat.length === 0) return null;
 
                                 return (
