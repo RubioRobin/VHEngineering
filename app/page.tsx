@@ -83,21 +83,46 @@ export default function HomePage() {
     // Listen for order-placed event to refresh the orders list
     useEffect(() => {
         const handleOrderPlaced = async () => {
-            console.log('Order placed event received, refreshing orders...');
+            console.log('🔔 Order placed event received, refreshing orders...');
             try {
                 const res = await fetch('/api/orders/period/current/all');
                 if (res.ok) {
                     const data = await res.json();
                     setAllCurrentWeekOrders(data.orders || []);
-                    console.log('Orders refreshed:', data.orders?.length || 0);
+                    console.log('✅ Orders refreshed:', data.orders?.length || 0, 'orders');
+                } else {
+                    console.error('❌ Failed to fetch orders:', res.status);
                 }
             } catch (error) {
-                console.error('Error fetching all current week orders:', error);
+                console.error('❌ Error fetching all current week orders:', error);
             }
         };
 
         window.addEventListener('order-placed', handleOrderPlaced);
-        return () => window.removeEventListener('order-placed', handleOrderPlaced);
+        console.log('👂 Listening for order-placed events');
+
+        return () => {
+            window.removeEventListener('order-placed', handleOrderPlaced);
+            console.log('👋 Stopped listening for order-placed events');
+        };
+    }, []);
+
+    // Poll for updates every 30 seconds as fallback
+    useEffect(() => {
+        const pollInterval = setInterval(async () => {
+            console.log('🔄 Polling for order updates...');
+            try {
+                const res = await fetch('/api/orders/period/current/all');
+                if (res.ok) {
+                    const data = await res.json();
+                    setAllCurrentWeekOrders(data.orders || []);
+                }
+            } catch (error) {
+                console.error('Error polling orders:', error);
+            }
+        }, 30000); // Poll every 30 seconds
+
+        return () => clearInterval(pollInterval);
     }, []);
 
     // Update timer when deadline changes
