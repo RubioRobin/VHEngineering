@@ -543,8 +543,16 @@ export default function HomePage() {
                         Array.from(new Set(filteredProducts.map(p => getCategory(p))))
                             .sort((a, b) => {
                                 // Custom sorting: Belegde broodjes first, then Snacks, then Banket
-                                const order = { 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
-                                return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
+                                const order: Record<string, number> = {
+                                    'Belegde broodjes': 1,
+                                    'Broodjes': 1,
+                                    'Snacks': 2,
+                                    'Banket': 3,
+                                    'Frisdrank': 4,
+                                    'Salades': 5,
+                                    'Overig': 99
+                                };
+                                return (order[a] || 99) - (order[b] || 99);
                             })
                             .map(category => {
                                 const productsInCat = filteredProducts.filter(p => getCategory(p) === category);

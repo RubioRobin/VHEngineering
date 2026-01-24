@@ -145,7 +145,7 @@ export default function OverviewPage() {
     const totalWithShipping = totalProductRevenue + (orders.length > 0 ? SHIPPING_COST : 0);
 
     if (loading) {
-        return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>;
+        return <div className="flex justify-center py-20"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
     }
 
     return (
