@@ -427,7 +427,7 @@ export default function HomePage() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
                     <div>
                         <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
-                            {showOnlyFavorites ? 'Jouw Favorieten' : 'Ons Assortiment'}
+                            {showOnlyFavorites ? 'Jouw Favorieten' : 'Het Assortiment'}
                         </h2>
                         <p className="text-slate-500 font-medium text-base mt-2">
                             {filteredProducts.length} {showOnlyFavorites ? 'favoriete producten' : 'producten'}
