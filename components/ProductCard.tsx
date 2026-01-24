@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Minus, ShoppingCart, Star } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Heart } from "lucide-react";
 import React, { useState } from "react";
 import { DashboardCard } from "./ui/DashboardCard";
 import { DashboardButton } from "./ui/DashboardButton";
@@ -50,7 +50,7 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                     </div>
                 )}
 
-                {/* Favorite Star Button - Top Left */}
+                {/* Favorite Heart Button - Top Left */}
                 {user && onToggleFavorite && (
                     <button
                         onClick={(e) => {
@@ -60,9 +60,9 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                         className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all z-10"
                         title={isFavorite ? 'Verwijder uit favorieten' : 'Toevoegen aan favorieten'}
                     >
-                        <Star
+                        <Heart
                             className={`w-6 h-6 transition-colors ${isFavorite
-                                ? 'fill-yellow-400 text-yellow-400'
+                                ? 'fill-rose-500 text-rose-500'
                                 : 'text-gray-400'
                                 }`}
                         />

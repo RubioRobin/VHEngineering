@@ -42,6 +42,7 @@ export default function HomePage() {
     const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
     const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
     const [deadline, setDeadline] = useState<Date | null>(null);
+    const [showScrollTop, setShowScrollTop] = useState(false);
 
     useEffect(() => {
         Promise.all([
@@ -184,6 +185,18 @@ export default function HomePage() {
             return;
         }
 
+        // Optimistic update
+        const wasFavorite = favorites.has(productId);
+        setFavorites(prev => {
+            const next = new Set(prev);
+            if (wasFavorite) {
+                next.delete(productId);
+            } else {
+                next.add(productId);
+            }
+            return next;
+        });
+
         try {
             const res = await fetch('/api/favorites', {
                 method: 'POST',
@@ -193,19 +206,47 @@ export default function HomePage() {
 
             if (res.ok) {
                 const data = await res.json();
-                const newFavorites = new Set(favorites);
+
+                // Sync with server text just to be sure
+                setFavorites(prev => {
+                    const next = new Set(prev);
+                    if (data.favorited) {
+                        next.add(productId);
+                    } else {
+                        next.delete(productId);
+                    }
+                    return next;
+                });
+
                 if (data.favorited) {
-                    newFavorites.add(productId);
                     showToast("Toegevoegd aan favorieten!", "success");
                 } else {
-                    newFavorites.delete(productId);
                     showToast("Verwijderd uit favorieten", "success");
                 }
-                setFavorites(newFavorites);
+            } else {
+                const errorData = await res.json().catch(() => ({}));
+                if (res.status === 404 || errorData.error === 'User or Product not found') {
+                    showToast("Sessie verlopen. Log opnieuw in.", "error");
+                    // Optionally clear local storage or redirect
+                    // localStorage.removeItem("vh_user");
+                } else {
+                    throw new Error(errorData.error || "Failed");
+                }
             }
         } catch (error) {
             console.error('Error toggling favorite:', error);
             showToast("Fout bij opslaan favoriet", "error");
+
+            // Revert on error
+            setFavorites(prev => {
+                const next = new Set(prev);
+                if (wasFavorite) {
+                    next.add(productId);
+                } else {
+                    next.delete(productId);
+                }
+                return next;
+            });
         }
     };
 
@@ -245,6 +286,17 @@ export default function HomePage() {
         // Cart stays closed - user clicks floating button to open
     };
 
+    // Scroll to top listener
+    useEffect(() => {
+        const handleScroll = () => setShowScrollTop(window.scrollY > 400);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     if (loading) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
@@ -254,16 +306,29 @@ export default function HomePage() {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 relative">
             <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
             <FloatingCartButton onClick={() => setIsCartOpen(true)} />
+
+            {/* Back to Top Button */}
+            <motion.button
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: showScrollTop ? 1 : 0, scale: showScrollTop ? 1 : 0 }}
+                onClick={scrollToTop}
+                className="fixed bottom-24 right-8 z-40 bg-white p-3 rounded-full shadow-lg border border-gray-200 text-primary hover:bg-gray-50 transition-all"
+                title="Naar boven"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                </svg>
+            </motion.button>
 
             {/* Dashboard Header & Timer */}
             <div className="flex flex-col md:flex-row items-stretch gap-6">
                 {/* Timer Card */}
                 <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
                     ? 'bg-gradient-to-br from-red-500 to-red-700 animate-pulse shadow-red-500/30'
-                    : 'bg-gradient-to-br from-primary to-primary-dark shadow-primary/20'
+                    : 'bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-500/20'
                     }`}>
                     <div className="flex flex-col h-full justify-between">
                         <div className="flex items-center gap-3 opacity-90">
@@ -352,56 +417,138 @@ export default function HomePage() {
                 )}
             </div>
 
-            {/* Product Grid */}
+            {/* Product Grid & Categories */}
             <div>
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
                     <div>
-                        <h2 className="text-2xl font-bold text-text-primary">
-                            {showOnlyFavorites ? 'Jouw favorieten!' : 'Het assortiment'}
+                        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                            {showOnlyFavorites ? 'Jouw Favorieten' : 'Ons Assortiment'}
                         </h2>
+                        <p className="text-slate-500 font-medium text-base mt-2">
+                            {filteredProducts.length} {showOnlyFavorites ? 'favoriete items' : 'verse producten, dagelijks bereid'}
+                        </p>
                     </div>
-                    <div className="flex items-center gap-4">
-                        {user && (
-                            <div className="flex gap-2 bg-white rounded-lg border border-border p-1">
-                                <button
-                                    onClick={() => setShowOnlyFavorites(false)}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${!showOnlyFavorites ? 'bg-primary text-white' : 'text-text-secondary hover:text-primary'}`}
-                                >
-                                    Alle
-                                </button>
-                                <button
-                                    onClick={() => setShowOnlyFavorites(true)}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${showOnlyFavorites ? 'bg-primary text-white' : 'text-text-secondary hover:text-primary'}`}
-                                    title="Favorieten"
-                                >
-                                    Favorieten
-                                </button>
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        {/* Category Pills (Mobile/Desktop) */}
+                        {!showOnlyFavorites && !searchQuery && (
+                            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar max-w-[100vw] sm:max-w-auto">
+                                {Array.from(new Set(products.map(p => p.description || 'Overig')))
+                                    .sort((a, b) => {
+                                        const order = { 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Overig': 4 };
+                                        return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
+                                    })
+                                    .map(cat => (
+                                        <a
+                                            key={cat}
+                                            href={`#cat-${cat}`}
+                                            className="px-6 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 whitespace-nowrap hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                document.getElementById(`cat-${cat}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            }}
+                                        >
+                                            {cat === 'Broodjes' ? 'Belegde broodjes' : cat}
+                                        </a>
+                                    ))}
                             </div>
                         )}
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                            <input
-                                type="text"
-                                placeholder="Zoeken..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 pr-4 py-2.5 bg-white border border-transparent shadow-sm rounded-xl text-sm focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none w-full transition-all hover:shadow-md"
-                            />
+
+                        <div className="flex items-center gap-3">
+                            {user && (
+                                <button
+                                    onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                                    className={`p-3 rounded-xl border transition-all ${showOnlyFavorites
+                                        ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-inner'
+                                        : 'bg-white border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-sm'}`}
+                                    title={showOnlyFavorites ? "Toon alles" : "Toon alleen favorieten"}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={showOnlyFavorites ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                    </svg>
+                                </button>
+                            )}
+
+                            <div className="relative flex-1 sm:w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Zoeken..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-400"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredProducts.map((product) => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onAddToCart={handleAddToCart}
-                            disabled={isDeadlinePassed}
-                            isFavorite={favorites.has(product.id)}
-                            onToggleFavorite={toggleFavorite}
-                        />
-                    ))}
+                <div className="space-y-12">
+                    {/* If searching or favorites: Show flat list */}
+                    {(searchQuery || showOnlyFavorites) ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {filteredProducts.length > 0 ? (
+                                filteredProducts.map((product) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        onAddToCart={handleAddToCart}
+                                        disabled={isDeadlinePassed}
+                                        isFavorite={favorites.has(product.id)}
+                                        onToggleFavorite={toggleFavorite}
+                                    />
+                                ))
+                            ) : (
+                                <div className="col-span-full py-20 text-center">
+                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                                        <Search className="w-8 h-8 text-slate-400" />
+                                    </div>
+                                    <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
+                                    <p className="text-slate-500">
+                                        {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        /* Default: Group by Category */
+                        Array.from(new Set(filteredProducts.map(p => p.description || 'Overig')))
+                            .sort((a, b) => {
+                                // Custom sorting: Broodjes first, then Snacks, then Banket
+                                const order = { 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Overig': 4 };
+                                return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
+                            })
+                            .map(category => {
+                                const productsInCat = filteredProducts.filter(p => (p.description || 'Overig') === category);
+                                if (productsInCat.length === 0) return null;
+
+                                return (
+                                    <section key={category} id={`cat-${category}`} className="scroll-mt-32">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="h-8 w-1.5 bg-indigo-500 rounded-full"></div>
+                                            <h3 className="text-2xl font-bold text-slate-800">
+                                                {category === 'Broodjes' ? 'Belegde broodjes' : category}
+                                            </h3>
+                                            <span className="bg-slate-100 text-slate-500 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-slate-200">
+                                                {productsInCat.length}
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                            {productsInCat.map((product) => (
+                                                <ProductCard
+                                                    key={product.id}
+                                                    product={product}
+                                                    onAddToCart={handleAddToCart}
+                                                    disabled={isDeadlinePassed}
+                                                    isFavorite={favorites.has(product.id)}
+                                                    onToggleFavorite={toggleFavorite}
+                                                />
+                                            ))}
+                                        </div>
+                                    </section>
+                                );
+                            })
+                    )}
                 </div>
             </div>
         </div>

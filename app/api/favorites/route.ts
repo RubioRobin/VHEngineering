@@ -9,25 +9,33 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing userId or productId' }, { status: 400 });
         }
 
-        // Check if favorite exists
-        const existing = await prisma.favorite.findUnique({
-            where: {
-                userId_productId: { userId, productId }
-            }
-        });
+        try {
+            // Check if favorite exists
+            const existing = await prisma.favorite.findUnique({
+                where: {
+                    userId_productId: { userId, productId }
+                }
+            });
 
-        if (existing) {
-            // Remove favorite
-            await prisma.favorite.delete({
-                where: { id: existing.id }
-            });
-            return NextResponse.json({ favorited: false });
-        } else {
-            // Add favorite
-            await prisma.favorite.create({
-                data: { userId, productId }
-            });
-            return NextResponse.json({ favorited: true });
+            if (existing) {
+                // Remove favorite
+                await prisma.favorite.delete({
+                    where: { id: existing.id }
+                });
+                return NextResponse.json({ favorited: false });
+            } else {
+                // Add favorite
+                await prisma.favorite.create({
+                    data: { userId, productId }
+                });
+                return NextResponse.json({ favorited: true });
+            }
+        } catch (dbError: any) {
+            // Handle foreign key constraint violation (User or Product not found)
+            if (dbError.code === 'P2003') {
+                return NextResponse.json({ error: 'User or Product not found' }, { status: 404 });
+            }
+            throw dbError; // Re-throw other errors
         }
     } catch (error) {
         console.error('Favorites error:', error);

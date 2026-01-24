@@ -24,8 +24,8 @@ export const UserIdentityModal = () => {
         try {
             await login(name, department);
             showToast(`Welkom, ${name}!`, "success");
-        } catch (error) {
-            showToast("Inloggen mislukt.", "error");
+        } catch (error: any) {
+            showToast(error.message || "Inloggen mislukt.", "error");
         } finally {
             setIsSubmitting(false);
         }

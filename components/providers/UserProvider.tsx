@@ -43,12 +43,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 body: JSON.stringify({ name, department }),
             });
 
-            if (!res.ok) throw new Error("Failed to login");
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || "Failed to login");
+            }
 
             const data = await res.json();
             setUser(data);
             localStorage.setItem("vh_user", JSON.stringify(data));
-        } catch (error) {
+        } catch (error: any) {
             console.error("Login failed:", error);
             throw error;
         }
