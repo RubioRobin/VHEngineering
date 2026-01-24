@@ -13,8 +13,8 @@ export const TimerBanner = ({ timeLeft, deadline }: TimerBannerProps) => {
 
     return (
         <div className={`sticky top-0 z-40 transition-all duration-300 ${isUrgent
-                ? 'bg-gradient-to-r from-red-500 via-red-600 to-red-500 animate-pulse shadow-lg shadow-red-500/50'
-                : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 shadow-md'
+            ? 'bg-gradient-to-r from-red-500 via-red-600 to-red-500 animate-pulse shadow-lg shadow-red-500/50'
+            : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 shadow-md'
             }`}>
             <div className="max-w-7xl mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
@@ -39,7 +39,7 @@ export const TimerBanner = ({ timeLeft, deadline }: TimerBannerProps) => {
                     </div>
                     {deadline && (
                         <div className="hidden md:block text-white/80 text-sm">
-                            📅 {format(deadline, 'EEEE d MMMM', { locale: nl })} · {format(deadline, 'HH:mm', { locale: nl })} uur
+                            {format(deadline, 'EEEE d MMMM', { locale: nl })} · {format(deadline, 'HH:mm', { locale: nl })} uur
                         </div>
                     )}
                 </div>

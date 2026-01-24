@@ -414,9 +414,9 @@ export default function HomePage() {
             <TimerBanner timeLeft={timeLeft} deadline={deadline} />
 
             {/* Dashboard Cards */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col md:flex-row items-stretch gap-6">
                 {/* Recent Orders - Current Week */}
-                <DashboardCard className="bg-white border-gray-200">
+                <DashboardCard className="flex-1 bg-white border-gray-200">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
