@@ -629,7 +629,6 @@ export default function HomePage() {
             </div>
         </div>
     );
-    );
 }
 
 const ClockIcon = () => (
