@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
                 count: result.count,
             });
         } else {
+            // Return the specific error message from the scraper (e.g. "No products found", "Browser failed")
             return NextResponse.json(
                 { error: result.message },
                 { status: 500 }
