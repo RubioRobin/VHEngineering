@@ -444,7 +444,7 @@ export default function HomePage() {
                                 )}
 
                                 {/* Progress indicator */}
-                                {(() => {
+                                {deadline && (() => {
                                     const now = new Date();
                                     const start = new Date(deadline);
                                     start.setDate(start.getDate() - 7); // Assume 7 day period
