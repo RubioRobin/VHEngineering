@@ -445,14 +445,16 @@ export default function HomePage() {
                 </DashboardCard>
 
                 {/* Recent Orders - Current Week */}
-                <DashboardCard className="flex-1 bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-                    <div className="flex items-center gap-4 mb-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600">
-                            👥
+                <DashboardCard className="flex-1 bg-white border-gray-200">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
                         </div>
                         <div>
-                            <p className="text-text-secondary text-xs uppercase font-bold">Deze Week</p>
-                            <h3 className="text-lg font-bold text-text-primary">Recent besteld</h3>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Deze Week</p>
+                            <h3 className="text-lg font-bold text-gray-900">Recent besteld</h3>
                         </div>
                     </div>
 
@@ -461,41 +463,46 @@ export default function HomePage() {
                         console.log('📋 Orders data:', allCurrentWeekOrders);
                         return allCurrentWeekOrders.length === 0;
                     })() ? (
-                        <div className="flex flex-col items-center justify-center py-6 text-center">
-                            <div className="text-4xl mb-2">🎯</div>
-                            <p className="text-text-primary font-bold text-lg">Wees de eerste!</p>
-                            <p className="text-text-muted text-sm mt-1">Nog niemand heeft besteld deze week</p>
+                        <div className="flex flex-col items-center justify-center py-8 text-center">
+                            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                            </div>
+                            <p className="text-gray-900 font-bold text-base">Wees de eerste!</p>
+                            <p className="text-gray-500 text-sm mt-1">Nog niemand heeft besteld deze week</p>
                         </div>
                     ) : (
-                        <div className="max-h-48 overflow-y-auto space-y-2">
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
                             {allCurrentWeekOrders.slice(0, 6).map((order: any) => (
-                                <div key={order.id} className="flex items-start gap-3 p-2 bg-white/60 rounded-lg">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
                                         {order.personName?.charAt(0).toUpperCase() || '?'}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-bold text-text-primary truncate">{order.personName}</p>
-                                        {order.department && (
-                                            <p className="text-xs text-text-muted">{order.department}</p>
-                                        )}
-                                        <div className="mt-1 text-xs text-blue-600">
-                                            {order.orderItems?.slice(0, 2).map((item: any, idx: number) => (
-                                                <div key={idx} className="truncate">
-                                                    {item.quantity}x {formatName(item.product?.name || 'Product')}
-                                                </div>
-                                            ))}
-                                            {order.orderItems?.length > 2 && (
-                                                <div className="text-text-muted italic">
-                                                    +{order.orderItems.length - 2} meer
-                                                </div>
+                                        <div className="flex items-baseline gap-2 mb-1">
+                                            <p className="text-sm font-bold text-gray-900">{order.personName}</p>
+                                            {order.department && (
+                                                <span className="text-xs text-gray-500">· {order.department}</span>
                                             )}
                                         </div>
+                                        <p className="text-sm text-gray-600 truncate">
+                                            {order.orderItems?.slice(0, 2).map((item: any, idx: number) => (
+                                                <span key={idx}>
+                                                    {idx > 0 && ', '}
+                                                    {item.quantity}x {formatName(item.product?.name || 'Product')}
+                                                </span>
+                                            ))}
+                                            {order.orderItems?.length > 2 && (
+                                                <span className="text-gray-400"> +{order.orderItems.length - 2}</span>
+                                            )}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
                             {allCurrentWeekOrders.length > 6 && (
-                                <p className="text-xs text-text-muted text-center pt-2">
-                                    +{allCurrentWeekOrders.length - 6} meer...
+                                <p className="text-xs text-gray-400 text-center pt-2 font-medium">
+                                    +{allCurrentWeekOrders.length - 6} meer bestelling{allCurrentWeekOrders.length - 6 !== 1 ? 'en' : ''}
                                 </p>
                             )}
                         </div>
