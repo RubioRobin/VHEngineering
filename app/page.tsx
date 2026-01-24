@@ -39,6 +39,7 @@ export default function HomePage() {
     const { user } = useUser();
     const [lastOrder, setLastOrder] = useState<any>(null);
     const [currentWeekOrder, setCurrentWeekOrder] = useState<any>(null);
+    const [allCurrentWeekOrders, setAllCurrentWeekOrders] = useState<any[]>([]);
     const { showToast } = useToast();
 
     // Helper to clean up categories
@@ -60,7 +61,8 @@ export default function HomePage() {
             fetchProducts(),
             fetchDeadline(),
             user ? fetchLastOrder() : Promise.resolve(),
-            user ? fetchCurrentWeekOrder() : Promise.resolve()
+            user ? fetchCurrentWeekOrder() : Promise.resolve(),
+            fetchAllCurrentWeekOrders()
         ]).finally(() => {
             setLoading(false);
         });
@@ -153,6 +155,18 @@ export default function HomePage() {
             }
         } catch (error) {
             console.error('Error fetching current week order:', error);
+        }
+    };
+
+    const fetchAllCurrentWeekOrders = async () => {
+        try {
+            const res = await fetch('/api/orders/period/current/all');
+            if (res.ok) {
+                const data = await res.json();
+                setAllCurrentWeekOrders(data.orders || []);
+            }
+        } catch (error) {
+            console.error('Error fetching all current week orders:', error);
         }
     };
 
@@ -385,6 +399,50 @@ export default function HomePage() {
                     </div>
                 </DashboardCard>
 
+                {/* Recent Orders - Current Week */}
+                <DashboardCard className="flex-1 bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+                    <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600">
+                            👥
+                        </div>
+                        <div>
+                            <p className="text-text-secondary text-xs uppercase font-bold">Deze Week</p>
+                            <h3 className="text-lg font-bold text-text-primary">Recent Besteld</h3>
+                        </div>
+                    </div>
+
+                    {allCurrentWeekOrders.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-6 text-center">
+                            <div className="text-4xl mb-2">🎯</div>
+                            <p className="text-text-primary font-bold text-lg">Wees de eerste!</p>
+                            <p className="text-text-muted text-sm mt-1">Nog niemand heeft besteld deze week</p>
+                        </div>
+                    ) : (
+                        <div className="max-h-48 overflow-y-auto space-y-2">
+                            {allCurrentWeekOrders.slice(0, 6).map((order: any) => (
+                                <div key={order.id} className="flex items-center gap-3 p-2 bg-white/60 rounded-lg">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                        {order.personName?.charAt(0).toUpperCase() || '?'}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold text-text-primary truncate">{order.personName}</p>
+                                        {order.department && (
+                                            <p className="text-xs text-text-muted">{order.department}</p>
+                                        )}
+                                    </div>
+                                    <div className="text-xs text-blue-600 font-medium shrink-0">
+                                        {order.orderItems?.length || 0} items
+                                    </div>
+                                </div>
+                            ))}
+                            {allCurrentWeekOrders.length > 6 && (
+                                <p className="text-xs text-text-muted text-center pt-2">
+                                    +{allCurrentWeekOrders.length - 6} meer...
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </DashboardCard>
 
 
                 {/* Recent Order - Reorder */}
