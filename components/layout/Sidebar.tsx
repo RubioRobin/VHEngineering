@@ -104,9 +104,11 @@ export const Sidebar = () => {
                             key={item.label}
                             href={item.href}
                             onClick={() => setMobileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
+                            className="flex items-center px-4 py-3 rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
                         >
-                            <item.icon className="w-5 h-5 transition-colors" />
+                            <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                                <item.icon className="w-5 h-5 transition-colors" />
+                            </div>
                             <AnimatePresence mode="wait">
                                 {!collapsed && (
                                     <motion.span
@@ -114,7 +116,7 @@ export const Sidebar = () => {
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.15 }}
-                                        className="font-medium text-sm overflow-hidden"
+                                        className="font-medium text-sm overflow-hidden ml-3"
                                     >
                                         {item.label}
                                     </motion.span>
@@ -126,8 +128,10 @@ export const Sidebar = () => {
 
                 {/* Bottom Actions - Only show on desktop */}
                 <div className="p-4 border-t border-border/50 space-y-2 hidden md:block">
-                    <Link href="/settings" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
-                        <Settings className="w-5 h-5" />
+                    <Link href="/settings" className="flex items-center px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
+                        <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                            <Settings className="w-5 h-5" />
+                        </div>
                         <AnimatePresence mode="wait">
                             {!collapsed && (
                                 <motion.span
@@ -135,7 +139,7 @@ export const Sidebar = () => {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.15 }}
-                                    className="font-medium text-sm overflow-hidden"
+                                    className="font-medium text-sm overflow-hidden ml-3"
                                 >
                                     Settings
                                 </motion.span>
@@ -144,10 +148,12 @@ export const Sidebar = () => {
                     </Link>
                     <button
                         onClick={toggleSidebar}
-                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors"
+                        className="flex items-center px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors"
                         title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
-                        <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
+                        <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                            <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
+                        </div>
                         <AnimatePresence mode="wait">
                             {!collapsed && (
                                 <motion.span
@@ -155,7 +161,7 @@ export const Sidebar = () => {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.15 }}
-                                    className="font-medium text-sm overflow-hidden"
+                                    className="font-medium text-sm overflow-hidden ml-3"
                                 >
                                     Inklappen
                                 </motion.span>
