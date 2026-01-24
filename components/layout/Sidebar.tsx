@@ -88,8 +88,8 @@ export const Sidebar = () => {
                     {/* Desktop Collapse Toggle */}
                     <button
                         onClick={toggleSidebar}
-                        className="hidden md:flex w-8 h-8 items-center justify-center rounded-lg hover:bg-background text-text-muted transition-colors"
-                        title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        className="hidden md:flex w-9 h-9 items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 hover:border-primary/30 transition-all duration-200 hover:scale-105 shadow-sm"
+                        title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
                         {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
                     </button>
