@@ -469,7 +469,7 @@ export default function HomePage() {
                     ) : (
                         <div className="max-h-48 overflow-y-auto space-y-2">
                             {allCurrentWeekOrders.slice(0, 6).map((order: any) => (
-                                <div key={order.id} className="flex items-center gap-3 p-2 bg-white/60 rounded-lg">
+                                <div key={order.id} className="flex items-start gap-3 p-2 bg-white/60 rounded-lg">
                                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
                                         {order.personName?.charAt(0).toUpperCase() || '?'}
                                     </div>
@@ -478,9 +478,18 @@ export default function HomePage() {
                                         {order.department && (
                                             <p className="text-xs text-text-muted">{order.department}</p>
                                         )}
-                                    </div>
-                                    <div className="text-xs text-blue-600 font-medium shrink-0">
-                                        {order.orderItems?.length || 0} items
+                                        <div className="mt-1 text-xs text-blue-600">
+                                            {order.orderItems?.slice(0, 2).map((item: any, idx: number) => (
+                                                <div key={idx} className="truncate">
+                                                    {item.quantity}x {formatName(item.product?.name || 'Product')}
+                                                </div>
+                                            ))}
+                                            {order.orderItems?.length > 2 && (
+                                                <div className="text-text-muted italic">
+                                                    +{order.orderItems.length - 2} meer
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
