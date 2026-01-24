@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, ClipboardList, Settings, Menu, X, History, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Clock, Settings, Menu, X, History, FolderOpen, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useUser } from "../providers/UserProvider";
@@ -9,7 +9,7 @@ import { useUI } from "../providers/UIProvider";
 
 const menuItems = [
     { icon: LayoutDashboard, label: 'Het assortiment', href: '/' },
-    { icon: ClipboardList, label: 'Overzicht', href: '/overview' },
+    { icon: Clock, label: 'Overzicht', href: '/overview' },
     { icon: History, label: 'Mijn bestellingen', href: '/mijn-bestellingen' },
     { icon: FolderOpen, label: 'Archief', href: '/archives' },
 ];
@@ -60,30 +60,28 @@ export const Sidebar = () => {
                     width: collapsed ? 80 : 280,
                     x: mobileOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 768 ? -280 : 0)
                 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.5 }}
+                transition={{ type: "spring", stiffness: 260, damping: 25, mass: 0.8 }}
                 className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-border shadow-soft flex flex-col md:z-40"
             >
                 {/* User Profile Area (replaces logo) */}
-                <div className="h-20 flex items-center justify-between px-6 border-b border-border/50">
-                    <div className="flex items-center">
-                        {/* Mobile Close Button */}
-                        <button
-                            onClick={() => setMobileOpen(false)}
-                            className="md:hidden absolute top-6 right-4 p-2 hover:bg-gray-100 rounded-lg"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
+                <div className="h-20 flex items-center px-6 border-b border-border/50">
+                    {/* Mobile Close Button */}
+                    <button
+                        onClick={() => setMobileOpen(false)}
+                        className="md:hidden absolute top-6 right-4 p-2 hover:bg-gray-100 rounded-lg"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
 
-                        <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
-                            {user?.name?.charAt(0).toUpperCase() || 'G'}
-                        </div>
-                        {!collapsed && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ml-3">
-                                <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
-                                <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
-                            </motion.div>
-                        )}
+                    <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
+                        {user?.name?.charAt(0).toUpperCase() || 'G'}
                     </div>
+                    {!collapsed && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ml-3">
+                            <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
+                            <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
+                        </motion.div>
+                    )}
                 </div>
 
                 {/* Menu */}
@@ -95,64 +93,28 @@ export const Sidebar = () => {
                             onClick={() => setMobileOpen(false)}
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
                         >
-                            <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" />
-                            <AnimatePresence mode="wait">
-                                {!collapsed && (
-                                    <motion.span
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="font-medium text-sm whitespace-nowrap"
-                                    >
-                                        {item.label}
-                                    </motion.span>
-                                )}
-                            </AnimatePresence>
+                            <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            {!collapsed && (
+                                <span className="font-medium text-sm">{item.label}</span>
+                            )}
                         </Link>
                     ))}
                 </nav>
 
-                {/* Bottom Actions */}
+                {/* Bottom Actions - Only show on desktop */}
                 <div className="p-4 border-t border-border/50 space-y-2 hidden md:block">
-                    {/* Collapse Toggle */}
+                    <Link href="/settings" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
+                        <Settings className="w-5 h-5" />
+                        {!collapsed && <span className="font-medium text-sm">Settings</span>}
+                    </Link>
                     <button
                         onClick={toggleSidebar}
-                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
-                        title={collapsed ? "Sidebar uitklappen" : "Sidebar inklappen"}
+                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors"
+                        title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
-                        {collapsed ? <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" /> : <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" />}
-                        <AnimatePresence mode="wait">
-                            {!collapsed && (
-                                <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="font-medium text-sm whitespace-nowrap"
-                                >
-                                    Inklappen
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
+                        <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
+                        {!collapsed && <span className="font-medium text-sm">Inklappen</span>}
                     </button>
-
-                    <Link href="/settings" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
-                        <Settings className="w-5 h-5 shrink-0" />
-                        <AnimatePresence mode="wait">
-                            {!collapsed && (
-                                <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="font-medium text-sm whitespace-nowrap"
-                                >
-                                    Settings
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
-                    </Link>
                 </div>
             </motion.aside>
         </>

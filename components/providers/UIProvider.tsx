@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface UIContextType {
     isSidebarCollapsed: boolean;
@@ -9,23 +9,11 @@ interface UIContextType {
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
-export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function UIProvider({ children }: { children: ReactNode }) {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-    // Persist preference in localStorage
-    useEffect(() => {
-        const saved = localStorage.getItem('sidebar_collapsed');
-        if (saved === 'true') {
-            setIsSidebarCollapsed(true);
-        }
-    }, []);
-
     const toggleSidebar = () => {
-        setIsSidebarCollapsed(prev => {
-            const newState = !prev;
-            localStorage.setItem('sidebar_collapsed', String(newState));
-            return newState;
-        });
+        setIsSidebarCollapsed(prev => !prev);
     };
 
     return (
@@ -33,12 +21,12 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
             {children}
         </UIContext.Provider>
     );
-};
+}
 
-export const useUI = () => {
+export function useUI() {
     const context = useContext(UIContext);
-    if (!context) {
+    if (context === undefined) {
         throw new Error('useUI must be used within a UIProvider');
     }
     return context;
-};
+}

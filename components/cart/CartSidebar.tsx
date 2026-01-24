@@ -134,8 +134,6 @@ export const CartSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 localStorage.setItem('cart', '[]');
                 setGeneralComment("");
                 window.dispatchEvent(new Event('cart-updated'));
-                console.log('🚀 Dispatching order-placed event');
-                window.dispatchEvent(new Event('order-placed')); // Notify other components
                 onClose();
                 showToast("Bestelling succesvol geplaatst! Bedankt.", "success");
             } else {

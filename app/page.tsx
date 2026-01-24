@@ -13,7 +13,6 @@ import { CartSidebar } from '@/components/cart/CartSidebar';
 import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
 import { useUser } from '@/components/providers/UserProvider';
 import { useToast } from '@/components/providers/ToastProvider';
-import { TimerBanner } from '@/components/TimerBanner';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
@@ -40,7 +39,6 @@ export default function HomePage() {
     const { user } = useUser();
     const [lastOrder, setLastOrder] = useState<any>(null);
     const [currentWeekOrder, setCurrentWeekOrder] = useState<any>(null);
-    const [allCurrentWeekOrders, setAllCurrentWeekOrders] = useState<any[]>([]);
     const { showToast } = useToast();
 
     // Helper to clean up categories
@@ -62,8 +60,7 @@ export default function HomePage() {
             fetchProducts(),
             fetchDeadline(),
             user ? fetchLastOrder() : Promise.resolve(),
-            user ? fetchCurrentWeekOrder() : Promise.resolve(),
-            fetchAllCurrentWeekOrders()
+            user ? fetchCurrentWeekOrder() : Promise.resolve()
         ]).finally(() => {
             setLoading(false);
         });
@@ -79,51 +76,6 @@ export default function HomePage() {
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    // Listen for order-placed event to refresh the orders list
-    useEffect(() => {
-        const handleOrderPlaced = async () => {
-            console.log('🔔 Order placed event received, refreshing orders...');
-            try {
-                const res = await fetch('/api/orders/period/current/all');
-                if (res.ok) {
-                    const data = await res.json();
-                    setAllCurrentWeekOrders(data.orders || []);
-                    console.log('✅ Orders refreshed:', data.orders?.length || 0, 'orders');
-                } else {
-                    console.error('❌ Failed to fetch orders:', res.status);
-                }
-            } catch (error) {
-                console.error('❌ Error fetching all current week orders:', error);
-            }
-        };
-
-        window.addEventListener('order-placed', handleOrderPlaced);
-        console.log('👂 Listening for order-placed events');
-
-        return () => {
-            window.removeEventListener('order-placed', handleOrderPlaced);
-            console.log('👋 Stopped listening for order-placed events');
-        };
-    }, []);
-
-    // Poll for updates every 30 seconds as fallback
-    useEffect(() => {
-        const pollInterval = setInterval(async () => {
-            console.log('🔄 Polling for order updates...');
-            try {
-                const res = await fetch('/api/orders/period/current/all');
-                if (res.ok) {
-                    const data = await res.json();
-                    setAllCurrentWeekOrders(data.orders || []);
-                }
-            } catch (error) {
-                console.error('Error polling orders:', error);
-            }
-        }, 30000); // Poll every 30 seconds
-
-        return () => clearInterval(pollInterval);
     }, []);
 
     // Update timer when deadline changes
@@ -201,18 +153,6 @@ export default function HomePage() {
             }
         } catch (error) {
             console.error('Error fetching current week order:', error);
-        }
-    };
-
-    const fetchAllCurrentWeekOrders = async () => {
-        try {
-            const res = await fetch('/api/orders/period/current/all');
-            if (res.ok) {
-                const data = await res.json();
-                setAllCurrentWeekOrders(data.orders || []);
-            }
-        } catch (error) {
-            console.error('Error fetching all current week orders:', error);
         }
     };
 
@@ -410,76 +350,40 @@ export default function HomePage() {
                 </svg>
             </motion.button>
 
-            {/* Timer Banner */}
-            <TimerBanner timeLeft={timeLeft} deadline={deadline} />
-
-            {/* Dashboard Cards */}
+            {/* Dashboard Header & Timer */}
             <div className="flex flex-col md:flex-row items-stretch gap-6">
-                {/* Recent Orders - Current Week */}
-                <DashboardCard className="flex-1 bg-white border-gray-200">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
+                {/* Timer Card */}
+                <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
+                    ? 'bg-gradient-to-br from-red-500 to-red-700 animate-pulse shadow-red-500/30'
+                    : 'bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-500/20'
+                    }`}>
+                    <div className="flex flex-col h-full justify-between">
+                        <div className="flex items-center gap-3 opacity-90">
+                            <ClockIcon />
+                            <span className="text-sm font-medium uppercase tracking-wider">
+                                {timeLeft && (timeLeft.d === 0 && timeLeft.h < 4) ? '🚨 SPOED!' : 'Bestellen Sluit Over'}
+                            </span>
                         </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Deze Week</p>
-                            <h3 className="text-lg font-bold text-gray-900">Recent besteld</h3>
-                        </div>
-                    </div>
-
-                    {(() => {
-                        console.log('🎨 Rendering Recent Orders card. Length:', allCurrentWeekOrders.length);
-                        console.log('📋 Orders data:', allCurrentWeekOrders);
-                        return allCurrentWeekOrders.length === 0;
-                    })() ? (
-                        <div className="flex flex-col items-center justify-center py-8 text-center">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </div>
-                            <p className="text-gray-900 font-bold text-base">Wees de eerste!</p>
-                            <p className="text-gray-500 text-sm mt-1">Nog niemand heeft besteld deze week</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3 max-h-64 overflow-y-auto">
-                            {allCurrentWeekOrders.slice(0, 6).map((order: any) => (
-                                <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
-                                        {order.personName?.charAt(0).toUpperCase() || '?'}
+                        <div className="mt-4">
+                            {timeLeft ? (
+                                <>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-mono font-bold">{timeLeft.d}d</span>
+                                        <span className="text-4xl font-mono font-bold">{timeLeft.h}u</span>
+                                        <span className="text-4xl font-mono font-bold">{timeLeft.m}m</span>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-baseline gap-2 mb-1">
-                                            <p className="text-sm font-bold text-gray-900">{order.personName}</p>
-                                            {order.department && (
-                                                <span className="text-xs text-gray-500">· {order.department}</span>
-                                            )}
-                                        </div>
-                                        <p className="text-sm text-gray-600 truncate">
-                                            {order.orderItems?.slice(0, 2).map((item: any, idx: number) => (
-                                                <span key={idx}>
-                                                    {idx > 0 && ', '}
-                                                    {item.quantity}x {formatName(item.product?.name || 'Product')}
-                                                </span>
-                                            ))}
-                                            {order.orderItems?.length > 2 && (
-                                                <span className="text-gray-400"> +{order.orderItems.length - 2}</span>
-                                            )}
+                                    {deadline && (
+                                        <p className="text-white/70 text-sm mt-3 font-medium">
+                                            Deadline: {format(deadline, 'EEEE d MMMM - HH:mm', { locale: nl })} uur
                                         </p>
-                                    </div>
-                                </div>
-                            ))}
-                            {allCurrentWeekOrders.length > 6 && (
-                                <p className="text-xs text-gray-400 text-center pt-2 font-medium">
-                                    +{allCurrentWeekOrders.length - 6} meer bestelling{allCurrentWeekOrders.length - 6 !== 1 ? 'en' : ''}
-                                </p>
+                                    )}
+                                </>
+                            ) : (
+                                <span className="text-3xl font-bold">Gesloten</span>
                             )}
                         </div>
-                    )}
+                    </div>
                 </DashboardCard>
-
 
                 {/* Recent Order - Reorder */}
                 {lastOrder && (
