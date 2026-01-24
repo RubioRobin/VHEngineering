@@ -401,8 +401,8 @@ export default function AdminPage() {
                 </button>
             </div>
 
-            {/* Top Row: 3 Columns on Large Screens */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Top Row: 2 Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 {/* Recurrent Deadline Settings */}
                 <DashboardCard className="p-6 border-emerald-100 bg-emerald-50/50 flex flex-col justify-between overflow-visible">
@@ -577,14 +577,16 @@ export default function AdminPage() {
                         className="w-full bg-cyan-600 hover:bg-cyan-700 font-semibold"
                         icon={<RefreshCcw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
                     >
-                        {refreshing ? 'Producten ophalen...' : 'Assortiment resetten (Scrape)'}
+                        {refreshing ? 'Producten ophalen...' : 'Assortiment resetten'}
                     </DashboardButton>
                 </DashboardCard>
 
                 {/* Reset Week */}
 
                 {/* Product Manager (FULL WIDTH) */}
-                <ProductManager adminToken={adminToken ?? ''} onUnauthorized={handleLogout} />
+                <div className="col-span-1 md:col-span-2">
+                    <ProductManager adminToken={adminToken ?? ''} onUnauthorized={handleLogout} />
+                </div>
             </div>
 
             {/* Email Management */}
