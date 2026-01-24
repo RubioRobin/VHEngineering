@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getISOWeek, getYear } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
+
+// Helper to get current Week ID (e.g., "2024-05")
+const getCurrentWeekId = () => {
+    const now = new Date();
+    return `${getYear(now)}-${getISOWeek(now)}`;
+};
 
 /**
  * GET /api/orders/period/current/all
@@ -9,13 +16,18 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
     try {
-        // Get the current active period
-        const period = await (prisma as any).orderPeriod.findFirst({
-            where: { isClosed: false },
-            orderBy: { deadline: 'desc' }
+        const weekId = getCurrentWeekId();
+        console.log('🔍 Looking for orders in week:', weekId);
+
+        // Get the current week's period
+        const period = await (prisma as any).orderPeriod.findUnique({
+            where: { weekId }
         });
 
+        console.log('📅 Period found:', period ? `Yes (ID: ${period.id}, Closed: ${period.isClosed})` : 'No');
+
         if (!period) {
+            console.log('⚠️ No period exists for this week yet');
             return NextResponse.json({ orders: [] });
         }
 
