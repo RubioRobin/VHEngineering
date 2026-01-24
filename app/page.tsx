@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { formatName } from '@/lib/utils';
 import ProductCard from '@/components/ProductCard';
 import { motion } from 'framer-motion';
-import { Search, Loader2, ShoppingBag, ChevronDown } from 'lucide-react';
+import { Search, Loader2, ShoppingBag, ChevronDown, Sandwich, Pizza, Croissant, Coffee, Carrot } from 'lucide-react';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { CartSidebar } from '@/components/cart/CartSidebar';
@@ -560,14 +560,38 @@ export default function HomePage() {
 
                                 return (
                                     <section key={category} id={`cat-${category}`} className="scroll-mt-32">
-                                        <div className="flex items-center gap-4 mb-6">
-                                            <div className="h-8 w-1.5 bg-indigo-500 rounded-full"></div>
-                                            <h3 className="text-2xl font-bold text-slate-800">
-                                                {category === 'Broodjes' ? 'Belegde broodjes' : category}
-                                            </h3>
-                                            <span className="bg-slate-100 text-slate-500 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-slate-200">
-                                                {productsInCat.length}
-                                            </span>
+                                        <div className="flex items-center gap-4 mb-8 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                            {/* Icon & Color Mapping */}
+                                            {(() => {
+                                                const style = {
+                                                    'Belegde broodjes': { icon: <Sandwich className="w-6 h-6 text-orange-600" />, bg: 'bg-orange-100', border: 'border-orange-100' },
+                                                    'Broodjes': { icon: <Sandwich className="w-6 h-6 text-orange-600" />, bg: 'bg-orange-100', border: 'border-orange-100' },
+                                                    'Snacks': { icon: <Pizza className="w-6 h-6 text-red-600" />, bg: 'bg-red-100', border: 'border-red-100' },
+                                                    'Banket': { icon: <Croissant className="w-6 h-6 text-amber-600" />, bg: 'bg-amber-100', border: 'border-amber-100' },
+                                                    'Frisdrank': { icon: <Coffee className="w-6 h-6 text-blue-600" />, bg: 'bg-blue-100', border: 'border-blue-100' },
+                                                    'Salades': { icon: <Carrot className="w-6 h-6 text-green-600" />, bg: 'bg-green-100', border: 'border-green-100' },
+                                                    'Overig': { icon: <ShoppingBag className="w-6 h-6 text-slate-600" />, bg: 'bg-slate-100', border: 'border-slate-100' },
+                                                }[category] || { icon: <ShoppingBag className="w-6 h-6 text-slate-600" />, bg: 'bg-slate-100', border: 'border-slate-100' };
+
+                                                // Correct display name
+                                                const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
+
+                                                return (
+                                                    <>
+                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${style.bg}`}>
+                                                            {style.icon}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h3 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                                                                {displayName}
+                                                                <span className="bg-slate-100 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200">
+                                                                    {productsInCat.length}
+                                                                </span>
+                                                            </h3>
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                             {productsInCat.map((product) => (
