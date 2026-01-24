@@ -376,7 +376,7 @@ export default function AdminPage() {
     if (isCheckingAuth) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <RefreshCcw className="w-8 h-8 text-indigo-500 animate-spin" />
+                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
             </div>
         );
     }

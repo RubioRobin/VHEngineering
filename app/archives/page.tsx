@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DashboardCard } from '@/components/ui/DashboardCard';
-import { Trash2, Clock, Users, ArrowRight, FolderOpen } from 'lucide-react';
+import { Trash2, Clock, Users, ArrowRight, FolderOpen, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -76,7 +76,7 @@ export default function ArchivesPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <Loader2 className="w-12 h-12 text-primary animate-spin" />
             </div>
         );
     }
