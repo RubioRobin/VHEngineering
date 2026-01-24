@@ -31,15 +31,18 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: 'Reminder already sent' });
         }
 
-        // 2. Check Time Condition (Now >= Deadline - 4 hours)
+        // 2. Check if TODAY is the deadline day
+        const today = new Date();
         const deadline = new Date(period.deadline);
-        const triggerTime = subHours(deadline, 4);
-        const now = new Date();
 
-        console.log(`[Cron] Check: Now(${now.toISOString()}) >= Trigger(${triggerTime.toISOString()})?`);
+        const isSameDay = today.getFullYear() === deadline.getFullYear() &&
+            today.getMonth() === deadline.getMonth() &&
+            today.getDate() === deadline.getDate();
 
-        if (isAfter(now, triggerTime) && now < deadline) {
-            console.log('[Cron] ⏰ It is time! 4 hours or less before deadline.');
+        console.log(`[Cron] Check: Today(${today.toDateString()}) === Deadline(${deadline.toDateString()})?`);
+
+        if (isSameDay) {
+            console.log('[Cron] ⏰ It is deadline day! Sending reminders...');
 
             // 3. Send Emails
             const result = await sendReminderToAll();
@@ -52,16 +55,15 @@ export async function GET(request: Request) {
 
             return NextResponse.json({
                 success: true,
-                message: 'Reminders sent successfully',
+                message: 'Reminders sent successfully for deadline day',
                 result
             });
         } else {
-            console.log('[Cron] Not yet time to send.');
+            console.log('[Cron] Not deadline day yet.');
             return NextResponse.json({
-                message: 'Not within 4 hour window yet',
+                message: 'Not deadline day',
                 deadline: deadline.toISOString(),
-                triggerTime: triggerTime.toISOString(),
-                now: now.toISOString()
+                today: today.toISOString()
             });
         }
 
