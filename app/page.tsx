@@ -418,8 +418,8 @@ export default function HomePage() {
             </div>
 
             {/* Sticky Header: Title + Search + Filters */}
-            <div className="sticky top-0 z-30 bg-gray-50/95 backdrop-blur-sm pt-4 pb-6 mb-8 border-b border-slate-200 shadow-sm transition-all -mx-4 px-4 sm:-mx-0 sm:px-0 sm:rounded-b-2xl">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="sticky top-0 z-30 bg-gray-50/95 backdrop-blur-sm shadow-sm border-b border-slate-200 mb-8 py-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 transition-all">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 max-w-7xl mx-auto">
                     <div>
                         <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
                             {showOnlyFavorites ? 'Jouw Favorieten' : 'Het Assortiment'}
