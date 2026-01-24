@@ -81,20 +81,21 @@ export const Sidebar = () => {
                     <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
                         {user?.name?.charAt(0).toUpperCase() || 'G'}
                     </div>
-                    <AnimatePresence mode="wait">
-                        {!collapsed && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                                className="ml-3 overflow-hidden"
-                            >
-                                <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
-                                <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    <div className="ml-3 overflow-hidden flex flex-col justify-center h-10">
+                        <motion.div
+                            initial={false}
+                            animate={{
+                                opacity: collapsed ? 0 : 1,
+                                width: collapsed ? 0 : "auto",
+                                marginLeft: collapsed ? 0 : 12
+                            }}
+                            transition={{ duration: 0.2 }}
+                            className="whitespace-nowrap"
+                        >
+                            <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
+                            <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
+                        </motion.div>
+                    </div>
                 </div>
 
                 {/* Menu */}
@@ -109,19 +110,18 @@ export const Sidebar = () => {
                             <div className="w-5 h-5 flex items-center justify-center shrink-0">
                                 <item.icon className="w-5 h-5 transition-colors" />
                             </div>
-                            <AnimatePresence mode="wait">
-                                {!collapsed && (
-                                    <motion.span
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="font-medium text-sm overflow-hidden ml-3"
-                                    >
-                                        {item.label}
-                                    </motion.span>
-                                )}
-                            </AnimatePresence>
+                            <motion.span
+                                initial={false}
+                                animate={{
+                                    opacity: collapsed ? 0 : 1,
+                                    width: collapsed ? 0 : "auto",
+                                    marginLeft: collapsed ? 0 : 12
+                                }}
+                                transition={{ duration: 0.2 }}
+                                className="font-medium text-sm overflow-hidden whitespace-nowrap"
+                            >
+                                {item.label}
+                            </motion.span>
                         </Link>
                     ))}
                 </nav>
@@ -132,19 +132,18 @@ export const Sidebar = () => {
                         <div className="w-5 h-5 flex items-center justify-center shrink-0">
                             <Settings className="w-5 h-5" />
                         </div>
-                        <AnimatePresence mode="wait">
-                            {!collapsed && (
-                                <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="font-medium text-sm overflow-hidden ml-3"
-                                >
-                                    Settings
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: collapsed ? 0 : 1,
+                                width: collapsed ? 0 : "auto",
+                                marginLeft: collapsed ? 0 : 12
+                            }}
+                            transition={{ duration: 0.2 }}
+                            className="font-medium text-sm overflow-hidden whitespace-nowrap"
+                        >
+                            Settings
+                        </motion.span>
                     </Link>
                     <button
                         onClick={toggleSidebar}
@@ -154,19 +153,18 @@ export const Sidebar = () => {
                         <div className="w-5 h-5 flex items-center justify-center shrink-0">
                             <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
                         </div>
-                        <AnimatePresence mode="wait">
-                            {!collapsed && (
-                                <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="font-medium text-sm overflow-hidden ml-3"
-                                >
-                                    Inklappen
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: collapsed ? 0 : 1,
+                                width: collapsed ? 0 : "auto",
+                                marginLeft: collapsed ? 0 : 12
+                            }}
+                            transition={{ duration: 0.2 }}
+                            className="font-medium text-sm overflow-hidden whitespace-nowrap"
+                        >
+                            Inklappen
+                        </motion.span>
                     </button>
                 </div>
             </motion.aside>
