@@ -14,7 +14,7 @@ export const LayoutInterior = ({ children }: { children: React.ReactNode }) => {
 
             {/* Main Content Area */}
             <div
-                className={`flex-1 transition-[padding] duration-500 ease-in-out flex flex-col ${isSidebarCollapsed ? 'md:pl-[80px]' : 'md:pl-[280px]'
+                className={`flex-1 transition-[padding] duration-300 ease-out flex flex-col ${isSidebarCollapsed ? 'md:pl-[80px]' : 'md:pl-[280px]'
                     }`}
             >
                 <main className="px-4 pt-4 pb-8 min-h-screen flex-1">
