@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, Clock, Settings, Menu, X, History, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Settings, Menu, X, History, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useUser } from "../providers/UserProvider";
@@ -9,7 +9,7 @@ import { useUI } from "../providers/UIProvider";
 
 const menuItems = [
     { icon: LayoutDashboard, label: 'Het assortiment', href: '/' },
-    { icon: Clock, label: 'Overzicht', href: '/overview' },
+    { icon: ClipboardList, label: 'Overzicht', href: '/overview' },
     { icon: History, label: 'Mijn bestellingen', href: '/mijn-bestellingen' },
     { icon: FolderOpen, label: 'Archief', href: '/archives' },
 ];
