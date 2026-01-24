@@ -18,13 +18,20 @@ const getAdminDeadline = async (): Promise<Date> => {
         return new Date(setting.value);
     }
 
-    // Default fallback: Thursday this week at 14:00
+    // Default fallback: Next Thursday at 14:00
     const now = new Date();
-    const day = now.getDay();
-    const diff = 4 - day; // 4 = Thursday
+    const day = now.getDay(); // 0 = Sunday, 4 = Thursday
+    let daysUntilThursday = 4 - day;
+
+    // If today is Thursday after 14:00, or Friday/Saturday/Sunday, go to next Thursday
+    if (daysUntilThursday < 0 || (daysUntilThursday === 0 && now.getHours() >= 14)) {
+        daysUntilThursday += 7;
+    }
+
     const deadline = new Date(now);
-    deadline.setDate(now.getDate() + diff);
+    deadline.setDate(now.getDate() + daysUntilThursday);
     deadline.setHours(14, 0, 0, 0);
+
     return deadline;
 };
 
