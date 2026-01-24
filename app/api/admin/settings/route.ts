@@ -33,11 +33,10 @@ export async function GET(request: NextRequest) {
  * Update deadline settings
  */
 export async function POST(request: NextRequest) {
-    // Auth check disabled for testing
-    // const authHeader = request.headers.get('authorization');
-    // if (!checkAdminAuth(authHeader)) {
-    //     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    const authHeader = request.headers.get('authorization');
+    if (!checkAdminAuth(authHeader)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     try {
         const { day, hour, minute } = await request.json();
@@ -63,6 +62,36 @@ export async function POST(request: NextRequest) {
                 update: { value: setting.value },
                 create: { key: setting.key, value: setting.value },
             });
+        }
+
+        // Sync current period deadline immediately
+        try {
+            // Re-import dynamically to get fresh settings? 
+            // Actually getNextDeadline fetches from DB so it will see the new values we just upserted above.
+            const { getNextDeadline, getCurrentPeriodId } = await import('@/lib/orderPeriod');
+
+            const newDeadline = await getNextDeadline();
+            const currentWeekId = await getCurrentPeriodId();
+
+            // Check if period exists
+            const period = await prisma.orderPeriod.findUnique({
+                where: { weekId: currentWeekId }
+            });
+
+            if (period) {
+                // Only update if the period deadline is in the future
+                // (prevent accidentally re-opening a past period if we mess with settings)
+                if (new Date(period.deadline) > new Date()) {
+                    await prisma.orderPeriod.update({
+                        where: { weekId: currentWeekId },
+                        data: { deadline: newDeadline }
+                    });
+                    console.log(`Updated current period ${currentWeekId} deadline to ${newDeadline}`);
+                }
+            }
+        } catch (syncError) {
+            console.error('Error syncing active period deadline:', syncError);
+            // Don't fail the request, just log
         }
 
         return NextResponse.json({ message: 'Instellingen succesvol bijgewerkt' });

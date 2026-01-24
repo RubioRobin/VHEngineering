@@ -1,5 +1,7 @@
 'use client';
 
+import { formatName } from "@/lib/utils";
+
 interface Product {
     id: string;
     name: string;
@@ -31,7 +33,7 @@ export default function CartItem({
             {/* Product name and remove button */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{item.product.name}</h3>
+                    <h3 className="font-semibold text-gray-900">{formatName(item.product.name)}</h3>
                     {item.product.price && (
                         <p className="text-sm text-gray-600">€ {item.product.price.toFixed(2)}</p>
                     )}

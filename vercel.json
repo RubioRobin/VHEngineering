@@ -3,5 +3,11 @@
         "app/api/admin/refresh-products/route.ts": {
             "maxDuration": 60
         }
-    }
+    },
+    "crons": [
+        {
+            "path": "/api/cron/reminder",
+            "schedule": "0 * * * *"
+        }
+    ]
 }

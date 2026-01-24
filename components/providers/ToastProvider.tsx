@@ -1,0 +1,160 @@
+"use client";
+
+import { createContext, useContext, useState, ReactNode } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, XCircle, AlertCircle, X } from 'lucide-react';
+
+type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+interface Toast {
+    id: string;
+    message: string;
+    type: ToastType;
+}
+
+interface ConfirmOptions {
+    message: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+    confirmText?: string;
+    cancelText?: string;
+}
+
+interface ToastContextType {
+    showToast: (message: string, type?: ToastType) => void;
+    showConfirm: (options: ConfirmOptions) => void;
+}
+
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
+
+export const useToast = () => {
+    const context = useContext(ToastContext);
+    if (!context) throw new Error('useToast must be used within ToastProvider');
+    return context;
+};
+
+export const ToastProvider = ({ children }: { children: ReactNode }) => {
+    const [toasts, setToasts] = useState<Toast[]>([]);
+    const [confirmDialog, setConfirmDialog] = useState<ConfirmOptions | null>(null);
+
+    const showToast = (message: string, type: ToastType = 'info') => {
+        const id = Date.now().toString();
+        setToasts(prev => [...prev, { id, message, type }]);
+
+        setTimeout(() => {
+            setToasts(prev => prev.filter(t => t.id !== id));
+        }, 4000);
+    };
+
+    const showConfirm = (options: ConfirmOptions) => {
+        setConfirmDialog(options);
+    };
+
+    const handleConfirm = () => {
+        confirmDialog?.onConfirm();
+        setConfirmDialog(null);
+    };
+
+    const handleCancel = () => {
+        confirmDialog?.onCancel?.();
+        setConfirmDialog(null);
+    };
+
+    const removeToast = (id: string) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+    };
+
+    const getIcon = (type: ToastType) => {
+        switch (type) {
+            case 'success': return <CheckCircle2 className="w-5 h-5" />;
+            case 'error': return <XCircle className="w-5 h-5" />;
+            case 'warning': return <AlertCircle className="w-5 h-5" />;
+            default: return <AlertCircle className="w-5 h-5" />;
+        }
+    };
+
+    const getColors = (type: ToastType) => {
+        switch (type) {
+            case 'success': return 'bg-green-50 border-green-200 text-green-800';
+            case 'error': return 'bg-red-50 border-red-200 text-red-800';
+            case 'warning': return 'bg-orange-50 border-orange-200 text-orange-800';
+            default: return 'bg-blue-50 border-blue-200 text-blue-800';
+        }
+    };
+
+    return (
+        <ToastContext.Provider value={{ showToast, showConfirm }}>
+            {children}
+
+            {/* Toast Container */}
+            <div className="fixed top-4 right-4 z-50 space-y-2 pointer-events-none">
+                <AnimatePresence>
+                    {toasts.map(toast => (
+                        <motion.div
+                            key={toast.id}
+                            initial={{ opacity: 0, x: 100, scale: 0.8 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: 100, scale: 0.8 }}
+                            className={`${getColors(toast.type)} border rounded-lg shadow-lg p-4 min-w-[300px] max-w-md pointer-events-auto`}
+                        >
+                            <div className="flex items-center gap-3">
+                                {getIcon(toast.type)}
+                                <p className="flex-1 font-medium text-sm">{toast.message}</p>
+                                <button
+                                    onClick={() => removeToast(toast.id)}
+                                    className="hover:opacity-70 transition-opacity"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </div>
+
+            {/* Confirm Dialog */}
+            <AnimatePresence>
+                {confirmDialog && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+                            onClick={handleCancel}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="fixed inset-0 flex items-center justify-center z-50 p-4"
+                            style={{ pointerEvents: 'none' }}
+                        >
+                            <div
+                                className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full"
+                                style={{ pointerEvents: 'auto' }}
+                            >
+                                <h3 className="text-lg font-bold text-text-primary mb-2">Bevestiging</h3>
+                                <p className="text-text-secondary mb-6">{confirmDialog.message}</p>
+                                <div className="flex gap-3 justify-end">
+                                    <button
+                                        onClick={handleCancel}
+                                        className="px-4 py-2 rounded-lg border border-border text-text-secondary hover:bg-gray-50 transition-colors font-medium"
+                                    >
+                                        {confirmDialog.cancelText || 'Annuleren'}
+                                    </button>
+                                    <button
+                                        onClick={handleConfirm}
+                                        className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white transition-colors font-medium"
+                                    >
+                                        {confirmDialog.confirmText || 'Bevestigen'}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </ToastContext.Provider>
+    );
+};

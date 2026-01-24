@@ -1,0 +1,9 @@
+@echo off
+SET "PATH=C:\Program Files\nodejs;%PATH%"
+echo Database repareren...
+echo 1. Generate...
+call npx prisma generate
+echo 2. DB Push (schema syncen)...
+call npx prisma db push
+echo Klaar! Je kunt dit venster sluiten en start_server.bat opnieuw draaien.
+pause

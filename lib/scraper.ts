@@ -9,11 +9,11 @@ interface ScrapedProduct {
 }
 
 /**
- * Scrape products from brood-shop.nl using Puppeteer
+ * Scrape products from a given URL using Puppeteer
  * Handles infinite scroll to load all products dynamically
  */
-export async function scrapeProducts(): Promise<ScrapedProduct[]> {
-    const url = process.env.SCRAPER_URL || 'https://www.brood-shop.nl/assortiment/belegde-broodjes/';
+export async function scrapeProducts(targetUrl: string): Promise<ScrapedProduct[]> {
+    const url = targetUrl;
 
     console.log(`🔍 Launching browser to scrape: ${url}`);
 
@@ -116,8 +116,13 @@ export async function scrapeProducts(): Promise<ScrapedProduct[]> {
                         sourceUrl = linkElement.getAttribute('href') || null;
                     }
 
-                    // Only add valid products (skip categories like 'Belegde Broodjes' and items without price)
-                    if (name && name.length > 3 && price !== null && name.toLowerCase() !== 'belegde broodjes') {
+                    // Only add valid sandwich products
+                    // Exclude drinks, soups, etc.
+                    const lowerName = name.toLowerCase();
+                    const invalidTerms = ['fles', 'melk', 'jus', 'smoothie', 'soep', 'blikje', 'cola', 'fanta', 'water', 'spa', 'red bull', 'aa drink', 'chocomel', 'fristi'];
+                    const isDrinkOrOther = invalidTerms.some(term => lowerName.includes(term));
+
+                    if (name && name.length > 3 && price !== null && !isDrinkOrOther && name.toLowerCase() !== 'belegde broodjes') {
                         results.push({
                             name,
                             price,
@@ -172,7 +177,8 @@ export async function saveScrapedProducts(products: ScrapedProduct[]): Promise<n
                         description: product.description,
                         imageUrl: product.imageUrl,
                         sourceUrl: product.sourceUrl,
-                    },
+                        allergens: (product as any).allergens || null,
+                    } as any,
                 });
                 console.log(`  ↻ Updated: ${product.name}`);
             } else {
@@ -192,21 +198,47 @@ export async function saveScrapedProducts(products: ScrapedProduct[]): Promise<n
 }
 
 /**
- * Run full scraping process and log results
+ * Run full scraping process for all active sources and log results
  */
 export async function runScraper(): Promise<{ success: boolean; message: string; count: number }> {
     try {
-        console.log('\n🚀 Starting scraper...\n');
-        const products = await scrapeProducts();
+        console.log('\n🚀 Starting multi-source scraper...\n');
 
-        if (products.length === 0) {
-            const errorMsg = 'No products found - website structure may have changed or is blocking requests';
+        // Fetch active sources from DB
+        const sources = await (prisma as any).scraperSource.findMany({
+            where: { isActive: true }
+        });
+
+        // If no sources in DB, use the default from env or hardcoded fallback
+        const urlsToScrape = sources.length > 0
+            ? sources.map((s: any) => s.url)
+            : [process.env.SCRAPER_URL || 'https://www.brood-shop.nl/assortiment/belegde-broodjes/'];
+
+        let totalScrapedProducts: ScrapedProduct[] = [];
+        let sourceResults: string[] = [];
+
+        for (const url of urlsToScrape) {
+            try {
+                const products = await scrapeProducts(url);
+                totalScrapedProducts = [...totalScrapedProducts, ...products];
+                sourceResults.push(`Success: ${url} (${products.length} products)`);
+            } catch (err: any) {
+                console.error(`Error scraping ${url}:`, err);
+                sourceResults.push(`Failed: ${url} (${err.message})`);
+            }
+        }
+
+        // Deduplicate by name
+        const uniqueProducts = Array.from(new Map(totalScrapedProducts.map(p => [p.name, p])).values());
+
+        if (uniqueProducts.length === 0) {
+            const errorMsg = 'No products found across all sources - website structure may have changed or sources are empty';
             console.log(`⚠️ ${errorMsg}`);
 
             await prisma.scraperLog.create({
                 data: {
                     status: 'error',
-                    message: errorMsg,
+                    message: sourceResults.join(' | '),
                     productsFound: 0,
                 },
             });
@@ -218,22 +250,22 @@ export async function runScraper(): Promise<{ success: boolean; message: string;
             };
         }
 
-        console.log(`\n💾 Saving ${products.length} products to database...\n`);
-        const savedCount = await saveScrapedProducts(products);
+        console.log(`\n💾 Saving ${uniqueProducts.length} unique products to database...\n`);
+        const savedCount = await saveScrapedProducts(uniqueProducts);
 
         await prisma.scraperLog.create({
             data: {
-                status: savedCount === products.length ? 'success' : 'partial',
-                message: `Saved ${savedCount}/${products.length} products`,
+                status: savedCount === uniqueProducts.length ? 'success' : 'partial',
+                message: sourceResults.join(' | '),
                 productsFound: savedCount,
             },
         });
 
-        console.log(`\n✅ Scraping complete! Saved ${savedCount} products\n`);
+        console.log(`\n✅ Scraping complete! Saved ${savedCount} products total\n`);
 
         return {
             success: true,
-            message: `Successfully scraped and saved ${savedCount} products from brood-shop.nl`,
+            message: `Successfully scraped and saved ${savedCount} unique products from ${urlsToScrape.length} sources.`,
             count: savedCount,
         };
 

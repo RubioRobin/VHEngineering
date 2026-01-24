@@ -1,75 +1,124 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-
-interface Product {
-    id: string;
-    name: string;
-    price: number | null;
-    description: string | null;
-    imageUrl: string | null;
-}
+import { Plus, Minus, ShoppingCart, Star } from "lucide-react";
+import React, { useState } from "react";
+import { DashboardCard } from "./ui/DashboardCard";
+import { DashboardButton } from "./ui/DashboardButton";
+import { useUser } from "./providers/UserProvider";
+import { formatName } from "@/lib/utils";
 
 interface ProductCardProps {
-    product: Product;
-    onAddToCart: (product: Product) => void;
+    product: {
+        id: string;
+        name: string;
+        price: number | null;
+        description: string | null;
+        imageUrl: string | null;
+        allergens: string | null;
+    };
+    onAddToCart: (product: any, quantity: number) => void;
     disabled?: boolean;
+    isFavorite?: boolean;
+    onToggleFavorite?: (productId: string) => void;
 }
 
-export default function ProductCard({ product, onAddToCart, disabled }: ProductCardProps) {
+const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onToggleFavorite }: ProductCardProps) => {
+    const [quantity, setQuantity] = useState(1);
+    const { user } = useUser();
+
+    const handleIncrement = () => setQuantity(q => q + 1);
+    const handleDecrement = () => setQuantity(q => Math.max(1, q - 1));
+
+    const handleAdd = () => {
+        onAddToCart(product, quantity);
+        setQuantity(1);
+    };
+
     return (
-        <div className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-primary-300">
-            {/* Image */}
-            <div className="relative h-48 bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
+        <DashboardCard className="h-full flex flex-col group relative" hoverEffect={!disabled}>
+            {/* Image Area */}
+            <div className="aspect-[4/3] w-full overflow-hidden bg-gray-50 relative rounded-t-2xl">
                 {product.imageUrl ? (
-                    <Image
+                    <img
                         src={product.imageUrl}
                         alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                 ) : (
-                    <div className="flex items-center justify-center h-full">
-                        <svg className="w-16 h-16 text-primary-200" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M21.5,8c-1.42,0-2.61,0.95-2.94,2.23C18,10.08,17,9,15.5,9c-0.89,0-1.68,0.48-2.14,1.21C12,10.08,11,9,9.5,9C8,9,7,10.08,6.64,11.23 C6.31,9.95,5.12,9,3.7,9c-1.5,0-2.7,1.2-2.7,2.7c0,0.1,0.01,0.19,0.02,0.29C1.1,14.65,3,19.3,12.11,21.94c0.23,0.07,0.48,0.06,0.78,0 c9.11-2.64,11.01-7.29,11.09-9.95c0.01-0.1,0.02-0.19,0.02-0.29C24,10.2,22.8,8,21.5,8z" />
-                        </svg>
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        <span className="text-4xl">🥪</span>
+                    </div>
+                )}
+
+                {/* Favorite Star Button - Top Left */}
+                {user && onToggleFavorite && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleFavorite(product.id);
+                        }}
+                        className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all z-10"
+                        title={isFavorite ? 'Verwijder uit favorieten' : 'Toevoegen aan favorieten'}
+                    >
+                        <Star
+                            className={`w-6 h-6 transition-colors ${isFavorite
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-400'
+                                }`}
+                        />
+                    </button>
+                )}
+
+                {/* Price Tag - Top Right */}
+                {product.price && (
+                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur text-text-primary px-3 py-1.5 rounded-full font-bold shadow-md text-sm border border-border/30">
+                        € {product.price.toFixed(2)}
                     </div>
                 )}
             </div>
 
             {/* Content */}
-            <div className="p-4 space-y-3">
-                <h3 className="font-bold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
-                    {product.name}
+            <div className="p-5 flex flex-col flex-1">
+                <h3 className="font-bold text-lg text-text-primary mb-1 line-clamp-1" title={product.name}>
+                    {formatName(product.name)}
                 </h3>
+                {/* Onderschriften verwijderd op verzoek */}
 
-                {product.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                        {product.description}
-                    </p>
-                )}
-
-                <div className="flex items-center justify-between pt-2">
-                    {product.price ? (
-                        <span className="text-2xl font-bold text-primary-600">
-                            € {product.price.toFixed(2)}
+                <div className="mt-auto space-y-3">
+                    {/* Quantity Selector */}
+                    <div className="flex items-center justify-between bg-background rounded-xl p-1 border border-border/50">
+                        <button
+                            onClick={handleDecrement}
+                            className="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-lg transition-colors"
+                            disabled={disabled}
+                        >
+                            <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="font-bold text-lg text-text-primary min-w-[2rem] text-center">
+                            {quantity}
                         </span>
-                    ) : (
-                        <span className="text-sm text-gray-400">Prijs onbekend</span>
-                    )}
+                        <button
+                            onClick={handleIncrement}
+                            className="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-lg transition-colors"
+                            disabled={disabled}
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
 
-                    <button
-                        onClick={() => onAddToCart(product)}
+                    {/* Add to Cart Button */}
+                    <DashboardButton
+                        onClick={handleAdd}
                         disabled={disabled}
-                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${disabled
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-primary-500 hover:bg-primary-600 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
-                            }`}
+                        className="w-full py-3 text-sm shadow-md"
+                        icon={<ShoppingCart className="w-4 h-4" />}
                     >
-                        {disabled ? 'Gesloten' : 'Toevoegen'}
-                    </button>
+                        Toevoegen
+                    </DashboardButton>
                 </div>
             </div>
-        </div>
+        </DashboardCard>
     );
-}
+};
+
+export default ProductCard;

@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { formatName } from '@/lib/utils';
+import { useToast } from '@/components/providers/ToastProvider';
 
 interface OrderItem {
     id: string;
@@ -33,6 +35,7 @@ interface Order {
 
 export default function MyOrdersPage() {
     const router = useRouter();
+    const { showToast } = useToast();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -73,8 +76,6 @@ export default function MyOrdersPage() {
     };
 
     const handleCancelOrder = async (orderId: string) => {
-        // if (!confirm('Weet je zeker dat je deze bestelling wilt annuleren?')) return;
-
         const token = localStorage.getItem('clientToken');
         try {
             const res = await fetch(`/api/orders/${orderId}?token=${token}`, {
@@ -83,19 +84,19 @@ export default function MyOrdersPage() {
 
             if (res.ok) {
                 setOrders(orders.filter(o => o.id !== orderId));
+                showToast("Bestelling succesvol geannuleerd.", "success");
             } else {
                 const data = await res.json();
                 console.error(data.error || 'Fout bij annuleren');
+                showToast(data.error || "Fout bij annuleren van bestelling.", "error");
             }
         } catch (err) {
             console.error('Er is een fout opgetreden');
+            showToast("Netwerkfout bij annuleren.", "error");
         }
     };
 
     const handleEditOrder = (order: Order) => {
-        // Option 1: Load back into cart for editing
-        // if (!confirm('Dit vervangt je huidige winkelmandje door de inhoud van deze bestelling. Doorgaan?')) return;
-
         const cartItems = order.orderItems.map(item => ({
             id: `${Date.now()}-${Math.random()}`,
             product: item.product,
@@ -107,7 +108,8 @@ export default function MyOrdersPage() {
         // We'll also tell the cart page we are editing this order
         localStorage.setItem('editingOrderId', order.id);
 
-        router.push('/cart');
+        showToast("Bestelling ingeladen in winkelmandje.", "success");
+        router.push('/');
     };
 
     const isOrderEditable = (order: Order) => {
@@ -244,7 +246,7 @@ export default function MyOrdersPage() {
                                                     <div className="flex-grow">
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-bold text-gray-900">{item.quantity}x</span>
-                                                            <span className="font-medium text-gray-800">{item.product.name}</span>
+                                                            <span className="font-medium text-gray-800">{formatName(item.product.name)}</span>
                                                         </div>
                                                         {item.comment && (
                                                             <p className="text-sm text-gray-500 mt-0.5 italic">Opmerking: {item.comment}</p>

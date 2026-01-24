@@ -1,700 +1,697 @@
-'use client';
+﻿'use client';
 
-export const dynamic = 'force-dynamic';
-
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface Product {
-    id: string;
-    name: string;
-    price: number | null;
-}
-
-interface OrderItem {
-    id: string;
-    quantity: number;
-    comment: string | null;
-    product: Product;
-}
-
-interface Order {
-    id: string;
-    personName: string;
-    department: string | null;
-    createdAt: string;
-    orderItems: OrderItem[];
-}
-
-interface Period {
-    weekId: string;
-    deadline: string;
-}
-
-interface DeadlineConfig {
-    day: string;
-    dayValue: number;
-    hour: number;
-    minute: number;
-    formatted: string;
-}
+import { DashboardCard } from '@/components/ui/DashboardCard';
+import { DashboardButton } from '@/components/ui/DashboardButton';
+import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info } from 'lucide-react';
+import { useToast } from '@/components/providers/ToastProvider';
+import { format } from 'date-fns';
+import { nl } from 'date-fns/locale';
 
 export default function AdminPage() {
-    const router = useRouter();
-    const [adminCode, setAdminCode] = useState('');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [periods, setPeriods] = useState<Period[]>([]);
-    const [selectedPeriod, setSelectedPeriod] = useState<string>('');
-    const [groupBy, setGroupBy] = useState<'person' | 'sandwich'>('person');
-    const [loading, setLoading] = useState(false);
+    const [currentDeadline, setCurrentDeadline] = useState<Date | null>(null);
+    const [emailList, setEmailList] = useState<any[]>([]);
+    const [newEmail, setNewEmail] = useState('');
+    const [newName, setNewName] = useState('');
     const [refreshing, setRefreshing] = useState(false);
-    const [exporting, setExporting] = useState(false);
-    const [savingSettings, setSavingSettings] = useState(false);
-    const [deadlineConfig, setDeadlineConfig] = useState<DeadlineConfig | null>(null);
-    const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-    // Auto-clear status after 3 seconds
+    // Recurring settings (Initialize with CURRENT TIME as requested)
+    const [deadlinesSettings, setDeadlineSettings] = useState(() => {
+        const now = new Date();
+        // Map JS getDay (0=Sun, 1=Mon) to our 1-5 range. Default weekends to Monday (1)
+        const day = now.getDay();
+        const adjustedDay = (day === 0 || day === 6) ? 1 : day;
+
+        return {
+            day: adjustedDay,
+            hour: now.getHours(),
+            minute: now.getMinutes()
+        };
+    });
+
+    // Saved deadline settings (for display in subtitle)
+    const [savedDeadlineSettings, setSavedDeadlineSettings] = useState({
+        day: 4,
+        hour: 14,
+        minute: 0
+    });
+
+    // Email template states
+    const [emailSubject, setEmailSubject] = useState('');
+    const [emailBodyText, setEmailBodyText] = useState('');
+    const [emailBodyHtml, setEmailBodyHtml] = useState('');
+    const [showHtmlEditor, setShowHtmlEditor] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+
+    const hourRef = useRef<HTMLDivElement>(null);
+    const minuteRef = useRef<HTMLDivElement>(null);
+
+    // Initial scroll on mount and wheel listener
     useEffect(() => {
-        if (statusMessage) {
-            const timer = setTimeout(() => setStatusMessage(null), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [statusMessage]);
+        const hEl = hourRef.current;
+        const mEl = minuteRef.current;
+
+        // Set initial positions
+        if (hEl) hEl.scrollTop = deadlinesSettings.hour * 32;
+        if (mEl) mEl.scrollTop = deadlinesSettings.minute * 32;
+
+        const handleWheel = (e: WheelEvent) => {
+            e.preventDefault();
+            const el = e.currentTarget as HTMLDivElement;
+            const itemHeight = 32;
+            const direction = e.deltaY > 0 ? 1 : -1;
+
+            el.scrollBy({
+                top: direction * itemHeight,
+                behavior: 'smooth'
+            });
+        };
+
+        if (hEl) hEl.addEventListener('wheel', handleWheel, { passive: false });
+        if (mEl) mEl.addEventListener('wheel', handleWheel, { passive: false });
+
+        return () => {
+            if (hEl) hEl.removeEventListener('wheel', handleWheel);
+            if (mEl) mEl.removeEventListener('wheel', handleWheel);
+        };
+    }, []); // Run once on mount
+
+    const { showToast, showConfirm } = useToast();
 
     useEffect(() => {
-        // Only fetch public settings on mount
-        fetchSettings();
-
-        // Check for stored session
-        const storedCode = sessionStorage.getItem('adminCode');
-        if (storedCode) {
-            setAdminCode(storedCode);
-            setIsAuthenticated(true);
-            loadAdminData(storedCode);
-        }
+        fetchEmails();
+        fetchEmailTemplate();
+        fetchCurrentDeadline();
+        fetchRecursiveSettings();
     }, []);
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        sessionStorage.setItem('adminCode', adminCode);
-        setIsAuthenticated(true);
-        loadAdminData(adminCode);
-    };
 
-    const loadAdminData = async (code: string) => {
-        setLoading(true);
-        try {
-            // Fetch periods
-            const periodsRes = await fetch('/api/admin/periods', {
-                headers: { 'Authorization': `Bearer ${code}` }
-            });
-            if (periodsRes.ok) {
-                const data = await periodsRes.json();
-                setPeriods(data.periods);
-                setSelectedPeriod(data.currentPeriodId);
-
-                // Fetch orders for current period
-                await fetchOrders(data.currentPeriodId, code);
-            }
-        } catch (error) {
-            console.error('Error loading admin data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchSettings = async () => {
+    const fetchRecursiveSettings = async () => {
         try {
             const res = await fetch('/api/admin/settings');
             if (res.ok) {
                 const data = await res.json();
-                setDeadlineConfig(data);
+                // ONLY update the saved settings subtitle, NOT the picker itself
+                // Picker stays at "Current Time" as initialized
+                setSavedDeadlineSettings({
+                    day: data.dayValue ?? 4,
+                    hour: data.hour ?? 14,
+                    minute: data.minute ?? 0
+                });
             }
         } catch (error) {
-            console.error('Error fetching settings:', error);
+            console.error('Error fetching recursive settings:', error);
         }
     };
 
-    const handleSaveSettings = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!deadlineConfig) return;
-
-        setSavingSettings(true);
+    const fetchEmails = async () => {
         try {
-            const res = await fetch('/api/admin/settings', {
+            const res = await fetch('/api/admin/emails');
+            if (res.ok) {
+                const data = await res.json();
+                setEmailList(data.emails || []);
+            }
+        } catch (error) {
+            console.error('Error fetching emails:', error);
+        }
+    };
+
+    const fetchEmailTemplate = async () => {
+        try {
+            const res = await fetch('/api/admin/email-template');
+            if (res.ok) {
+                const data = await res.json();
+                const template = data.template;
+                setEmailSubject(template.subject || '');
+                setEmailBodyText(template.bodyText || '');
+                setEmailBodyHtml(template.bodyHtml || '');
+            }
+        } catch (error) {
+            console.error('Error fetching template:', error);
+        }
+    };
+
+    const fetchCurrentDeadline = async () => {
+        try {
+            const res = await fetch('/api/deadline');
+            if (res.ok) {
+                const data = await res.json();
+                setCurrentDeadline(new Date(data.deadline));
+            }
+        } catch (error) {
+            console.error('Error fetching deadline:', error);
+        }
+    };
+
+    const handleSaveTemplate = async () => {
+        if (!emailSubject || !emailBodyText) {
+            showToast('Subject en tekst zijn verplicht!', 'warning');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/admin/email-template', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${adminCode}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    day: deadlineConfig.dayValue,
-                    hour: deadlineConfig.hour,
-                    minute: deadlineConfig.minute,
-                }),
+                    subject: emailSubject,
+                    bodyText: emailBodyText,
+                    bodyHtml: emailBodyHtml || emailBodyText
+                })
             });
 
             if (res.ok) {
-                setStatusMessage({ type: 'success', text: 'Instellingen opgeslagen!' });
-                fetchSettings(); // Refresh formatted string
+                showToast('Email template opgeslagen!', 'success');
             } else {
-                const data = await res.json();
-                setStatusMessage({ type: 'error', text: `Fout: ${data.error}` });
+                showToast('Fout bij opslaan template', 'error');
             }
         } catch (error) {
-            console.error('Error saving settings:', error);
-            setStatusMessage({ type: 'error', text: 'Opslaan mislukt' });
-        } finally {
-            setSavingSettings(false);
+            showToast('Netwerkfout', 'error');
         }
     };
 
 
-
-
-
-    const fetchOrders = async (periodId: string, code: string = adminCode) => {
-        setLoading(true);
+    const handleAddEmail = async () => {
+        if (!newEmail) {
+            showToast('Vul een email adres in!', 'warning');
+            return;
+        }
 
         try {
-            const res = await fetch(`/api/admin/orders?period=${periodId}`, {
-                headers: { 'Authorization': `Bearer ${code}` }
+            const res = await fetch('/api/admin/emails', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: newEmail, name: newName })
             });
 
             if (res.ok) {
-                const data = await res.json();
-                setOrders(data);
+                showToast('Email toegevoegd!', 'success');
+                setNewEmail('');
+                setNewName('');
+                fetchEmails();
             } else {
-                console.error('Failed to fetch orders');
+                const data = await res.json();
+                showToast(data.error || 'Fout bij toevoegen email', 'error');
             }
         } catch (error) {
-            console.error('Error fetching orders:', error);
-        } finally {
-            setLoading(false);
+            showToast('Netwerkfout', 'error');
         }
     };
 
-    const handleRefreshProducts = async () => {
-        setRefreshing(true);
+    const handleDeleteEmail = async (id: string) => {
+        showConfirm({
+            message: 'Email verwijderen uit de lijst?',
+            onConfirm: async () => {
+                try {
+                    const res = await fetch('/api/admin/emails', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id })
+                    });
 
+                    if (res.ok) {
+                        showToast('Email verwijderd!', 'success');
+                        fetchEmails();
+                    } else {
+                        showToast('Fout bij verwijderen', 'error');
+                    }
+                } catch (error) {
+                    showToast('Netwerkfout', 'error');
+                }
+            }
+        });
+    };
+
+    const handleRefreshAssortment = async () => {
+        const code = prompt('Voer de admin code in om het assortiment te vernieuwen:');
+        if (!code) return;
+
+        setRefreshing(true);
         try {
             const res = await fetch('/api/admin/refresh-products', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${adminCode}` }
+                headers: {
+                    'Authorization': `Bearer ${code}`
+                }
             });
 
-            const data = await res.json();
-
             if (res.ok) {
-                setStatusMessage({ type: 'success', text: `Producten vernieuwd! ${data.count} items.` });
+                showToast('Assortiment succesvol vernieuwd!', 'success');
             } else {
-                setStatusMessage({ type: 'error', text: `Fout: ${data.error}` });
+                const data = await res.json();
+                showToast(data.error || 'Fout bij vernieuwen', 'error');
             }
         } catch (error) {
-            console.error('Error refreshing products:', error);
-            setStatusMessage({ type: 'error', text: 'Refresh mislukt' });
+            showToast('Netwerkfout', 'error');
         } finally {
             setRefreshing(false);
         }
     };
 
-    const handleExportExcel = async () => {
-        setExporting(true);
+
+    const handleSaveRecurrentDeadline = async () => {
+        const code = prompt('Voer de admin code in om de instellingen op te slaan:');
+        if (!code) return;
+
         try {
-            const res = await fetch(`/api/admin/export?period=${selectedPeriod}`, {
-                headers: { 'Authorization': `Bearer ${adminCode}` }
+            const res = await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${code}`
+                },
+                body: JSON.stringify(deadlinesSettings)
             });
 
             if (res.ok) {
-                const blob = await res.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `bestellingen-${selectedPeriod}.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-                window.URL.revokeObjectURL(url);
-                setStatusMessage({ type: 'success', text: 'Excel gedownload!' });
-            } else {
-                setStatusMessage({ type: 'error', text: 'Export mislukt' });
-            }
-        } catch (error) {
-            console.error('Error exporting:', error);
-            setStatusMessage({ type: 'error', text: 'Export mislukt' });
-        } finally {
-            setExporting(false);
-        }
-    };
-
-    const handleDeleteOrder = async (orderId: string) => {
-        // if (!confirm('Weet je zeker dat je deze bestelling wilt verwijderen?')) return;
-
-        try {
-            const res = await fetch(`/api/orders/${orderId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${adminCode}` }
-            });
-
-            if (res.ok) {
-                setStatusMessage({ type: 'success', text: 'Bestelling verwijderd' });
-                fetchOrders(selectedPeriod);
+                setSavedDeadlineSettings({ ...deadlinesSettings });
+                showToast('Wekelijkse deadline opgeslagen!', 'success');
             } else {
                 const data = await res.json();
-                setStatusMessage({ type: 'error', text: `Fout: ${data.error}` });
+                showToast(data.error || 'Fout bij opslaan', 'error');
             }
         } catch (error) {
-            console.error('Error deleting order:', error);
-            setStatusMessage({ type: 'error', text: 'Verwijderen mislukt' });
+            showToast('Netwerkfout', 'error');
         }
     };
 
-    const handlePeriodChange = (periodId: string) => {
-        setSelectedPeriod(periodId);
-        fetchOrders(periodId);
-    };
+    const handleResetWeek = async () => {
+        const code = prompt('VOORZICHTIG: Voer de admin code in om alle huidige bestellingen te wissen en de week te resetten:');
+        if (!code) return;
 
+        if (!confirm('Weet je zeker dat je alle bestellingen van deze week wilt wissen?')) return;
 
-
-    // Prepare grouped data
-    const groupedData = () => {
-        if (groupBy === 'person') {
-            // Group by person
-            return orders.map((order) => ({
-                id: order.id,
-                person: order.personName,
-                department: order.department,
-                items: order.orderItems,
-                orderedAt: order.createdAt,
-            }));
-        } else {
-            // Group by sandwich
-            const sandwichMap = new Map<
-                string,
-                { name: string; quantity: number; comments: string[]; price: number | null }
-            >();
-
-            orders.forEach((order) => {
-                order.orderItems.forEach((item) => {
-                    const existing = sandwichMap.get(item.product.id);
-                    if (existing) {
-                        existing.quantity += item.quantity;
-                        if (item.comment) {
-                            existing.comments.push(`${item.comment} (${order.personName})`);
-                        }
-                    } else {
-                        sandwichMap.set(item.product.id, {
-                            name: item.product.name,
-                            quantity: item.quantity,
-                            comments: item.comment ? [`${item.comment} (${order.personName})`] : [],
-                            price: item.product.price,
-                        });
-                    }
-                });
+        try {
+            const res = await fetch('/api/admin/reset', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${code}`
+                }
             });
 
-            return Array.from(sandwichMap.values());
+            if (res.ok) {
+                showToast('Week succesvol gereset!', 'success');
+                fetchCurrentDeadline();
+            } else {
+                const data = await res.json();
+                showToast(data.error || 'Fout bij resetten', 'error');
+            }
+        } catch (error) {
+            showToast('Netwerkfout', 'error');
         }
     };
 
-    // Login Screen
-    if (!isAuthenticated) {
-        return (
-            <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-                <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-                    <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">
-                        Admin Login
-                    </h1>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Admin Code
-                            </label>
-                            <input
-                                type="password"
-                                value={adminCode}
-                                onChange={(e) => setAdminCode(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                                placeholder="Voer code in..."
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg transition-colors"
-                        >
-                            Inloggen
-                        </button>
-                    </form>
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                        <button
-                            onClick={() => router.push('/')}
-                            className="w-full text-gray-500 hover:text-gray-700 text-sm font-medium"
-                        >
-                            ← Terug naar Home
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    const handleSendTestEmail = async () => {
+        try {
+            const res = await fetch('/api/admin/test-email', { method: 'POST' });
+            const data = await res.json();
 
-    // Admin dashboard
+            if (res.ok) {
+                showToast((data.message || 'Test emails verzonden!') + ' (Let op: kan soms even duren)', 'success');
+            } else {
+                console.error('Test email failed:', data);
+                showToast(`Fout: ${data.error || 'Kon geen email versturen'}`, 'error');
+            }
+        } catch (error) {
+            console.error('Network error sending test email:', error);
+            showToast('Netwerkfout bij versturen', 'error');
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white">
-            {/* Header */}
-            <header className="bg-white shadow-md">
-                <div className="container mx-auto px-4 py-6">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => router.push('/')}
-                                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
-                            >
-                                ← Home
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </header>
+        <div className="space-y-8">
+            <div>
+                <h1 className="text-3xl font-bold text-text-primary">Admin beheer</h1>
+                <p className="text-text-muted mt-2">Beheer deadline en email notificaties</p>
+            </div>
 
-            {/* Main Content */}
-            <main className="container mx-auto px-4 py-8">
-                {/* Status Message */}
-                {statusMessage && (
-                    <div className="absolute top-20 left-0 right-0 flex justify-center z-50 pointer-events-none">
-                        <div className={`px-6 py-2 rounded-full shadow-lg text-white font-bold animate-bounce ${statusMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                            }`}>
-                            {statusMessage.text}
-                        </div>
-                    </div>
-                )}
+            {/* Top Row: 3 Columns on Large Screens */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                {/* Controls */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Period Selector */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Periode
-                            </label>
-                            <select
-                                value={selectedPeriod}
-                                onChange={(e) => handlePeriodChange(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                            >
-                                {periods.map((period) => (
-                                    <option key={period.weekId} value={period.weekId}>
-                                        Week {period.weekId}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Group By */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Groeperen
-                            </label>
-                            <select
-                                value={groupBy}
-                                onChange={(e) => setGroupBy(e.target.value as 'person' | 'sandwich')}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                            >
-                                <option value="person">Per Persoon</option>
-                                <option value="sandwich">Per Broodje</option>
-                            </select>
-                        </div>
-
-                        {/* Export Button */}
-                        <div className="flex items-end">
-                            <button
-                                onClick={handleExportExcel}
-                                disabled={exporting}
-                                className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors disabled:bg-gray-400"
-                            >
-                                {exporting ? 'Exporteren...' : 'Excel Export'}
-                            </button>
-                        </div>
-
-                        {/* Refresh Products */}
-                        <div className="flex items-end">
-                            <button
-                                onClick={handleRefreshProducts}
-                                disabled={refreshing}
-                                className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors disabled:bg-gray-400"
-                            >
-                                {refreshing ? 'Bezig...' : 'Ververs Assortiment'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-
-                {/* Settings Section */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-t-4 border-primary-500">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">
-                        Bestel Deadline Instellingen
-                    </h2>
-                    {deadlineConfig ? (
-                        <form onSubmit={handleSaveSettings} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Deadline Dag
-                                </label>
-                                <select
-                                    value={deadlineConfig.dayValue}
-                                    onChange={(e) => setDeadlineConfig({ ...deadlineConfig, dayValue: parseInt(e.target.value) })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                                >
-                                    <option value={0}>Zondag</option>
-                                    <option value={1}>Maandag</option>
-                                    <option value={2}>Dinsdag</option>
-                                    <option value={3}>Woensdag</option>
-                                    <option value={4}>Donderdag</option>
-                                    <option value={5}>Vrijdag</option>
-                                    <option value={6}>Zaterdag</option>
-                                </select>
+                {/* Recurrent Deadline Settings */}
+                <DashboardCard className="p-6 border-emerald-100 bg-emerald-50/50 flex flex-col justify-between overflow-visible">
+                    <div>
+                        <div className="mb-4 text-emerald-600">
+                            <div className="flex items-center gap-4 mb-1">
+                                <Settings className="w-8 h-8" />
+                                <h2 className="text-xl font-bold">Wekelijkse deadline</h2>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Bestel Deadline Tijd (Uur:Minuut)
-                                </label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="23"
-                                        value={deadlineConfig.hour}
-                                        onChange={(e) => setDeadlineConfig({ ...deadlineConfig, hour: parseInt(e.target.value) })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                                    />
-                                    <span className="font-bold">:</span>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="59"
-                                        value={deadlineConfig.minute}
-                                        onChange={(e) => setDeadlineConfig({ ...deadlineConfig, minute: parseInt(e.target.value) })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                                    />
+                            <p className="text-sm text-emerald-600/70 ml-12 tabular-nums">
+                                Huidige instelling: {['', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'][savedDeadlineSettings.day]} om {savedDeadlineSettings.hour.toString().padStart(2, '0')}:{savedDeadlineSettings.minute.toString().padStart(2, '0')}
+                            </p>
+                        </div>
+                        <div className="flex gap-3 mb-4">
+                            {/* Day Selector */}
+                            <div className="flex-1">
+                                <label className="text-[10px] uppercase font-bold text-text-muted mb-1 ml-1 block">Dag</label>
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const dropdown = document.getElementById('day-dropdown');
+                                            if (dropdown) {
+                                                dropdown.classList.toggle('hidden');
+                                            }
+                                        }}
+                                        className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-medium text-gray-700 hover:border-emerald-300 transition-colors cursor-pointer text-left flex items-center justify-between"
+                                    >
+                                        <span>{['', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'][deadlinesSettings.day]}</span>
+                                        <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <polyline points="6 9 12 15 18 9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </button>
+                                    <div
+                                        id="day-dropdown"
+                                        className="hidden absolute z-10 w-full mt-1 bg-white border border-emerald-200 rounded-lg shadow-lg overflow-hidden"
+                                    >
+                                        {[
+                                            { value: 1, label: 'Maandag' },
+                                            { value: 2, label: 'Dinsdag' },
+                                            { value: 3, label: 'Woensdag' },
+                                            { value: 4, label: 'Donderdag' },
+                                            { value: 5, label: 'Vrijdag' }
+                                        ].map((day) => (
+                                            <button
+                                                key={day.value}
+                                                type="button"
+                                                onClick={() => {
+                                                    setDeadlineSettings({ ...deadlinesSettings, day: day.value });
+                                                    const dropdown = document.getElementById('day-dropdown');
+                                                    if (dropdown) dropdown.classList.add('hidden');
+                                                }}
+                                                className={`w-full px-3 py-2 text-left text-sm font-medium transition-colors ${deadlinesSettings.day === day.value
+                                                    ? 'bg-emerald-500 text-white'
+                                                    : 'text-gray-700 hover:bg-emerald-50'
+                                                    }`}
+                                            >
+                                                {day.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg border border-gray-200">
-                                <p className="font-semibold text-primary-700">Huidige deadline:</p>
-                                <p>{deadlineConfig.formatted}</p>
-                            </div>
-                            <div>
-                                <button
-                                    type="submit"
-                                    disabled={savingSettings}
-                                    className="w-full px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg shadow-md transition-all disabled:bg-gray-400"
-                                >
-                                    {savingSettings ? 'Opslaan...' : 'Instellingen Opslaan'}
-                                </button>
-                            </div>
-                        </form>
-                    ) : (
-                        <div className="text-center py-4">Laden van instellingen...</div>
-                    )}
-                </div>
 
-                {/* Stats */}
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white rounded-xl shadow-md p-6">
-                        <div className="text-sm font-medium text-gray-600 mb-1">
-                            Totaal Bestellingen
-                        </div>
-                        <div className="text-3xl font-bold text-primary-600">
-                            {orders.length}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-md p-6">
-                        <div className="text-sm font-medium text-gray-600 mb-1">
-                            Totaal Broodjes
-                        </div>
-                        <div className="text-3xl font-bold text-primary-600">
-                            {orders.reduce(
-                                (sum, order) =>
-                                    sum +
-                                    order.orderItems.reduce((s, item) => s + item.quantity, 0),
-                                0
-                            )}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-xl shadow-md p-6">
-                        <div className="text-sm font-medium text-gray-600 mb-1">
-                            Unieke Personen
-                        </div>
-                        <div className="text-3xl font-bold text-primary-600">
-                            {new Set(orders.map((o) => o.personName)).size}
-                        </div>
-                    </div>
-                </div>
+                            {/* Time Picker */}
+                            <div className="flex-1">
+                                <label className="text-[10px] uppercase font-bold text-text-muted mb-1 ml-1 block">Tijd</label>
+                                <div className="bg-white rounded-lg p-2 border border-emerald-200">
+                                    <div className="flex items-center justify-center gap-2">
+                                        {/* Hour Scroll */}
+                                        <div className="relative group">
+                                            <div
+                                                ref={hourRef}
+                                                onScroll={(e) => {
+                                                    const el = e.currentTarget;
+                                                    const itemHeight = 32;
+                                                    const index = Math.round(el.scrollTop / itemHeight);
+                                                    if (index !== deadlinesSettings.hour && index >= 0 && index < 24) {
+                                                        setDeadlineSettings(prev => ({ ...prev, hour: index }));
+                                                    }
+                                                }}
+                                                className="h-16 w-14 overflow-y-scroll snap-y snap-mandatory cursor-grab active:cursor-grabbing remove-scrollbar"
+                                            >
+                                                <div className="flex flex-col items-center py-[16px]">
+                                                    {Array.from({ length: 24 }, (_, i) => (
+                                                        <button
+                                                            key={i}
+                                                            className={`w-full h-8 flex items-center justify-center shrink-0 snap-center transition-all ${deadlinesSettings.hour === i
+                                                                ? 'text-emerald-700 font-bold text-lg'
+                                                                : 'text-gray-400 text-sm hover:text-emerald-500'
+                                                                }`}
+                                                            onClick={(e) => {
+                                                                e.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                                                            }}
+                                                        >
+                                                            <span className="tabular-nums pointer-events-none">
+                                                                {i.toString().padStart(2, '0')}
+                                                            </span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="absolute top-1/2 left-0 right-0 h-8 -translate-y-1/2 border-y border-emerald-300 pointer-events-none" />
+                                        </div>
 
-                {/* Orders Table */}
-                {loading ? (
-                    <div className="text-center py-12">
-                        <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-gray-600">Laden...</p>
-                    </div>
-                ) : orders.length === 0 ? (
-                    <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-                        <div className="text-gray-300 mb-4">
-                            <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                            </svg>
+                                        <span className="text-base font-bold text-emerald-600 pb-1">:</span>
+
+                                        {/* Minute Scroll */}
+                                        <div className="relative group">
+                                            <div
+                                                ref={minuteRef}
+                                                onScroll={(e) => {
+                                                    const el = e.currentTarget;
+                                                    const itemHeight = 32;
+                                                    const index = Math.round(el.scrollTop / itemHeight);
+                                                    if (index !== deadlinesSettings.minute && index >= 0 && index < 60) {
+                                                        setDeadlineSettings(prev => ({ ...prev, minute: index }));
+                                                    }
+                                                }}
+                                                className="h-16 w-14 overflow-y-scroll snap-y snap-mandatory cursor-grab active:cursor-grabbing remove-scrollbar"
+                                            >
+                                                <div className="flex flex-col items-center py-[16px]">
+                                                    {Array.from({ length: 60 }, (_, i) => (
+                                                        <button
+                                                            key={i}
+                                                            className={`w-full h-8 flex items-center justify-center shrink-0 snap-center transition-all ${deadlinesSettings.minute === i
+                                                                ? 'text-emerald-700 font-bold text-lg'
+                                                                : 'text-gray-400 text-sm hover:text-emerald-500'
+                                                                }`}
+                                                            onClick={(e) => {
+                                                                e.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                                                            }}
+                                                        >
+                                                            <span className="tabular-nums pointer-events-none">
+                                                                {i.toString().padStart(2, '0')}
+                                                            </span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="absolute top-1/2 left-0 right-0 h-8 -translate-y-1/2 border-y border-emerald-300 pointer-events-none" />
+                                        </div>
+                                    </div>
+                                    <style jsx global>{`
+                                        .remove-scrollbar::-webkit-scrollbar { display: none; }
+                                        .remove-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                                    `}</style>
+                                </div>
+                            </div>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                            Nog geen bestellingen
-                        </h2>
-                        <p className="text-gray-600">
-                            Er zijn nog geen bestellingen voor deze periode
+                    </div>
+                    <DashboardButton
+                        onClick={handleSaveRecurrentDeadline}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"
+                    >
+                        Opslaan
+                    </DashboardButton>
+                </DashboardCard>
+
+                {/* Assortment Management */}
+                <DashboardCard className="p-6 border-cyan-100 bg-cyan-50/50 flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center gap-4 mb-4 text-cyan-600">
+                            <Database className="w-8 h-8" />
+                            <h2 className="text-xl font-bold">Producten beheren</h2>
+                        </div>
+                        <p className="text-text-secondary mb-4 text-sm">
+                            Haal de nieuwste broodjes op van brood-shop.nl. Dit kan even duren.
                         </p>
                     </div>
-                ) : (
-                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div className="overflow-x-auto">
-                            {groupBy === 'person' ? (
-                                <table className="w-full">
-                                    <thead className="bg-primary-100">
-                                        <tr>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Naam
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Afdeling
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Broodje
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Aantal
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Opmerking
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Besteld op
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Acties
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200">
-                                        {orders.map((order) =>
-                                            order.orderItems.map((item, idx) => (
-                                                <tr
-                                                    key={`${order.id}-${item.id}`}
-                                                    className="hover:bg-gray-50"
-                                                >
-                                                    {idx === 0 && (
-                                                        <>
-                                                            <td
-                                                                className="px-6 py-4 font-semibold"
-                                                                rowSpan={order.orderItems.length}
-                                                            >
-                                                                {order.personName}
-                                                            </td>
-                                                            <td
-                                                                className="px-6 py-4 text-gray-600"
-                                                                rowSpan={order.orderItems.length}
-                                                            >
-                                                                {order.department || '-'}
-                                                            </td>
-                                                        </>
-                                                    )}
-                                                    <td className="px-6 py-4">{item.product.name}</td>
-                                                    <td className="px-6 py-4 font-semibold">
-                                                        {item.quantity}x
-                                                    </td>
-                                                    <td className="px-6 py-4 text-gray-600">
-                                                        {item.comment || '-'}
-                                                    </td>
-                                                    {idx === 0 && (
-                                                        <>
-                                                            <td
-                                                                className="px-6 py-4 text-sm text-gray-600"
-                                                                rowSpan={order.orderItems.length}
-                                                            >
-                                                                {new Date(order.createdAt).toLocaleString('nl-NL')}
-                                                            </td>
-                                                            <td
-                                                                className="px-6 py-4 text-sm text-gray-600"
-                                                                rowSpan={order.orderItems.length}
-                                                            >
-                                                                <button
-                                                                    onClick={() => handleDeleteOrder((order as any).id)}
-                                                                    className="text-red-600 hover:text-red-800 font-bold"
-                                                                    title="Verwijder bestelling"
-                                                                >
-                                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                    </svg>
-                                                                </button>
-                                                            </td>
-                                                        </>
-                                                    )}
-                                                </tr>
-                                            ))
+                    <DashboardButton
+                        onClick={handleRefreshAssortment}
+                        disabled={refreshing}
+                        className="w-full bg-cyan-600 hover:bg-cyan-700 font-semibold"
+                        icon={<RefreshCcw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
+                    >
+                        {refreshing ? 'Producten ophalen...' : 'Assortiment vernieuwen'}
+                    </DashboardButton>
+                </DashboardCard>
+
+                {/* Reset Week */}
+                <DashboardCard className="p-6 border-red-100 bg-red-50/50 flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center gap-4 mb-4 text-red-600">
+                            <AlertTriangle className="w-8 h-8" />
+                            <h2 className="text-xl font-bold">Week reset</h2>
+                        </div>
+                        <p className="text-text-secondary mb-4 text-sm">
+                            Wis alle huidige bestellingen om een nieuwe week met een schone lei te beginnen.
+                        </p>
+                    </div>
+                    <DashboardButton
+                        onClick={handleResetWeek}
+                        className="w-full bg-red-600 hover:bg-red-700 font-bold"
+                        icon={<Trash2 className="w-4 h-4" />}
+                    >
+                        Start nieuwe week
+                    </DashboardButton>
+                </DashboardCard>
+            </div>
+
+            {/* Email Management */}
+            <DashboardCard className="p-6 col-span-1 lg:col-span-2 border-blue-100 bg-blue-50/50">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4 text-blue-600">
+                        <Mail className="w-8 h-8" />
+                        <div>
+                            <h2 className="text-xl font-bold flex items-center gap-2">
+                                Email notificaties
+                            </h2>
+                            <p className="text-sm text-text-muted">
+                                De automatische reminder wordt verstuurd op <strong>{['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'][savedDeadlineSettings?.day || 4]}</strong> om <strong>{String(((savedDeadlineSettings?.hour || 14) - 4 + 24) % 24).padStart(2, '0')}:{String(savedDeadlineSettings?.minute || 0).padStart(2, '0')}</strong> (4 uur voor deadline).
+                            </p>
+                        </div>
+                    </div>
+                    <DashboardButton
+                        onClick={handleSendTestEmail}
+                        className="bg-blue-600 hover:bg-blue-700"
+                        icon={<Send className="w-4 h-4" />}
+                    >
+                        Test email versturen
+                    </DashboardButton>
+                </div>
+
+                {/* Add Email Form */}
+                <div className="flex flex-col md:flex-row gap-3 mb-6 p-4 bg-white/60 rounded-xl border border-blue-100 shadow-sm backdrop-blur-sm">
+                    <div className="flex-1 relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" />
+                        <input
+                            type="email"
+                            placeholder="nieuwe.collega@vh-pe.nl"
+                            value={newEmail}
+                            onChange={(e) => setNewEmail(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-blue-100 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <input
+                            type="text"
+                            placeholder="Naam (optioneel)"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            className="w-full px-4 py-2.5 bg-white border border-blue-100 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
+                        />
+                    </div>
+                    <DashboardButton
+                        onClick={handleAddEmail}
+                        className="bg-blue-600 hover:bg-blue-700 md:w-auto w-full shadow-lg shadow-blue-600/20"
+                        icon={<Plus className="w-4 h-4" />}
+                    >
+                        Toevoegen
+                    </DashboardButton>
+                </div>
+
+                {/* Email List */}
+                <div className="space-y-2">
+                    {emailList.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-blue-300">
+                            <Mail className="w-12 h-12 mb-2 opacity-20" />
+                            <p className="text-sm">Nog geen emails toegevoegd</p>
+                        </div>
+                    ) : (
+                        emailList.map((subscriber) => (
+                            <div key={subscriber.id} className="group flex items-center justify-between p-3 bg-white hover:bg-blue-50/50 rounded-xl border border-blue-100/50 hover:border-blue-200 transition-all shadow-sm hover:shadow-md">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                                        {(subscriber.name || subscriber.email)[0].toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-gray-800">{subscriber.email}</p>
+                                        {subscriber.name && (
+                                            <p className="text-xs text-blue-400 font-medium">{subscriber.name}</p>
                                         )}
-                                    </tbody>
-                                </table>
-                            ) : (
-                                <table className="w-full">
-                                    <thead className="bg-primary-100">
-                                        <tr>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Broodje
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Totaal Aantal
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Prijs
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Totaal Bedrag
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">
-                                                Opmerkingen
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200">
-                                        {groupedData().map((item: any, idx: number) => (
-                                            <tr key={idx} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 font-semibold">
-                                                    {item.name}
-                                                </td>
-                                                <td className="px-6 py-4 font-bold text-primary-600">
-                                                    {item.quantity}x
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    {item.price ? `€ ${item.price.toFixed(2)}` : '-'}
-                                                </td>
-                                                <td className="px-6 py-4 font-semibold">
-                                                    {item.price
-                                                        ? `€ ${(item.price * item.quantity).toFixed(2)}`
-                                                        : '-'}
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">
-                                                    {item.comments.length > 0
-                                                        ? item.comments.join('; ')
-                                                        : '-'}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => handleDeleteEmail(subscriber.id)}
+                                    className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </DashboardCard>
+
+            {/* Email Template Editor */}
+            <DashboardCard className="p-6 col-span-1 lg:col-span-2 border-purple-100 bg-purple-50/50">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4 text-purple-600">
+                        <Edit3 className="w-8 h-8" />
+                        <div>
+                            <h2 className="text-xl font-bold">Email template editor</h2>
+                            <p className="text-sm text-text-muted">Pas de reminder email aan (versturen 4 uur voor deadline)</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <DashboardButton
+                            onClick={() => setShowPreview(!showPreview)}
+                            className="bg-gray-600 hover:bg-gray-700"
+                            icon={<Eye className="w-4 h-4" />}
+                        >
+                            {showPreview ? 'Editor' : 'Preview'}
+                        </DashboardButton>
+                        <DashboardButton
+                            onClick={handleSaveTemplate}
+                            className="bg-purple-600 hover:bg-purple-700"
+                        >
+                            Opslaan
+                        </DashboardButton>
+                    </div>
+                </div>
+
+                {!showPreview ? (
+                    <div className="space-y-4">
+                        {/* Subject */}
+                        <div>
+                            <label className="block text-sm font-medium text-text-primary mb-2">
+                                Email onderwerp
+                            </label>
+                            <input
+                                type="text"
+                                value={emailSubject}
+                                onChange={(e) => setEmailSubject(e.target.value)}
+                                placeholder="Vergeet niet te bestellen!"
+                                className="w-full px-4 py-2 bg-white border border-border rounded-lg focus:border-primary outline-none"
+                            />
+                        </div>
+
+                        {/* Body Text */}
+                        <div>
+                            <label className="block text-sm font-medium text-text-primary mb-2">
+                                Email tekst (Plain text)
+                            </label>
+                            <p className="text-xs text-text-muted mb-2">
+                                Gebruik {`{{name}}`} voor personalisatie (bijv. "Hallo {`{{name}}`}!")
+                            </p>
+                            <textarea
+                                value={emailBodyText}
+                                onChange={(e) => setEmailBodyText(e.target.value)}
+                                rows={8}
+                                placeholder="Hallo {{name}}!&#10;&#10;Dit is je reminder om je broodje te bestellen..."
+                                className="w-full px-4 py-3 bg-white border border-border rounded-lg focus:border-primary outline-none font-mono text-sm"
+                            />
+                        </div>
+
+
+                    </div>
+                ) : (
+                    <div className="bg-white border border-border rounded-lg p-6">
+                        <h3 className="text-lg font-bold text-text-primary mb-4">Email preview</h3>
+                        <div className="border-b border-border pb-3 mb-4">
+                            <p className="text-xs text-text-muted">Subject:</p>
+                            <p className="text-base font-semibold text-text-primary">{emailSubject || '(Geen onderwerp)'}</p>
+                        </div>
+                        <div className="prose prose-sm max-w-none">
+                            <pre className="whitespace-pre-wrap font-sans text-sm text-text-secondary bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                {emailBodyText.replace(/\{\{name\}\}/g, 'Jan') || '(Geen inhoud)'}
+                            </pre>
                         </div>
                     </div>
                 )}
-            </main>
+            </DashboardCard>
         </div>
     );
 }

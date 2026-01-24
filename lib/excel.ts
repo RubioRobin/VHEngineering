@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { PrismaClient } from '@prisma/client';
+import { formatName } from './utils';
 
 const prisma = new PrismaClient();
 
@@ -74,7 +75,7 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
             personSheet.addRow({
                 name: order.personName,
                 department: order.department || '-',
-                sandwich: item.product.name,
+                sandwich: formatName(item.product.name),
                 quantity: item.quantity,
                 comment: item.comment || '-',
                 price: item.product.price ? `€ ${item.product.price.toFixed(2)}` : '-',
@@ -113,15 +114,15 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
 
     orders.forEach(order => {
         order.orderItems.forEach(item => {
-            const existing = sandwichTotals.get(item.product.name);
+            const existing = sandwichTotals.get(formatName(item.product.name));
             if (existing) {
                 existing.quantity += item.quantity;
                 if (item.comment) {
                     existing.comments.push(`${item.comment} (${item.quantity}x)`);
                 }
             } else {
-                sandwichTotals.set(item.product.name, {
-                    name: item.product.name,
+                sandwichTotals.set(formatName(item.product.name), {
+                    name: formatName(item.product.name),
                     quantity: item.quantity,
                     comments: item.comment ? [`${item.comment} (${item.quantity}x)`] : [],
                     price: item.product.price,
