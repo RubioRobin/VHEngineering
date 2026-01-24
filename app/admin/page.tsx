@@ -6,7 +6,7 @@ import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { ProductManager } from '@/components/admin/ProductManager';
 import { AdminLoginModal } from '@/components/admin/AdminLoginModal';
-import { Trash2, Plus, Mail, Settings, RefreshCcw, Database, AlertTriangle, Eye, ChevronDown, Check, Loader2 } from 'lucide-react';
+import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut, Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
