@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { useToast } from '@/components/providers/ToastProvider';
-import { Edit2, Trash2, Plus, Save, X, Search, DollarSign } from 'lucide-react';
+import { Edit2, Trash2, Plus, Save, X, Search, DollarSign, ChevronDown } from 'lucide-react';
 
 interface Product {
     id: string;
@@ -241,15 +241,18 @@ export function ProductManager() {
                                 </button>
                             </div>
                         ) : (
-                            <select
-                                value={newProduct.category}
-                                onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
-                                className="w-full px-4 py-2 border rounded-lg bg-white appearance-none"
-                            >
-                                {CATEGORIES.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
+                            <div className="relative w-full">
+                                <select
+                                    value={newProduct.category}
+                                    onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-700 font-medium"
+                                >
+                                    {CATEGORIES.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                            </div>
                         )}
 
                         <input
@@ -312,15 +315,18 @@ export function ProductManager() {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <select
-                                                value={editForm.description || ''}
-                                                onChange={e => setEditForm({ ...editForm, description: e.target.value })}
-                                                className="flex-1 px-3 py-1 border rounded bg-white"
-                                            >
-                                                {CATEGORIES.map(cat => (
-                                                    <option key={cat} value={cat}>{cat}</option>
-                                                ))}
-                                            </select>
+                                            <div className="relative flex-1">
+                                                <select
+                                                    value={editForm.description || ''}
+                                                    onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                                                    className="w-full px-3 py-1 border rounded bg-white appearance-none focus:outline-none focus:border-indigo-500"
+                                                >
+                                                    {CATEGORIES.map(cat => (
+                                                        <option key={cat} value={cat}>{cat}</option>
+                                                    ))}
+                                                </select>
+                                                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+                                            </div>
                                         )}
 
                                         <input

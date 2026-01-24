@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { formatName } from '@/lib/utils';
 import ProductCard from '@/components/ProductCard';
 import { motion } from 'framer-motion';
-import { Search, Loader2, ShoppingBag } from 'lucide-react';
+import { Search, Loader2, ShoppingBag, ChevronDown } from 'lucide-react';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { CartSidebar } from '@/components/cart/CartSidebar';
@@ -33,6 +33,7 @@ export default function HomePage() {
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const { user } = useUser();
     const [lastOrder, setLastOrder] = useState<any>(null);
     const [currentWeekOrder, setCurrentWeekOrder] = useState<any>(null);
@@ -262,8 +263,12 @@ export default function HomePage() {
             filtered = filtered.filter(p => favorites.has(p.id));
         }
 
+        if (selectedCategory) {
+            filtered = filtered.filter(p => (p.description || 'Overig') === selectedCategory);
+        }
+
         setFilteredProducts(filtered);
-    }, [searchQuery, products, showOnlyFavorites, favorites]);
+    }, [searchQuery, products, showOnlyFavorites, favorites, selectedCategory]);
 
     const handleAddToCart = (product: Product, quantity: number) => {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -430,27 +435,30 @@ export default function HomePage() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3">
-                        {/* Category Pills (Mobile/Desktop) */}
+                        {/* Category Dropdown */}
                         {!showOnlyFavorites && !searchQuery && (
-                            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar max-w-[100vw] sm:max-w-auto">
-                                {Array.from(new Set(products.map(p => p.description || 'Overig')))
-                                    .sort((a, b) => {
-                                        const order = { 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Overig': 4 };
-                                        return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
-                                    })
-                                    .map(cat => (
-                                        <a
-                                            key={cat}
-                                            href={`#cat-${cat}`}
-                                            className="px-6 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 whitespace-nowrap hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                document.getElementById(`cat-${cat}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                            }}
-                                        >
-                                            {cat === 'Broodjes' ? 'Belegde broodjes' : cat}
-                                        </a>
-                                    ))}
+                            <div className="relative min-w-[200px]">
+                                <select
+                                    value={selectedCategory || ''}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setSelectedCategory(val === '' ? null : val);
+                                    }}
+                                    className="appearance-none w-full pl-4 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200"
+                                >
+                                    <option value="">Alle Categorieën</option>
+                                    {Array.from(new Set(products.map(p => p.description || 'Overig')))
+                                        .sort((a, b) => {
+                                            const order = { 'Belegde broodjes': 1, 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
+                                            return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
+                                        })
+                                        .map(cat => (
+                                            <option key={cat} value={cat}>
+                                                {cat === 'Broodjes' ? 'Belegde broodjes' : cat}
+                                            </option>
+                                        ))}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                             </div>
                         )}
 
