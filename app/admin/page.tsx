@@ -5,22 +5,27 @@ import { useRouter } from 'next/navigation';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { ProductManager } from '@/components/admin/ProductManager';
-import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info } from 'lucide-react';
+import { AdminLoginModal } from '@/components/admin/AdminLoginModal';
+import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut } from 'lucide-react';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
 export default function AdminPage() {
+    // Auth State
+    const [adminToken, setAdminToken] = useState<string | null>(null);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+    // Dashboard State
     const [currentDeadline, setCurrentDeadline] = useState<Date | null>(null);
     const [emailList, setEmailList] = useState<any[]>([]);
     const [newEmail, setNewEmail] = useState('');
     const [newName, setNewName] = useState('');
     const [refreshing, setRefreshing] = useState(false);
 
-    // Recurring settings (Initialize with CURRENT TIME as requested)
+    // Recurring settings (Initialize with CURRENT TIME)
     const [deadlinesSettings, setDeadlineSettings] = useState(() => {
         const now = new Date();
-        // Map JS getDay (0=Sun, 1=Mon) to our 1-5 range. Default weekends to Monday (1)
         const day = now.getDay();
         const adjustedDay = (day === 0 || day === 6) ? 1 : day;
 
@@ -48,8 +53,21 @@ export default function AdminPage() {
     const hourRef = useRef<HTMLDivElement>(null);
     const minuteRef = useRef<HTMLDivElement>(null);
 
+    const { showToast, showConfirm } = useToast();
+
+    // Check auth on mount
+    useEffect(() => {
+        const token = localStorage.getItem('vh_admin_token');
+        if (token) {
+            setAdminToken(token);
+        }
+        setIsCheckingAuth(false);
+    }, []);
+
     // Initial scroll on mount and wheel listener
     useEffect(() => {
+        if (!adminToken) return;
+
         const hEl = hourRef.current;
         const mEl = minuteRef.current;
 
@@ -76,25 +94,46 @@ export default function AdminPage() {
             if (hEl) hEl.removeEventListener('wheel', handleWheel);
             if (mEl) mEl.removeEventListener('wheel', handleWheel);
         };
-    }, []); // Run once on mount
-
-    const { showToast, showConfirm } = useToast();
+    }, [adminToken]);
 
     useEffect(() => {
-        fetchEmails();
-        fetchEmailTemplate();
-        fetchCurrentDeadline();
-        fetchRecursiveSettings();
-    }, []);
+        if (adminToken) {
+            fetchEmails();
+            fetchEmailTemplate();
+            fetchCurrentDeadline();
+            fetchRecursiveSettings();
+        }
+    }, [adminToken]);
 
+    const verifyLogin = async (code: string): Promise<boolean> => {
+        try {
+            // Verify by trying to fetch settings (which requires auth)
+            const res = await fetch('/api/admin/settings', {
+                headers: { 'Authorization': `Bearer ${code}` }
+            });
+
+            if (res.ok) {
+                setAdminToken(code);
+                localStorage.setItem('vh_admin_token', code);
+                return true;
+            }
+        } catch (error) {
+            console.error('Login verification error:', error);
+        }
+        return false;
+    };
+
+    const handleLogout = () => {
+        setAdminToken(null);
+        localStorage.removeItem('vh_admin_token');
+        showToast('Uitgelogd', 'info');
+    };
 
     const fetchRecursiveSettings = async () => {
         try {
             const res = await fetch('/api/admin/settings');
             if (res.ok) {
                 const data = await res.json();
-                // ONLY update the saved settings subtitle, NOT the picker itself
-                // Picker stays at "Current Time" as initialized
                 setSavedDeadlineSettings({
                     day: data.dayValue ?? 4,
                     hour: data.hour ?? 14,
@@ -154,7 +193,10 @@ export default function AdminPage() {
         try {
             const res = await fetch('/api/admin/email-template', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                },
                 body: JSON.stringify({
                     subject: emailSubject,
                     bodyText: emailBodyText,
@@ -165,13 +207,13 @@ export default function AdminPage() {
             if (res.ok) {
                 showToast('Email template opgeslagen!', 'success');
             } else {
+                if (res.status === 401) handleLogout();
                 showToast('Fout bij opslaan template', 'error');
             }
         } catch (error) {
             showToast('Netwerkfout', 'error');
         }
     };
-
 
     const handleAddEmail = async () => {
         if (!newEmail) {
@@ -182,7 +224,10 @@ export default function AdminPage() {
         try {
             const res = await fetch('/api/admin/emails', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                },
                 body: JSON.stringify({ email: newEmail, name: newName })
             });
 
@@ -192,6 +237,7 @@ export default function AdminPage() {
                 setNewName('');
                 fetchEmails();
             } else {
+                if (res.status === 401) handleLogout();
                 const data = await res.json();
                 showToast(data.error || 'Fout bij toevoegen email', 'error');
             }
@@ -207,7 +253,10 @@ export default function AdminPage() {
                 try {
                     const res = await fetch('/api/admin/emails', {
                         method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${adminToken}`
+                        },
                         body: JSON.stringify({ id })
                     });
 
@@ -215,6 +264,7 @@ export default function AdminPage() {
                         showToast('Email verwijderd!', 'success');
                         fetchEmails();
                     } else {
+                        if (res.status === 401) handleLogout();
                         showToast('Fout bij verwijderen', 'error');
                     }
                 } catch (error) {
@@ -225,21 +275,21 @@ export default function AdminPage() {
     };
 
     const handleRefreshAssortment = async () => {
-        const code = prompt('Voer de admin code in om het assortiment te vernieuwen:');
-        if (!code) return;
+        if (!adminToken) return;
 
         setRefreshing(true);
         try {
             const res = await fetch('/api/admin/refresh-products', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${code}`
+                    'Authorization': `Bearer ${adminToken}`
                 }
             });
 
             if (res.ok) {
                 showToast('Assortiment succesvol vernieuwd!', 'success');
             } else {
+                if (res.status === 401) handleLogout();
                 const data = await res.json();
                 showToast(data.error || 'Fout bij vernieuwen', 'error');
             }
@@ -250,17 +300,15 @@ export default function AdminPage() {
         }
     };
 
-
     const handleSaveRecurrentDeadline = async () => {
-        const code = prompt('Voer de admin code in om de instellingen op te slaan:');
-        if (!code) return;
+        if (!adminToken) return;
 
         try {
             const res = await fetch('/api/admin/settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${code}`
+                    'Authorization': `Bearer ${adminToken}`
                 },
                 body: JSON.stringify(deadlinesSettings)
             });
@@ -269,6 +317,7 @@ export default function AdminPage() {
                 setSavedDeadlineSettings({ ...deadlinesSettings });
                 showToast('Wekelijkse deadline opgeslagen!', 'success');
             } else {
+                if (res.status === 401) handleLogout();
                 const data = await res.json();
                 showToast(data.error || 'Fout bij opslaan', 'error');
             }
@@ -278,8 +327,7 @@ export default function AdminPage() {
     };
 
     const handleResetWeek = async () => {
-        const code = prompt('VOORZICHTIG: Voer de admin code in om alle huidige bestellingen te wissen en de week te resetten:');
-        if (!code) return;
+        if (!adminToken) return;
 
         if (!confirm('Weet je zeker dat je alle bestellingen van deze week wilt wissen?')) return;
 
@@ -287,7 +335,7 @@ export default function AdminPage() {
             const res = await fetch('/api/admin/reset', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${code}`
+                    'Authorization': `Bearer ${adminToken}`
                 }
             });
 
@@ -295,6 +343,7 @@ export default function AdminPage() {
                 showToast('Week succesvol gereset!', 'success');
                 fetchCurrentDeadline();
             } else {
+                if (res.status === 401) handleLogout();
                 const data = await res.json();
                 showToast(data.error || 'Fout bij resetten', 'error');
             }
@@ -305,12 +354,16 @@ export default function AdminPage() {
 
     const handleSendTestEmail = async () => {
         try {
-            const res = await fetch('/api/admin/test-email', { method: 'POST' });
+            const res = await fetch('/api/admin/test-email', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${adminToken}` }
+            });
             const data = await res.json();
 
             if (res.ok) {
                 showToast((data.message || 'Test emails verzonden!') + ' (Let op: kan soms even duren)', 'success');
             } else {
+                if (res.status === 401) handleLogout();
                 console.error('Test email failed:', data);
                 showToast(`Fout: ${data.error || 'Kon geen email versturen'}`, 'error');
             }
@@ -320,11 +373,32 @@ export default function AdminPage() {
         }
     };
 
+    if (isCheckingAuth) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <RefreshCcw className="w-8 h-8 text-indigo-500 animate-spin" />
+            </div>
+        );
+    }
+
+    if (!adminToken) {
+        return <AdminLoginModal onLogin={verifyLogin} />;
+    }
+
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold text-text-primary">Admin beheer</h1>
-                <p className="text-text-muted mt-2">Beheer deadline en email notificaties</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-text-primary">Admin beheer</h1>
+                    <p className="text-text-muted mt-2">Beheer deadline en email notificaties</p>
+                </div>
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all shadow-sm self-start sm:self-center"
+                >
+                    <LogOut className="w-4 h-4" />
+                    Uitloggen
+                </button>
             </div>
 
             {/* Top Row: 3 Columns on Large Screens */}
@@ -358,13 +432,11 @@ export default function AdminPage() {
                                         className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-medium text-gray-700 hover:border-emerald-300 transition-colors cursor-pointer text-left flex items-center justify-between"
                                     >
                                         <span>{['', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'][deadlinesSettings.day]}</span>
-                                        <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <polyline points="6 9 12 15 18 9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
+                                        <ChevronDown className="w-4 h-4 text-emerald-600" />
                                     </button>
                                     <div
                                         id="day-dropdown"
-                                        className="hidden absolute z-10 w-full mt-1 bg-white border border-emerald-200 rounded-lg shadow-lg overflow-hidden"
+                                        className="hidden absolute z-30 w-full mt-1 bg-white border border-emerald-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
                                     >
                                         {[
                                             { value: 1, label: 'Maandag' },
@@ -530,12 +602,12 @@ export default function AdminPage() {
                 </DashboardCard>
 
                 {/* Product Manager (FULL WIDTH) */}
-                <ProductManager />
+                <ProductManager adminToken={adminToken ?? ''} onUnauthorized={handleLogout} />
             </div>
 
             {/* Email Management */}
             <DashboardCard className="p-6 col-span-1 lg:col-span-2 border-blue-100 bg-blue-50/50">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                     <div className="flex items-center gap-4 text-blue-600">
                         <Mail className="w-8 h-8" />
                         <div>
@@ -549,7 +621,7 @@ export default function AdminPage() {
                     </div>
                     <DashboardButton
                         onClick={handleSendTestEmail}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-blue-600 hover:bg-blue-700 md:w-auto w-full"
                         icon={<Send className="w-4 h-4" />}
                     >
                         Test email versturen
@@ -678,8 +750,6 @@ export default function AdminPage() {
                                 className="w-full px-4 py-3 bg-white border border-border rounded-lg focus:border-primary outline-none font-mono text-sm"
                             />
                         </div>
-
-
                     </div>
                 ) : (
                     <div className="bg-white border border-border rounded-lg p-6">

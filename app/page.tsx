@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { formatName } from '@/lib/utils';
 import ProductCard from '@/components/ProductCard';
 import { motion } from 'framer-motion';
@@ -34,6 +34,8 @@ export default function HomePage() {
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const { user } = useUser();
     const [lastOrder, setLastOrder] = useState<any>(null);
     const [currentWeekOrder, setCurrentWeekOrder] = useState<any>(null);
@@ -60,6 +62,18 @@ export default function HomePage() {
         ]).finally(() => {
             setLoading(false);
         });
+    }, []);
+
+    // Handle clicking outside of category dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsCategoryDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     // Update timer when deadline changes
@@ -443,28 +457,54 @@ export default function HomePage() {
                     <div className="flex flex-col sm:flex-row gap-3">
                         {/* Category Dropdown */}
                         {!showOnlyFavorites && !searchQuery && (
-                            <div className="relative min-w-[200px]">
-                                <select
-                                    value={selectedCategory || ''}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        setSelectedCategory(val === '' ? null : val);
-                                    }}
-                                    className="appearance-none w-full pl-4 pr-10 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200"
+                            <div className="relative min-w-[220px]" ref={dropdownRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                                    className="w-full pl-6 pr-4 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200 flex items-center justify-between"
                                 >
-                                    <option value="">Alle Categorieën</option>
-                                    {Array.from(new Set(products.map(p => getCategory(p))))
-                                        .sort((a, b) => {
-                                            const order = { 'Belegde broodjes': 1, 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
-                                            return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
-                                        })
-                                        .map(cat => (
-                                            <option key={cat} value={cat}>
-                                                {cat === 'Broodjes' ? 'Belegde broodjes' : cat}
-                                            </option>
-                                        ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                    <span className="truncate">
+                                        {selectedCategory ? (selectedCategory === 'Broodjes' ? 'Belegde broodjes' : selectedCategory) : 'Alle Categorieën'}
+                                    </span>
+                                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {isCategoryDropdownOpen && (
+                                    <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedCategory(null);
+                                                setIsCategoryDropdownOpen(false);
+                                            }}
+                                            className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === null
+                                                ? 'bg-indigo-600 text-white'
+                                                : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
+                                                }`}
+                                        >
+                                            Alle Categorieën
+                                        </button>
+                                        {Array.from(new Set(products.map(p => getCategory(p))))
+                                            .sort((a, b) => {
+                                                const order = { 'Belegde broodjes': 1, 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
+                                                return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
+                                            })
+                                            .map(cat => (
+                                                <button
+                                                    key={cat}
+                                                    onClick={() => {
+                                                        setSelectedCategory(cat);
+                                                        setIsCategoryDropdownOpen(false);
+                                                    }}
+                                                    className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === cat
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
+                                                        }`}
+                                                >
+                                                    {cat === 'Broodjes' ? 'Belegde broodjes' : cat}
+                                                </button>
+                                            ))}
+                                    </div>
+                                )}
                             </div>
                         )}
 

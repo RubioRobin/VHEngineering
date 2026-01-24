@@ -15,7 +15,12 @@ interface Product {
     imageUrl: string | null;
 }
 
-export function ProductManager() {
+interface ProductManagerProps {
+    adminToken: string;
+    onUnauthorized: () => void;
+}
+
+export function ProductManager({ adminToken, onUnauthorized }: ProductManagerProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -65,14 +70,11 @@ export function ProductManager() {
         if (!editingId || !editForm.name || !editForm.price) return;
 
         try {
-            const adminCode = prompt("Admin Code:");
-            if (!adminCode) return;
-
             const res = await fetch(`/api/admin/products/${editingId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${adminCode}`
+                    'Authorization': `Bearer ${adminToken}`
                 },
                 body: JSON.stringify(editForm)
             });
@@ -82,6 +84,7 @@ export function ProductManager() {
                 setEditingId(null);
                 showToast('Product bijgewerkt!', 'success');
             } else {
+                if (res.status === 401) onUnauthorized();
                 showToast('Fout bij opslaan', 'error');
             }
         } catch (error) {
@@ -93,14 +96,11 @@ export function ProductManager() {
         showConfirm({
             message: `Weet je zeker dat je "${name}" wilt verwijderen?`,
             onConfirm: async () => {
-                const adminCode = prompt("Admin Code ter bevestiging:");
-                if (!adminCode) return;
-
                 try {
                     const res = await fetch(`/api/admin/products/${id}`, {
                         method: 'DELETE',
                         headers: {
-                            'Authorization': `Bearer ${adminCode}`
+                            'Authorization': `Bearer ${adminToken}`
                         }
                     });
 
@@ -108,6 +108,7 @@ export function ProductManager() {
                         setProducts(products.filter(p => p.id !== id));
                         showToast('Product verwijderd', 'success');
                     } else {
+                        if (res.status === 401) onUnauthorized();
                         showToast('Kon product niet verwijderen', 'error');
                     }
                 } catch (error) {
@@ -129,15 +130,12 @@ export function ProductManager() {
             return;
         }
 
-        const adminCode = prompt("Admin Code:");
-        if (!adminCode) return;
-
         try {
             const res = await fetch('/api/admin/products', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${adminCode}`
+                    'Authorization': `Bearer ${adminToken}`
                 },
                 body: JSON.stringify({
                     name: newProduct.name,
@@ -154,6 +152,7 @@ export function ProductManager() {
                 setNewProduct({ name: '', price: '', category: 'Belegde broodjes', imageUrl: '' });
                 showToast('Product aangemaakt!', 'success');
             } else {
+                if (res.status === 401) onUnauthorized();
                 showToast('Fout bij aanmaken', 'error');
             }
         } catch (error) {
