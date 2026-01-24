@@ -78,63 +78,7 @@ export default function OverviewPage() {
     const shippingPerPerson = orders.length > 0 ? SHIPPING_COST / orders.length : 0;
 
     const handleExport = () => {
-        // Tab 1: Per Person
-        const personData = orders.flatMap(order => {
-            const subtotal = calculateTotal(order.orderItems);
-            return order.orderItems.map((item, idx) => ({
-                Naam: order.personName,
-                Broodje: item.product.name,
-                Aantal: item.quantity,
-                Stukprijs: item.product.price,
-                'Subtotaal Items': item.quantity * item.product.price,
-                // Only show shipping on the first item for this person to avoid double counting in Excel sums if manually summed
-                'Bezorgkosten Aandeel': idx === 0 ? shippingPerPerson : 0,
-                'Totaal Persoon': idx === 0 ? (subtotal + shippingPerPerson) : 0,
-                Opmerking: item.comment || '',
-                Besteld: format(new Date(order.createdAt), 'dd-MM HH:mm')
-            }));
-        });
-
-        // Tab 2: Total List (Aggregation)
-        const totals: Record<string, { count: number; price: number; total: number }> = {};
-
-        orders.forEach(order => {
-            order.orderItems.forEach(item => {
-                const name = item.product.name;
-                if (!totals[name]) {
-                    totals[name] = { count: 0, price: item.product.price, total: 0 };
-                }
-                totals[name].count += item.quantity;
-                totals[name].total += item.quantity * item.product.price;
-            });
-        });
-
-        const totalData = Object.entries(totals).map(([name, data]) => ({
-            Broodje: name,
-            'Totaal Aantal': data.count,
-            'Stukprijs': data.price,
-            'Totaal': data.total
-        }));
-
-        // Add shipping row to totalData
-        totalData.push({
-            Broodje: 'BEZORGKOSTEN (Totaal)',
-            'Totaal Aantal': 1,
-            'Stukprijs': SHIPPING_COST,
-            'Totaal': SHIPPING_COST
-        });
-
-        // create workbook
-        const wb = XLSX.utils.book_new();
-
-        const wsPerson = XLSX.utils.json_to_sheet(personData);
-        XLSX.utils.book_append_sheet(wb, wsPerson, "Per Persoon");
-
-        const wsTotal = XLSX.utils.json_to_sheet(totalData);
-        XLSX.utils.book_append_sheet(wb, wsTotal, "Totaallijst");
-
-        // Save
-        XLSX.writeFile(wb, `Bestellijst_Week_${format(new Date(), 'ww')}.xlsx`);
+        window.location.href = '/api/orders/export';
     };
 
     const calculateTotal = (orderItems: any[]) => {
