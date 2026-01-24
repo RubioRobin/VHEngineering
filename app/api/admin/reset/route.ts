@@ -9,13 +9,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     try {
-        // Delete all orders
-        // In a real app, you might want to archive them instead of hard delete
-        // But for this simplified request: "Alles resetten"
-        await prisma.order.deleteMany({});
+        // Close the current order period to create an archive
+        const currentPeriod = await prisma.orderPeriod.findFirst({
+            where: { isClosed: false },
+            orderBy: { createdAt: 'desc' }
+        });
 
-        // Also could implement logic to close/archive the OrderPeriod
-        // For now, simple wipe is effective for "Start new week"
+        if (currentPeriod) {
+            // Close the current period - this preserves it as an archive
+            await prisma.orderPeriod.update({
+                where: { id: currentPeriod.id },
+                data: { isClosed: true }
+            });
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {
