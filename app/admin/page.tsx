@@ -565,10 +565,10 @@ export default function AdminPage() {
                     <div>
                         <div className="flex items-center gap-4 mb-4 text-cyan-600">
                             <Database className="w-8 h-8" />
-                            <h2 className="text-xl font-bold">Producten Scrapen</h2>
+                            <h2 className="text-xl font-bold">Assortiment Resetten</h2>
                         </div>
                         <p className="text-text-secondary mb-4 text-sm">
-                            Haal de nieuwste broodjes op van brood-shop.nl (Automatisch).
+                            Zet het assortiment terug naar de basis (haalt producten opnieuw op).
                         </p>
                     </div>
                     <DashboardButton
