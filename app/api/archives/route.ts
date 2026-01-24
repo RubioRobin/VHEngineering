@@ -4,6 +4,9 @@ import prisma from '@/lib/prisma';
 export async function GET() {
     try {
         const archives = await prisma.orderPeriod.findMany({
+            where: {
+                isClosed: true
+            },
             include: {
                 _count: {
                     select: { orders: true }

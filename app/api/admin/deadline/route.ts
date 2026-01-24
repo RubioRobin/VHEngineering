@@ -15,32 +15,35 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing deadline' }, { status: 400 });
         }
 
-        const weekId = `${getYear(new Date())}-${getISOWeek(new Date())}`;
         const deadlineDate = new Date(deadline);
 
-        // Find or create current order period
-        let period = await prisma.orderPeriod.findUnique({
-            where: { weekId }
+        // Save to GlobalSettings for future periods
+        await prisma.globalSetting.upsert({
+            where: { key: 'orderDeadline' },
+            update: { value: deadlineDate.toISOString() },
+            create: {
+                key: 'orderDeadline',
+                value: deadlineDate.toISOString()
+            }
         });
 
-        if (!period) {
-            period = await prisma.orderPeriod.create({
-                data: {
-                    weekId,
-                    startDate: new Date(),
-                    endDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-                    deadline: deadlineDate
-                }
-            });
-        } else {
-            // Update deadline
-            period = await prisma.orderPeriod.update({
-                where: { weekId },
+        // Also update current open period if it exists
+        const weekId = `${getYear(new Date())}-${getISOWeek(new Date())}`;
+        const currentPeriod = await prisma.orderPeriod.findFirst({
+            where: {
+                weekId,
+                isClosed: false
+            }
+        });
+
+        if (currentPeriod) {
+            await prisma.orderPeriod.update({
+                where: { id: currentPeriod.id },
                 data: { deadline: deadlineDate }
             });
         }
 
-        return NextResponse.json({ success: true, deadline: period.deadline });
+        return NextResponse.json({ success: true, deadline: deadlineDate });
     } catch (error) {
         console.error('Error setting deadline:', error);
         return NextResponse.json({ error: 'Failed to set deadline' }, { status: 500 });
