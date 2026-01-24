@@ -44,7 +44,9 @@ export default function HomePage() {
     // Helper to clean up categories
     const getCategory = (p: Product) => {
         const cat = p.description || 'Overig';
-        return cat.toLowerCase().includes('handmatig') ? 'Snacks' : cat;
+        if (cat === 'Broodjes') return 'Belegde broodjes';
+        if (cat.toLowerCase().includes('handmatig')) return 'Snacks';
+        return cat;
     };
 
     // Timer State
@@ -464,7 +466,7 @@ export default function HomePage() {
                                     className="w-full pl-6 pr-4 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200 flex items-center justify-between"
                                 >
                                     <span className="truncate">
-                                        {selectedCategory ? (selectedCategory === 'Broodjes' ? 'Belegde broodjes' : selectedCategory) : 'Alle Categorieën'}
+                                        {selectedCategory ? selectedCategory : 'Alle Categorieën'}
                                     </span>
                                     <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
                                 </button>
@@ -485,7 +487,7 @@ export default function HomePage() {
                                         </button>
                                         {Array.from(new Set(products.map(p => getCategory(p))))
                                             .sort((a, b) => {
-                                                const order = { 'Belegde broodjes': 1, 'Broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
+                                                const order = { 'Belegde broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
                                                 return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
                                             })
                                             .map(cat => (
@@ -496,11 +498,11 @@ export default function HomePage() {
                                                         setIsCategoryDropdownOpen(false);
                                                     }}
                                                     className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === cat
-                                                        ? 'bg-indigo-600 text-white'
-                                                        : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
+                                                            ? 'bg-indigo-600 text-white'
+                                                            : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
                                                         }`}
                                                 >
-                                                    {cat === 'Broodjes' ? 'Belegde broodjes' : cat}
+                                                    {cat}
                                                 </button>
                                             ))}
                                     </div>
