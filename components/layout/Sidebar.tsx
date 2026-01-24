@@ -76,12 +76,20 @@ export const Sidebar = () => {
                     <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
                         {user?.name?.charAt(0).toUpperCase() || 'G'}
                     </div>
-                    {!collapsed && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="ml-3">
-                            <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
-                            <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
-                        </motion.div>
-                    )}
+                    <AnimatePresence mode="wait">
+                        {!collapsed && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="ml-3"
+                            >
+                                <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
+                                <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Menu */}
@@ -94,9 +102,19 @@ export const Sidebar = () => {
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
                         >
                             <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            {!collapsed && (
-                                <span className="font-medium text-sm">{item.label}</span>
-                            )}
+                            <AnimatePresence mode="wait">
+                                {!collapsed && (
+                                    <motion.span
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -10 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="font-medium text-sm"
+                                    >
+                                        {item.label}
+                                    </motion.span>
+                                )}
+                            </AnimatePresence>
                         </Link>
                     ))}
                 </nav>
@@ -105,7 +123,19 @@ export const Sidebar = () => {
                 <div className="p-4 border-t border-border/50 space-y-2 hidden md:block">
                     <Link href="/settings" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
                         <Settings className="w-5 h-5" />
-                        {!collapsed && <span className="font-medium text-sm">Settings</span>}
+                        <AnimatePresence mode="wait">
+                            {!collapsed && (
+                                <motion.span
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="font-medium text-sm"
+                                >
+                                    Settings
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
                     </Link>
                     <button
                         onClick={toggleSidebar}
@@ -113,7 +143,19 @@ export const Sidebar = () => {
                         title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
                         <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
-                        {!collapsed && <span className="font-medium text-sm">Inklappen</span>}
+                        <AnimatePresence mode="wait">
+                            {!collapsed && (
+                                <motion.span
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="font-medium text-sm"
+                                >
+                                    Inklappen
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
                     </button>
                 </div>
             </motion.aside>
