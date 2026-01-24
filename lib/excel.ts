@@ -66,11 +66,11 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
-                fgColor: { argb: 'FFD4A017' }, // Bakery Gold
+                fgColor: { argb: 'FFE2E8F0' }, // Neutral Light Gray (Slate-200)
             };
             cell.font = {
                 bold: true,
-                color: { argb: 'FFFFFFFF' },
+                color: { argb: 'FF1E293B' }, // Dark Slate Text
                 size: 12
             };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -186,7 +186,7 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
     const grandTotal = sortedTotals.reduce((sum, item) => sum + (item.price ? item.price * item.quantity : 0), 0);
 
     // Add Shipping Cost Row (Hardcoded for now as per previous logic, usually 1.95 total split)
-    // Actually, usually shipping is just added on top. Let's add a "Bezorgkosten" row if needed, 
+    // Actually, usually shipping is just added on top. Let's add a "Bezorgkosten" row if needed,
     // but the user only asked for "slick" look. I'll stick to product totals + grand total.
 
     // Add empty row
