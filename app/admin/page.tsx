@@ -577,29 +577,11 @@ export default function AdminPage() {
                         className="w-full bg-cyan-600 hover:bg-cyan-700 font-semibold"
                         icon={<RefreshCcw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
                     >
-                        {refreshing ? 'Producten ophalen...' : 'Assortiment vernieuwen (Scrape)'}
+                        {refreshing ? 'Producten ophalen...' : 'Assortiment resetten (Scrape)'}
                     </DashboardButton>
                 </DashboardCard>
 
                 {/* Reset Week */}
-                <DashboardCard className="p-6 border-red-100 bg-red-50/50 flex flex-col justify-between">
-                    <div>
-                        <div className="flex items-center gap-4 mb-4 text-red-600">
-                            <AlertTriangle className="w-8 h-8" />
-                            <h2 className="text-xl font-bold">Week reset</h2>
-                        </div>
-                        <p className="text-text-secondary mb-4 text-sm">
-                            Wis alle huidige bestellingen om een nieuwe week met een schone lei te beginnen.
-                        </p>
-                    </div>
-                    <DashboardButton
-                        onClick={handleResetWeek}
-                        className="w-full bg-red-600 hover:bg-red-700 font-bold"
-                        icon={<Trash2 className="w-4 h-4" />}
-                    >
-                        Start nieuwe week
-                    </DashboardButton>
-                </DashboardCard>
 
                 {/* Product Manager (FULL WIDTH) */}
                 <ProductManager adminToken={adminToken ?? ''} onUnauthorized={handleLogout} />
