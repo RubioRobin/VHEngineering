@@ -682,7 +682,6 @@ export default function AdminPage() {
                         <Edit3 className="w-8 h-8" />
                         <div>
                             <h2 className="text-xl font-bold">Email template editor</h2>
-                            <p className="text-sm text-text-muted">Pas de reminder email aan (versturen 4 uur voor deadline)</p>
                         </div>
                     </div>
                     <div className="flex gap-2">
@@ -721,11 +720,8 @@ export default function AdminPage() {
                         {/* Body Text */}
                         <div>
                             <label className="block text-sm font-medium text-text-primary mb-2">
-                                Email tekst (Plain text)
+                                Email tekst
                             </label>
-                            <p className="text-xs text-text-muted mb-2">
-                                Gebruik {`{{name}}`} voor personalisatie (bijv. "Hallo {`{{name}}`}!")
-                            </p>
                             <textarea
                                 value={emailBodyText}
                                 onChange={(e) => setEmailBodyText(e.target.value)}
