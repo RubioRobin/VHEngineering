@@ -388,14 +388,8 @@ export default function HomePage() {
                 {/* Recent Order - Reorder */}
                 {lastOrder && (
                     <DashboardCard className="flex-1 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                        <div className="flex items-center gap-4 mb-3">
-                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-600">
-                                🔄
-                            </div>
-                            <div>
-                                <p className="text-text-secondary text-xs uppercase font-bold">Recent besteld</p>
-                                <h3 className="text-lg font-bold text-text-primary">Bestel opnieuw</h3>
-                            </div>
+                        <div className="mb-3">
+                            <h3 className="text-lg font-bold text-text-primary">Bestel opnieuw</h3>
                         </div>
 
                         {/* Show actual items */}
