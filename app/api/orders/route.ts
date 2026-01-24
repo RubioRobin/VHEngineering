@@ -9,28 +9,44 @@ const getCurrentWeekId = () => {
 };
 
 // Helper to get admin deadline from global settings
+// Helper to get admin deadline from global settings
 const getAdminDeadline = async (): Promise<Date> => {
     const setting = await prisma.globalSetting.findUnique({
         where: { key: 'orderDeadline' }
     });
 
+    const now = new Date();
+    let targetDate = new Date(now);
+    let targetDay = 4; // Default: Thursday
+    let targetHours = 14;
+    let targetMinutes = 0;
+
     if (setting?.value) {
-        return new Date(setting.value);
+        const storedDate = new Date(setting.value);
+        // If stored date is in the future, use it directly (manual override for this week)
+        if (storedDate > now) {
+            return storedDate;
+        }
+        // Otherwise, use its pattern (Day of week + Time)
+        targetDay = storedDate.getDay();
+        targetHours = storedDate.getHours();
+        targetMinutes = storedDate.getMinutes();
     }
 
-    // Default fallback: Next Thursday at 14:00
-    const now = new Date();
-    const day = now.getDay(); // 0 = Sunday, 4 = Thursday
-    let daysUntilThursday = 4 - day;
+    // Calculate next occurrence of target Day + Time
+    let daysUntil = targetDay - now.getDay();
 
-    // If today is Thursday after 14:00, or Friday/Saturday/Sunday, go to next Thursday
-    if (daysUntilThursday < 0 || (daysUntilThursday === 0 && now.getHours() >= 14)) {
-        daysUntilThursday += 7;
+    // Check if we passed the time today
+    const passedTimeToday = daysUntil === 0 &&
+        (now.getHours() > targetHours || (now.getHours() === targetHours && now.getMinutes() >= targetMinutes));
+
+    if (daysUntil < 0 || passedTimeToday) {
+        daysUntil += 7;
     }
 
     const deadline = new Date(now);
-    deadline.setDate(now.getDate() + daysUntilThursday);
-    deadline.setHours(14, 0, 0, 0);
+    deadline.setDate(now.getDate() + daysUntil);
+    deadline.setHours(targetHours, targetMinutes, 0, 0);
 
     return deadline;
 };
