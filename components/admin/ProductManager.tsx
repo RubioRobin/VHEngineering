@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { useToast } from '@/components/providers/ToastProvider';
-import { Edit2, Trash2, Plus, Save, X, Search, DollarSign, ChevronDown } from 'lucide-react';
+import { Edit2, Trash2, Plus, Save, X, Search, DollarSign, ChevronDown, Loader2 } from 'lucide-react';
 
 interface Product {
     id: string;
@@ -271,7 +271,9 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
             {/* Product List */}
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                 {isLoading ? (
-                    <div className="text-center py-8 text-gray-400">Laden...</div>
+                    <div className="text-center py-8 text-gray-400 flex justify-center">
+                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                    </div>
                 ) : filteredProducts.length === 0 ? (
                     <div className="text-center py-8 text-gray-400">Geen producten gevonden</div>
                 ) : (
