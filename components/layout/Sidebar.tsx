@@ -95,10 +95,20 @@ export const Sidebar = () => {
                             onClick={() => setMobileOpen(false)}
                             className="flex items-center gap-3 px-4 py-3 rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
                         >
-                            <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            {!collapsed && (
-                                <span className="font-medium text-sm">{item.label}</span>
-                            )}
+                            <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" />
+                            <AnimatePresence mode="wait">
+                                {!collapsed && (
+                                    <motion.span
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="font-medium text-sm whitespace-nowrap"
+                                    >
+                                        {item.label}
+                                    </motion.span>
+                                )}
+                            </AnimatePresence>
                         </Link>
                     ))}
                 </nav>
@@ -111,13 +121,37 @@ export const Sidebar = () => {
                         className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
                         title={collapsed ? "Sidebar uitklappen" : "Sidebar inklappen"}
                     >
-                        {collapsed ? <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" /> : <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />}
-                        {!collapsed && <span className="font-medium text-sm">Inklappen</span>}
+                        {collapsed ? <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" /> : <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" />}
+                        <AnimatePresence mode="wait">
+                            {!collapsed && (
+                                <motion.span
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="font-medium text-sm whitespace-nowrap"
+                                >
+                                    Inklappen
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
                     </button>
 
                     <Link href="/settings" className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
-                        <Settings className="w-5 h-5" />
-                        {!collapsed && <span className="font-medium text-sm">Settings</span>}
+                        <Settings className="w-5 h-5 shrink-0" />
+                        <AnimatePresence mode="wait">
+                            {!collapsed && (
+                                <motion.span
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="font-medium text-sm whitespace-nowrap"
+                                >
+                                    Settings
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
                     </Link>
                 </div>
             </motion.aside>
