@@ -36,7 +36,7 @@ export const Sidebar = () => {
             <motion.button
                 onClick={() => setMobileOpen(true)}
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                animate={{ scale: mobileOpen ? 0 : 1 }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 className="md:hidden fixed bottom-6 left-6 z-50 w-16 h-16 bg-primary rounded-full shadow-lg flex items-center justify-center text-white"
@@ -61,7 +61,7 @@ export const Sidebar = () => {
             <motion.aside
                 initial={false}
                 animate={{
-                    width: collapsed ? 80 : 280,
+                    width: mobileOpen ? 280 : (collapsed ? 80 : 280),
                     x: mobileOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 768 ? -280 : 0)
                 }}
                 transition={{
