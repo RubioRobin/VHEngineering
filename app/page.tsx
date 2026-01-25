@@ -425,7 +425,9 @@ export default function HomePage() {
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
                             <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
-                                {showOnlyFavorites ? 'Jouw Favorieten' : 'Het Assortiment'}
+                                {showOnlyFavorites
+                                    ? 'Jouw Favorieten'
+                                    : (selectedCategory || 'Het Assortiment')}
                             </h2>
                             <p className="text-slate-500 font-medium text-base mt-2">
                                 {filteredProducts.length} {showOnlyFavorites ? 'favoriete producten' : 'producten'}
@@ -569,15 +571,17 @@ export default function HomePage() {
 
                             return (
                                 <section key={category} id={`cat-${category}`} className="scroll-mt-48">
-                                    {/* Minimalist Design */}
-                                    <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-gray-100 mt-12">
-                                        <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-                                            {displayName}
-                                        </h3>
-                                        <span className="text-sm font-bold text-slate-400">
-                                            {productsInCat.length} opties
-                                        </span>
-                                    </div>
+                                    {/* Minimalist Design - Only show title if NOT filtered by specific category (to avoid double title) */}
+                                    {!selectedCategory && (
+                                        <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-gray-100 mt-12">
+                                            <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                                                {displayName}
+                                            </h3>
+                                            <span className="text-sm font-bold text-slate-400">
+                                                {productsInCat.length} opties
+                                            </span>
+                                        </div>
+                                    )}
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {productsInCat.map((product) => (
