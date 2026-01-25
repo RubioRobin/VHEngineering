@@ -45,8 +45,10 @@ export default function RootLayout({
 
                                 {/* Main Content Area */}
                                 <LayoutContent>
-                                    <main className="min-h-screen flex-1 flex flex-col bg-gray-50/30">
-                                        {children}
+                                    <main className="px-4 pt-4 pb-8 min-h-screen flex-1">
+                                        <div className="max-w-7xl mx-auto">
+                                            {children}
+                                        </div>
                                     </main>
                                     <Footer />
                                 </LayoutContent>
