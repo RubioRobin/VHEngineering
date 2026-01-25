@@ -66,7 +66,7 @@ export const Sidebar = () => {
                     ease: [0.4, 0.0, 0.2, 1]
                 }}
                 style={{ willChange: 'width' }}
-                className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-border shadow-soft flex flex-col md:z-40 overflow-hidden"
+                className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-slate-300 shadow-soft flex flex-col md:z-40 overflow-hidden"
             >
                 {/* User Profile Area (replaces logo) */}
                 <div className="h-20 flex items-center px-6 border-b border-border/50">

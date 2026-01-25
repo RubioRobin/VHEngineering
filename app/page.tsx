@@ -352,7 +352,7 @@ export default function HomePage() {
 
             {/* Dashboard Header & Timer */}
             <div className="bg-white pt-6 pb-6 border-b border-gray-50">
-                <div className="max-w-7xl mx-auto px-4">
+                <div className="max-w-[1800px] mx-auto px-6">
                     <div className="flex flex-col md:flex-row items-stretch gap-6">
                         {/* Timer Card */}
                         <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
@@ -421,7 +421,7 @@ export default function HomePage() {
 
             {/* Sticky Header: Title + Search + Filters */}
             <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100 transition-all">
-                <div className="max-w-7xl mx-auto px-4 py-4">
+                <div className="max-w-[1800px] mx-auto px-6 py-4">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
                             <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -518,7 +518,7 @@ export default function HomePage() {
             </div>
 
             {/* Scrollable Product List */}
-            <div className="space-y-12">
+            <div className="space-y-12 max-w-[1800px] mx-auto px-6">
                 {/* If searching or favorites: Show flat list */}
                 {(searchQuery || showOnlyFavorites) ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
