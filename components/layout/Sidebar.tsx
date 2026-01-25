@@ -99,7 +99,7 @@ export const Sidebar = () => {
                 </div>
 
                 {/* Menu */}
-                <nav className="flex-1 py-8 px-4 space-y-2">
+                <nav className="flex-1 pt-2 pb-4 px-4 space-y-2">
                     {menuItems.map((item) => (
                         <Link
                             key={item.label}
