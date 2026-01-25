@@ -513,128 +513,129 @@ export default function HomePage() {
                         </div>
                     </div>
                 </div>
-
-                {/* Scrollable Product List */}
-                <div className="space-y-12">
-                    {/* If searching or favorites: Show flat list */}
-                    {(searchQuery || showOnlyFavorites) ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {filteredProducts.length > 0 ? (
-                                filteredProducts.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={product}
-                                        onAddToCart={handleAddToCart}
-                                        disabled={isDeadlinePassed}
-                                        isFavorite={favorites.has(product.id)}
-                                        onToggleFavorite={toggleFavorite}
-                                    />
-                                ))
-                            ) : (
-                                <div className="col-span-full py-20 text-center">
-                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                                        <Search className="w-8 h-8 text-slate-400" />
-                                    </div>
-                                    <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
-                                    <p className="text-slate-500">
-                                        {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        /* Default: Group by Category */
-                        Array.from(new Set(filteredProducts.map(p => getCategory(p))))
-                            .sort((a, b) => {
-                                // Custom sorting: Belegde broodjes first, then Snacks, then Banket
-                                const order: Record<string, number> = {
-                                    'Belegde broodjes': 1,
-                                    'Broodjes': 1,
-                                    'Snacks': 2,
-                                    'Banket': 3,
-                                    'Frisdrank': 4,
-                                    'Salades': 5,
-                                    'Overig': 99
-                                };
-                                return (order[a] || 99) - (order[b] || 99);
-                            })
-                            .map(category => {
-                                const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
-                                if (productsInCat.length === 0) return null;
-
-                                return (
-                                    <section key={category} id={`cat-${category}`} className="scroll-mt-48">
-                                        {/* Minimalist Design with Dynamic Colors */}
-                                        {(() => {
-                                            // Palette with strong accent colors for the line
-                                            const colorPalette = [
-                                                { line: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 border-orange-200' }, // Broodjes
-                                                { line: 'bg-red-500', badge: 'bg-red-100 text-red-700 border-red-200' },    // Snacks
-                                                { line: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200' },  // Banket
-                                                { line: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 border-blue-200' },    // Frisdrank
-                                                { line: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Salades
-                                                { line: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 border-purple-200' },
-                                                { line: 'bg-pink-500', badge: 'bg-pink-100 text-pink-700 border-pink-200' },
-                                                { line: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
-                                                { line: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-                                                { line: 'bg-lime-500', badge: 'bg-lime-100 text-lime-700 border-lime-200' },
-                                            ];
-
-                                            const knownCategories: Record<string, number> = {
-                                                'Belegde broodjes': 0, 'Broodjes': 0,
-                                                'Snacks': 1,
-                                                'Banket': 2,
-                                                'Frisdrank': 3,
-                                                'Salades': 4,
-                                                'Overig': 5
-                                            };
-
-                                            let colorIndex = knownCategories[category];
-                                            if (colorIndex === undefined) {
-                                                const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                                                colorIndex = 6 + (hash % (colorPalette.length - 6));
-                                            }
-
-                                            const style = colorPalette[colorIndex];
-                                            const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
-
-                                            return (
-                                                <div className="flex items-center gap-4 mb-6 pt-4">
-                                                    <div className={`h-8 w-1.5 rounded-full ${style.line}`}></div>
-                                                    <h3 className="text-2xl font-bold text-slate-800">
-                                                        {displayName}
-                                                    </h3>
-                                                    <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${style.badge}`}>
-                                                        {productsInCat.length}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })()}
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                            {productsInCat.map((product) => (
-                                                <ProductCard
-                                                    key={product.id}
-                                                    product={product}
-                                                    onAddToCart={handleAddToCart}
-                                                    disabled={isDeadlinePassed}
-                                                    isFavorite={favorites.has(product.id)}
-                                                    onToggleFavorite={toggleFavorite}
-                                                />
-                                            ))}
-                                        </div>
-                                    </section>
-                                );
-                            })
-                    )}
-                </div>
             </div>
-            );
+
+            {/* Scrollable Product List */}
+            <div className="space-y-12">
+                {/* If searching or favorites: Show flat list */}
+                {(searchQuery || showOnlyFavorites) ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {filteredProducts.length > 0 ? (
+                            filteredProducts.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={handleAddToCart}
+                                    disabled={isDeadlinePassed}
+                                    isFavorite={favorites.has(product.id)}
+                                    onToggleFavorite={toggleFavorite}
+                                />
+                            ))
+                        ) : (
+                            <div className="col-span-full py-20 text-center">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                                    <Search className="w-8 h-8 text-slate-400" />
+                                </div>
+                                <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
+                                <p className="text-slate-500">
+                                    {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    /* Default: Group by Category */
+                    Array.from(new Set(filteredProducts.map(p => getCategory(p))))
+                        .sort((a, b) => {
+                            // Custom sorting: Belegde broodjes first, then Snacks, then Banket
+                            const order: Record<string, number> = {
+                                'Belegde broodjes': 1,
+                                'Broodjes': 1,
+                                'Snacks': 2,
+                                'Banket': 3,
+                                'Frisdrank': 4,
+                                'Salades': 5,
+                                'Overig': 99
+                            };
+                            return (order[a] || 99) - (order[b] || 99);
+                        })
+                        .map(category => {
+                            const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
+                            if (productsInCat.length === 0) return null;
+
+                            return (
+                                <section key={category} id={`cat-${category}`} className="scroll-mt-48">
+                                    {/* Minimalist Design with Dynamic Colors */}
+                                    {(() => {
+                                        // Palette with strong accent colors for the line
+                                        const colorPalette = [
+                                            { line: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 border-orange-200' }, // Broodjes
+                                            { line: 'bg-red-500', badge: 'bg-red-100 text-red-700 border-red-200' },    // Snacks
+                                            { line: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200' },  // Banket
+                                            { line: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 border-blue-200' },    // Frisdrank
+                                            { line: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Salades
+                                            { line: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 border-purple-200' },
+                                            { line: 'bg-pink-500', badge: 'bg-pink-100 text-pink-700 border-pink-200' },
+                                            { line: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
+                                            { line: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+                                            { line: 'bg-lime-500', badge: 'bg-lime-100 text-lime-700 border-lime-200' },
+                                        ];
+
+                                        const knownCategories: Record<string, number> = {
+                                            'Belegde broodjes': 0, 'Broodjes': 0,
+                                            'Snacks': 1,
+                                            'Banket': 2,
+                                            'Frisdrank': 3,
+                                            'Salades': 4,
+                                            'Overig': 5
+                                        };
+
+                                        let colorIndex = knownCategories[category];
+                                        if (colorIndex === undefined) {
+                                            const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                                            colorIndex = 6 + (hash % (colorPalette.length - 6));
+                                        }
+
+                                        const style = colorPalette[colorIndex];
+                                        const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
+
+                                        return (
+                                            <div className="flex items-center gap-4 mb-6 pt-4">
+                                                <div className={`h-8 w-1.5 rounded-full ${style.line}`}></div>
+                                                <h3 className="text-2xl font-bold text-slate-800">
+                                                    {displayName}
+                                                </h3>
+                                                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${style.badge}`}>
+                                                    {productsInCat.length}
+                                                </span>
+                                            </div>
+                                        );
+                                    })()}
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {productsInCat.map((product) => (
+                                            <ProductCard
+                                                key={product.id}
+                                                product={product}
+                                                onAddToCart={handleAddToCart}
+                                                disabled={isDeadlinePassed}
+                                                isFavorite={favorites.has(product.id)}
+                                                onToggleFavorite={toggleFavorite}
+                                            />
+                                        ))}
+                                    </div>
+                                </section>
+                            );
+                        })
+                )}
+            </div>
+        </div>
+    );
 }
 
 const ClockIcon = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-            </svg>
-            );
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+    </svg>
+);
