@@ -117,7 +117,7 @@ export default function MijnBestellingenPage() {
 
     return (
         <div className="space-y-6">
-            <div className="pl-16 md:pl-0">
+            <div className="pl-0">
                 <h1 className="text-3xl font-bold text-text-primary">Mijn bestellingen</h1>
                 <p className="text-text-muted mt-1 text-sm">Bestelgeschiedenis per week</p>
             </div>

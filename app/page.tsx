@@ -423,7 +423,7 @@ export default function HomePage() {
             <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100 transition-all">
                 <div className="max-w-[1800px] mx-auto px-6 py-4">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                        <div className="pl-16 md:pl-0">
+                        <div>
                             <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
                                 {showOnlyFavorites
                                     ? 'Jouw Favorieten'
@@ -441,7 +441,7 @@ export default function HomePage() {
                                     <button
                                         type="button"
                                         onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                                        className="w-full pl-6 pr-4 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200 flex items-center justify-between"
+                                        className="w-full pl-6 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200 flex items-center justify-between"
                                     >
                                         <span className="truncate">
                                             {selectedCategory ? selectedCategory : 'Alle Categorieën'}
@@ -450,7 +450,7 @@ export default function HomePage() {
                                     </button>
 
                                     {isCategoryDropdownOpen && (
-                                        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                                             <button
                                                 onClick={() => {
                                                     setSelectedCategory(null);

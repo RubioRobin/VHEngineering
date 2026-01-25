@@ -33,12 +33,16 @@ export const Sidebar = () => {
     return (
         <>
             {/* Mobile Hamburger Button */}
-            <button
+            <motion.button
                 onClick={() => setMobileOpen(true)}
-                className="md:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-primary rounded-xl shadow-lg flex items-center justify-center text-white"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="md:hidden fixed bottom-6 left-6 z-50 w-16 h-16 bg-primary rounded-full shadow-lg flex items-center justify-center text-white"
             >
                 <Menu className="w-6 h-6" />
-            </button>
+            </motion.button>
 
             {/* Mobile Backdrop */}
             <AnimatePresence>
