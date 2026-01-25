@@ -117,7 +117,7 @@ export default function MijnBestellingenPage() {
 
     return (
         <div className="space-y-6">
-            <div>
+            <div className="pl-16 md:pl-0">
                 <h1 className="text-3xl font-bold text-text-primary">Mijn bestellingen</h1>
                 <p className="text-text-muted mt-1 text-sm">Bestelgeschiedenis per week</p>
             </div>
@@ -186,7 +186,7 @@ export default function MijnBestellingenPage() {
                                                     className={`px-6 py-4 bg-white ${idx !== 0 ? 'mt-3' : 'mt-3'} mx-3 rounded-lg border border-border/50 hover:border-primary/30 transition-all shadow-sm`}
                                                 >
                                                     {/* Order Header */}
-                                                    <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex flex-col md:flex-row md:items-start justify-between mb-3 gap-3">
                                                         <div className="flex-1">
                                                             <p className="text-sm font-semibold text-text-primary">
                                                                 {format(new Date(order.createdAt), 'EEEE d MMMM, HH:mm', { locale: nl })}
@@ -195,10 +195,10 @@ export default function MijnBestellingenPage() {
                                                                 Totaal inc. € {shippingShare.toFixed(2)} bezorgkosten
                                                             </p>
                                                         </div>
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="flex items-center gap-2 w-full md:w-auto">
                                                             <button
                                                                 onClick={() => handleReorder(order)}
-                                                                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all font-medium shadow-sm hover:shadow"
+                                                                className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all font-medium shadow-sm hover:shadow flex-1 md:flex-none"
                                                             >
                                                                 <RotateCcw className="w-4 h-4" />
                                                                 Opnieuw bestellen

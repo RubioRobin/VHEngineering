@@ -101,20 +101,20 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                     <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
                         <button
                             onClick={handleDecrement}
-                            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
                             disabled={disabled}
                         >
-                            <Minus className="w-4 h-4" />
+                            <Minus className="w-5 h-5" />
                         </button>
-                        <span className="font-bold text-sm text-slate-700 min-w-[1.5rem] text-center">
+                        <span className="font-bold text-sm text-slate-700 min-w-[2rem] text-center">
                             {quantity}
                         </span>
                         <button
                             onClick={handleIncrement}
-                            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
                             disabled={disabled}
                         >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-5 h-5" />
                         </button>
                     </div>
                 </div>

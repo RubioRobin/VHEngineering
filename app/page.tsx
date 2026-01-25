@@ -423,7 +423,7 @@ export default function HomePage() {
             <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100 transition-all">
                 <div className="max-w-[1800px] mx-auto px-6 py-4">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                        <div>
+                        <div className="pl-16 md:pl-0">
                             <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
                                 {showOnlyFavorites
                                     ? 'Jouw Favorieten'

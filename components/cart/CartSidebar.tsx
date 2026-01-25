@@ -167,7 +167,7 @@ export const CartSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-[51] flex flex-col rounded-l-3xl overflow-hidden"
+                        className="fixed top-0 right-0 bottom-0 w-full md:max-w-md bg-white shadow-2xl z-[51] flex flex-col md:rounded-l-3xl overflow-hidden"
                     >
                         {/* Header */}
                         <div className="p-6 border-b border-border flex items-center justify-between bg-background/50">
@@ -218,7 +218,7 @@ export const CartSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                                             value={item.comment || ''}
                                             onChange={(e) => updateComment(item.id, e.target.value)}
                                             placeholder="Opmerking (bijv. geen boter)"
-                                            className="w-full mt-3 text-xs bg-white border border-border rounded-lg px-3 py-2 outline-none focus:border-primary/50 transition-colors"
+                                            className="w-full mt-3 text-base sm:text-xs bg-white border border-border rounded-lg px-3 py-2 outline-none focus:border-primary/50 transition-colors"
                                         />
                                     </div>
                                 ))
@@ -233,7 +233,7 @@ export const CartSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                                     value={generalComment}
                                     onChange={(e) => setGeneralComment(e.target.value)}
                                     placeholder="Iets wat we moeten weten over de hele bestelling?"
-                                    className="w-full text-sm bg-white border border-border rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-colors resize-none h-20"
+                                    className="w-full text-base sm:text-sm bg-white border border-border rounded-xl px-4 py-3 outline-none focus:border-primary/50 transition-colors resize-none h-20"
                                 />
                             </div>
 

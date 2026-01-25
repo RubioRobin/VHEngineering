@@ -95,7 +95,7 @@ export default function OverviewPage() {
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
-                <div>
+                <div className="pl-16 md:pl-0 pt-4 md:pt-0">
                     <h1 className="text-3xl font-bold text-text-primary">Week overzicht</h1>
                     <p className="text-text-secondary">Alle bestellingen voor deze week</p>
                 </div>
