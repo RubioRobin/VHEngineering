@@ -55,6 +55,13 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                     </div>
                 )}
 
+                {/* Price Tag - Top Left */}
+                {product.price && (
+                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-indigo-600 px-3 py-1.5 rounded-full font-bold shadow-sm text-sm border border-indigo-100">
+                        € {product.price.toFixed(2)}
+                    </div>
+                )}
+
                 {/* Favorite Heart Button - Top Right now for better flow with new layout */}
                 {user && onToggleFavorite && (
                     <button
@@ -77,42 +84,10 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                     <h3 className="font-bold text-lg text-slate-800 leading-tight" title={product.name}>
                         {formatName(product.name)}
                     </h3>
-                    {product.price && (
-                        <span className="font-bold text-lg text-indigo-600 shrink-0 bg-indigo-50 px-2 py-0.5 rounded-lg">
-                            € {product.price.toFixed(2)}
-                        </span>
-                    )}
                 </div>
 
-                {product.description && (
-                    <p className="text-sm text-slate-500 mb-5 line-clamp-2 leading-relaxed">
-                        {product.description}
-                    </p>
-                )}
-
                 <div className="mt-auto pt-4 border-t border-gray-50 flex items-center gap-3">
-                    {/* Compact Quantity Selector */}
-                    <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
-                        <button
-                            onClick={handleDecrement}
-                            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
-                            disabled={disabled}
-                        >
-                            <Minus className="w-3.5 h-3.5" />
-                        </button>
-                        <span className="font-bold text-sm text-slate-700 min-w-[1.5rem] text-center">
-                            {quantity}
-                        </span>
-                        <button
-                            onClick={handleIncrement}
-                            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
-                            disabled={disabled}
-                        >
-                            <Plus className="w-3.5 h-3.5" />
-                        </button>
-                    </div>
-
-                    {/* Add Button */}
+                    {/* Add Button - First now */}
                     <DashboardButton
                         onClick={handleAdd}
                         disabled={disabled}
@@ -121,6 +96,27 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                     >
                         Toevoegen
                     </DashboardButton>
+
+                    {/* Compact Quantity Selector - Second now */}
+                    <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
+                        <button
+                            onClick={handleDecrement}
+                            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            disabled={disabled}
+                        >
+                            <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="font-bold text-sm text-slate-700 min-w-[1.5rem] text-center">
+                            {quantity}
+                        </span>
+                        <button
+                            onClick={handleIncrement}
+                            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            disabled={disabled}
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
             </div>
         </motion.div>
