@@ -418,7 +418,7 @@ export default function HomePage() {
             </div>
 
             {/* Sticky Header: Title + Search + Filters */}
-            <div className="sticky top-0 z-30 bg-gray-50/95 backdrop-blur-sm pt-4 pb-6 mb-8 border-b border-slate-200 shadow-sm transition-all -mx-4 px-4 sm:-mx-0 sm:px-0 sm:rounded-b-2xl">
+            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md py-4 mb-8 border-b border-gray-200 shadow-sm transition-all -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
