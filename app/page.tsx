@@ -568,51 +568,20 @@ export default function HomePage() {
                             return (
                                 <section key={category} id={`cat-${category}`} className="scroll-mt-48">
                                     {/* Minimalist Design with Dynamic Colors */}
-                                    {(() => {
-                                        // Palette with strong accent colors for the line
-                                        const colorPalette = [
-                                            { line: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 border-orange-200' }, // Broodjes
-                                            { line: 'bg-red-500', badge: 'bg-red-100 text-red-700 border-red-200' },    // Snacks
-                                            { line: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200' },  // Banket
-                                            { line: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 border-blue-200' },    // Frisdrank
-                                            { line: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Salades
-                                            { line: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 border-purple-200' },
-                                            { line: 'bg-pink-500', badge: 'bg-pink-100 text-pink-700 border-pink-200' },
-                                            { line: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
-                                            { line: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-                                            { line: 'bg-lime-500', badge: 'bg-lime-100 text-lime-700 border-lime-200' },
-                                        ];
+                                    const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
 
-                                        const knownCategories: Record<string, number> = {
-                                            'Belegde broodjes': 0, 'Broodjes': 0,
-                                            'Snacks': 1,
-                                            'Banket': 2,
-                                            'Frisdrank': 3,
-                                            'Salades': 4,
-                                            'Overig': 5
-                                        };
-
-                                        let colorIndex = knownCategories[category];
-                                        if (colorIndex === undefined) {
-                                            const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                                            colorIndex = 6 + (hash % (colorPalette.length - 6));
-                                        }
-
-                                        const style = colorPalette[colorIndex];
-                                        const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
-
-                                        return (
-                                            <div className="flex items-center gap-4 mb-6 pt-4">
-                                                <div className={`h-8 w-1.5 rounded-full ${style.line}`}></div>
-                                                <h3 className="text-2xl font-bold text-slate-800">
-                                                    {displayName}
-                                                </h3>
-                                                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${style.badge}`}>
-                                                    {productsInCat.length}
-                                                </span>
-                                            </div>
-                                        );
-                                    })()}
+                                    return (
+                                    <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-gray-100 mt-12">
+                                        <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                                            {displayName}
+                                        </h3>
+                                        <span className="text-sm font-bold text-slate-400">
+                                            {productsInCat.length} opties
+                                        </span>
+                                    </div>
+                                    );
+                                })()
+                                }
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {productsInCat.map((product) => (
