@@ -557,10 +557,10 @@ export default function HomePage() {
                         </motion.div>
                     ) : (
                         <motion.div
-                            key="category-list"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            key={`category-list-${selectedCategory || 'all'}`}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.2 }}
                         >
                             {/* Default: Group by Category */}
