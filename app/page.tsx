@@ -565,12 +565,11 @@ export default function HomePage() {
                             const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
                             if (productsInCat.length === 0) return null;
 
+                            const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
+
                             return (
                                 <section key={category} id={`cat-${category}`} className="scroll-mt-48">
-                                    {/* Minimalist Design with Dynamic Colors */}
-                                    const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
-
-                                    return (
+                                    {/* Minimalist Design */}
                                     <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-gray-100 mt-12">
                                         <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
                                             {displayName}
@@ -579,9 +578,6 @@ export default function HomePage() {
                                             {productsInCat.length} opties
                                         </span>
                                     </div>
-                                    );
-                                })()
-                                }
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {productsInCat.map((product) => (
