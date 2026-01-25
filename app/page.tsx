@@ -351,7 +351,7 @@ export default function HomePage() {
             </motion.button>
 
             {/* Dashboard Header & Timer */}
-            <div className="bg-white pt-6 pb-6 border-b border-gray-50">
+            <div className="bg-white pt-6 pb-6">
                 <div className="max-w-[1800px] mx-auto px-6">
                     <div className="flex flex-col md:flex-row items-stretch gap-6">
                         {/* Timer Card */}
