@@ -351,74 +351,76 @@ export default function HomePage() {
             </motion.button>
 
             {/* Dashboard Header & Timer */}
-            <div className="max-w-7xl mx-auto px-4 pt-4">
-                <div className="flex flex-col md:flex-row items-stretch gap-6">
-                    {/* Timer Card */}
-                    <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
-                        ? 'bg-gradient-to-br from-red-500 to-red-700 animate-pulse shadow-red-500/30'
-                        : 'bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-500/20'
-                        }`}>
-                        <div className="flex flex-col h-full justify-between">
-                            <div className="flex items-center gap-3 opacity-90">
-                                <ClockIcon />
-                                <span className="text-sm font-medium uppercase tracking-wider">
-                                    {timeLeft && (timeLeft.d === 0 && timeLeft.h < 4) ? '🚨 SPOED!' : 'Bestellen Sluit Over'}
-                                </span>
+            <div className="bg-white pt-6 pb-6 border-b border-gray-50">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="flex flex-col md:flex-row items-stretch gap-6">
+                        {/* Timer Card */}
+                        <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
+                            ? 'bg-gradient-to-br from-red-500 to-red-700 animate-pulse shadow-red-500/30'
+                            : 'bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-500/20'
+                            }`}>
+                            <div className="flex flex-col h-full justify-between">
+                                <div className="flex items-center gap-3 opacity-90">
+                                    <ClockIcon />
+                                    <span className="text-sm font-medium uppercase tracking-wider">
+                                        {timeLeft && (timeLeft.d === 0 && timeLeft.h < 4) ? '🚨 SPOED!' : 'Bestellen Sluit Over'}
+                                    </span>
+                                </div>
+                                <div className="mt-4">
+                                    {timeLeft ? (
+                                        <>
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-4xl font-mono font-bold">{timeLeft.d}d</span>
+                                                <span className="text-4xl font-mono font-bold">{timeLeft.h}u</span>
+                                                <span className="text-4xl font-mono font-bold">{timeLeft.m}m</span>
+                                            </div>
+                                            {deadline && (
+                                                <p className="text-white/70 text-sm mt-3 font-medium">
+                                                    Deadline: {format(deadline, 'EEEE d MMMM - HH:mm', { locale: nl })} uur
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <span className="text-3xl font-bold">Gesloten</span>
+                                    )}
+                                </div>
                             </div>
-                            <div className="mt-4">
-                                {timeLeft ? (
-                                    <>
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-mono font-bold">{timeLeft.d}d</span>
-                                            <span className="text-4xl font-mono font-bold">{timeLeft.h}u</span>
-                                            <span className="text-4xl font-mono font-bold">{timeLeft.m}m</span>
-                                        </div>
-                                        {deadline && (
-                                            <p className="text-white/70 text-sm mt-3 font-medium">
-                                                Deadline: {format(deadline, 'EEEE d MMMM - HH:mm', { locale: nl })} uur
-                                            </p>
-                                        )}
-                                    </>
-                                ) : (
-                                    <span className="text-3xl font-bold">Gesloten</span>
-                                )}
-                            </div>
-                        </div>
-                    </DashboardCard>
-
-                    {/* Recent Order - Reorder */}
-                    {lastOrder && (
-                        <DashboardCard className="flex-1 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                            <div className="mb-3">
-                                <h3 className="text-lg font-bold text-text-primary">Bestel opnieuw</h3>
-                            </div>
-
-                            <div className="mb-3 space-y-1">
-                                {lastOrder.orderItems?.slice(0, 3).map((item: any, idx: number) => (
-                                    <div key={idx} className="text-sm text-text-secondary">
-                                        <span className="font-medium text-text-primary">{item.quantity}x</span> {formatName(item.product.name)}
-                                    </div>
-                                ))}
-                                {lastOrder.orderItems?.length > 3 && (
-                                    <div className="text-sm text-text-muted italic">
-                                        +{lastOrder.orderItems.length - 3} meer...
-                                    </div>
-                                )}
-                            </div>
-
-                            <DashboardButton
-                                onClick={handleReorder}
-                                className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 shadow-lg"
-                            >
-                                Opnieuw bestellen
-                            </DashboardButton>
                         </DashboardCard>
-                    )}
+
+                        {/* Recent Order - Reorder */}
+                        {lastOrder && (
+                            <DashboardCard className="flex-1 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                                <div className="mb-3">
+                                    <h3 className="text-lg font-bold text-text-primary">Bestel opnieuw</h3>
+                                </div>
+
+                                <div className="mb-3 space-y-1">
+                                    {lastOrder.orderItems?.slice(0, 3).map((item: any, idx: number) => (
+                                        <div key={idx} className="text-sm text-text-secondary">
+                                            <span className="font-medium text-text-primary">{item.quantity}x</span> {formatName(item.product.name)}
+                                        </div>
+                                    ))}
+                                    {lastOrder.orderItems?.length > 3 && (
+                                        <div className="text-sm text-text-muted italic">
+                                            +{lastOrder.orderItems.length - 3} meer...
+                                        </div>
+                                    )}
+                                </div>
+
+                                <DashboardButton
+                                    onClick={handleReorder}
+                                    className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 shadow-lg"
+                                >
+                                    Opnieuw bestellen
+                                </DashboardButton>
+                            </DashboardCard>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Sticky Header: Title + Search + Filters */}
-            <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100 transition-all mt-8">
+            <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100 transition-all">
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
