@@ -350,8 +350,8 @@ export default function HomePage() {
                 </svg>
             </motion.button>
 
-            {/* Timer Card - Scrolls away */}
-            <div className="mb-8">
+            {/* Dashboard Header & Timer */}
+            <div className="max-w-7xl mx-auto px-4 pt-4">
                 <div className="flex flex-col md:flex-row items-stretch gap-6">
                     {/* Timer Card */}
                     <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
@@ -418,222 +418,223 @@ export default function HomePage() {
             </div>
 
             {/* Sticky Header: Title + Search + Filters */}
-            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md py-4 mb-8 border-b border-gray-200 shadow-sm transition-all -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
-                            {showOnlyFavorites ? 'Jouw Favorieten' : 'Het Assortiment'}
-                        </h2>
-                        <p className="text-slate-500 font-medium text-base mt-2">
-                            {filteredProducts.length} {showOnlyFavorites ? 'favoriete producten' : 'producten'}
-                        </p>
-                    </div>
+            <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100 transition-all mt-8">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div>
+                            <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                                {showOnlyFavorites ? 'Jouw Favorieten' : 'Het Assortiment'}
+                            </h2>
+                            <p className="text-slate-500 font-medium text-base mt-2">
+                                {filteredProducts.length} {showOnlyFavorites ? 'favoriete producten' : 'producten'}
+                            </p>
+                        </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        {/* Category Dropdown */}
-                        {!showOnlyFavorites && !searchQuery && (
-                            <div className="relative min-w-[220px]" ref={dropdownRef}>
-                                <button
-                                    type="button"
-                                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                                    className="w-full pl-6 pr-4 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200 flex items-center justify-between"
-                                >
-                                    <span className="truncate">
-                                        {selectedCategory ? selectedCategory : 'Alle Categorieën'}
-                                    </span>
-                                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
-                                </button>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            {/* Category Dropdown */}
+                            {!showOnlyFavorites && !searchQuery && (
+                                <div className="relative min-w-[220px]" ref={dropdownRef}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                                        className="w-full pl-6 pr-4 py-3 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200 flex items-center justify-between"
+                                    >
+                                        <span className="truncate">
+                                            {selectedCategory ? selectedCategory : 'Alle Categorieën'}
+                                        </span>
+                                        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                                    </button>
 
-                                {isCategoryDropdownOpen && (
-                                    <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <button
-                                            onClick={() => {
-                                                setSelectedCategory(null);
-                                                setIsCategoryDropdownOpen(false);
-                                            }}
-                                            className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === null
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
-                                                }`}
-                                        >
-                                            Alle Categorieën
-                                        </button>
-                                        {Array.from(new Set(products.map(p => getCategory(p))))
-                                            .sort((a, b) => {
-                                                const order = { 'Belegde broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
-                                                return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
-                                            })
-                                            .map(cat => (
-                                                <button
-                                                    key={cat}
-                                                    onClick={() => {
-                                                        setSelectedCategory(cat);
-                                                        setIsCategoryDropdownOpen(false);
-                                                    }}
-                                                    className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === cat
-                                                        ? 'bg-indigo-600 text-white'
-                                                        : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
-                                                        }`}
-                                                >
-                                                    {cat}
-                                                </button>
-                                            ))}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        <div className="flex items-center gap-3">
-                            {user && (
-                                <button
-                                    onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
-                                    className={`p-3 rounded-xl border transition-all ${showOnlyFavorites
-                                        ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-inner'
-                                        : 'bg-white border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-sm'}`}
-                                    title={showOnlyFavorites ? "Toon alles" : "Toon alleen favorieten"}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={showOnlyFavorites ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                    </svg>
-                                </button>
+                                    {isCategoryDropdownOpen && (
+                                        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedCategory(null);
+                                                    setIsCategoryDropdownOpen(false);
+                                                }}
+                                                className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === null
+                                                    ? 'bg-indigo-600 text-white'
+                                                    : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
+                                                    }`}
+                                            >
+                                                Alle Categorieën
+                                            </button>
+                                            {Array.from(new Set(products.map(p => getCategory(p))))
+                                                .sort((a, b) => {
+                                                    const order = { 'Belegde broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
+                                                    return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
+                                                })
+                                                .map(cat => (
+                                                    <button
+                                                        key={cat}
+                                                        onClick={() => {
+                                                            setSelectedCategory(cat);
+                                                            setIsCategoryDropdownOpen(false);
+                                                        }}
+                                                        className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === cat
+                                                            ? 'bg-indigo-600 text-white'
+                                                            : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
+                                                            }`}
+                                                    >
+                                                        {cat}
+                                                    </button>
+                                                ))}
+                                        </div>
+                                    )}
+                                </div>
                             )}
 
-                            <div className="relative flex-1 sm:w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Zoeken..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-400"
-                                />
+                            <div className="flex items-center gap-3">
+                                {user && (
+                                    <button
+                                        onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                                        className={`p-3 rounded-xl border transition-all ${showOnlyFavorites
+                                            ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-inner'
+                                            : 'bg-white border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-sm'}`}
+                                        title={showOnlyFavorites ? "Toon alles" : "Toon alleen favorieten"}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={showOnlyFavorites ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                        </svg>
+                                    </button>
+                                )}
+
+                                <div className="relative flex-1 sm:w-64">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Zoeken..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-400"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Scrollable Product List */}
-            <div className="space-y-12">
-                {/* If searching or favorites: Show flat list */}
-                {(searchQuery || showOnlyFavorites) ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredProducts.length > 0 ? (
-                            filteredProducts.map((product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={product}
-                                    onAddToCart={handleAddToCart}
-                                    disabled={isDeadlinePassed}
-                                    isFavorite={favorites.has(product.id)}
-                                    onToggleFavorite={toggleFavorite}
-                                />
-                            ))
-                        ) : (
-                            <div className="col-span-full py-20 text-center">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                                    <Search className="w-8 h-8 text-slate-400" />
-                                </div>
-                                <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
-                                <p className="text-slate-500">
-                                    {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    /* Default: Group by Category */
-                    Array.from(new Set(filteredProducts.map(p => getCategory(p))))
-                        .sort((a, b) => {
-                            // Custom sorting: Belegde broodjes first, then Snacks, then Banket
-                            const order: Record<string, number> = {
-                                'Belegde broodjes': 1,
-                                'Broodjes': 1,
-                                'Snacks': 2,
-                                'Banket': 3,
-                                'Frisdrank': 4,
-                                'Salades': 5,
-                                'Overig': 99
-                            };
-                            return (order[a] || 99) - (order[b] || 99);
-                        })
-                        .map(category => {
-                            const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
-                            if (productsInCat.length === 0) return null;
-
-                            return (
-                                <section key={category} id={`cat-${category}`} className="scroll-mt-48">
-                                    {/* Minimalist Design with Dynamic Colors */}
-                                    {(() => {
-                                        // Palette with strong accent colors for the line
-                                        const colorPalette = [
-                                            { line: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 border-orange-200' }, // Broodjes
-                                            { line: 'bg-red-500', badge: 'bg-red-100 text-red-700 border-red-200' },    // Snacks
-                                            { line: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200' },  // Banket
-                                            { line: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 border-blue-200' },    // Frisdrank
-                                            { line: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Salades
-                                            { line: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 border-purple-200' },
-                                            { line: 'bg-pink-500', badge: 'bg-pink-100 text-pink-700 border-pink-200' },
-                                            { line: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
-                                            { line: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-                                            { line: 'bg-lime-500', badge: 'bg-lime-100 text-lime-700 border-lime-200' },
-                                        ];
-
-                                        const knownCategories: Record<string, number> = {
-                                            'Belegde broodjes': 0, 'Broodjes': 0,
-                                            'Snacks': 1,
-                                            'Banket': 2,
-                                            'Frisdrank': 3,
-                                            'Salades': 4,
-                                            'Overig': 5
-                                        };
-
-                                        let colorIndex = knownCategories[category];
-                                        if (colorIndex === undefined) {
-                                            const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                                            colorIndex = 6 + (hash % (colorPalette.length - 6));
-                                        }
-
-                                        const style = colorPalette[colorIndex];
-                                        const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
-
-                                        return (
-                                            <div className="flex items-center gap-4 mb-6 pt-4">
-                                                <div className={`h-8 w-1.5 rounded-full ${style.line}`}></div>
-                                                <h3 className="text-2xl font-bold text-slate-800">
-                                                    {displayName}
-                                                </h3>
-                                                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${style.badge}`}>
-                                                    {productsInCat.length}
-                                                </span>
-                                            </div>
-                                        );
-                                    })()}
-
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                        {productsInCat.map((product) => (
-                                            <ProductCard
-                                                key={product.id}
-                                                product={product}
-                                                onAddToCart={handleAddToCart}
-                                                disabled={isDeadlinePassed}
-                                                isFavorite={favorites.has(product.id)}
-                                                onToggleFavorite={toggleFavorite}
-                                            />
-                                        ))}
+                {/* Scrollable Product List */}
+                <div className="space-y-12">
+                    {/* If searching or favorites: Show flat list */}
+                    {(searchQuery || showOnlyFavorites) ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {filteredProducts.length > 0 ? (
+                                filteredProducts.map((product) => (
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        onAddToCart={handleAddToCart}
+                                        disabled={isDeadlinePassed}
+                                        isFavorite={favorites.has(product.id)}
+                                        onToggleFavorite={toggleFavorite}
+                                    />
+                                ))
+                            ) : (
+                                <div className="col-span-full py-20 text-center">
+                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                                        <Search className="w-8 h-8 text-slate-400" />
                                     </div>
-                                </section>
-                            );
-                        })
-                )}
+                                    <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
+                                    <p className="text-slate-500">
+                                        {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        /* Default: Group by Category */
+                        Array.from(new Set(filteredProducts.map(p => getCategory(p))))
+                            .sort((a, b) => {
+                                // Custom sorting: Belegde broodjes first, then Snacks, then Banket
+                                const order: Record<string, number> = {
+                                    'Belegde broodjes': 1,
+                                    'Broodjes': 1,
+                                    'Snacks': 2,
+                                    'Banket': 3,
+                                    'Frisdrank': 4,
+                                    'Salades': 5,
+                                    'Overig': 99
+                                };
+                                return (order[a] || 99) - (order[b] || 99);
+                            })
+                            .map(category => {
+                                const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
+                                if (productsInCat.length === 0) return null;
+
+                                return (
+                                    <section key={category} id={`cat-${category}`} className="scroll-mt-48">
+                                        {/* Minimalist Design with Dynamic Colors */}
+                                        {(() => {
+                                            // Palette with strong accent colors for the line
+                                            const colorPalette = [
+                                                { line: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 border-orange-200' }, // Broodjes
+                                                { line: 'bg-red-500', badge: 'bg-red-100 text-red-700 border-red-200' },    // Snacks
+                                                { line: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200' },  // Banket
+                                                { line: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 border-blue-200' },    // Frisdrank
+                                                { line: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Salades
+                                                { line: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 border-purple-200' },
+                                                { line: 'bg-pink-500', badge: 'bg-pink-100 text-pink-700 border-pink-200' },
+                                                { line: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 border-cyan-200' },
+                                                { line: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+                                                { line: 'bg-lime-500', badge: 'bg-lime-100 text-lime-700 border-lime-200' },
+                                            ];
+
+                                            const knownCategories: Record<string, number> = {
+                                                'Belegde broodjes': 0, 'Broodjes': 0,
+                                                'Snacks': 1,
+                                                'Banket': 2,
+                                                'Frisdrank': 3,
+                                                'Salades': 4,
+                                                'Overig': 5
+                                            };
+
+                                            let colorIndex = knownCategories[category];
+                                            if (colorIndex === undefined) {
+                                                const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                                                colorIndex = 6 + (hash % (colorPalette.length - 6));
+                                            }
+
+                                            const style = colorPalette[colorIndex];
+                                            const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
+
+                                            return (
+                                                <div className="flex items-center gap-4 mb-6 pt-4">
+                                                    <div className={`h-8 w-1.5 rounded-full ${style.line}`}></div>
+                                                    <h3 className="text-2xl font-bold text-slate-800">
+                                                        {displayName}
+                                                    </h3>
+                                                    <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${style.badge}`}>
+                                                        {productsInCat.length}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })()}
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                            {productsInCat.map((product) => (
+                                                <ProductCard
+                                                    key={product.id}
+                                                    product={product}
+                                                    onAddToCart={handleAddToCart}
+                                                    disabled={isDeadlinePassed}
+                                                    isFavorite={favorites.has(product.id)}
+                                                    onToggleFavorite={toggleFavorite}
+                                                />
+                                            ))}
+                                        </div>
+                                    </section>
+                                );
+                            })
+                    )}
+                </div>
             </div>
-        </div>
-    );
+            );
 }
 
 const ClockIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-    </svg>
-);
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+            </svg>
+            );
