@@ -82,7 +82,7 @@ export default function ArchivesPage() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 px-6 py-8 max-w-[1800px] mx-auto">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
                     <FolderOpen className="w-6 h-6" />

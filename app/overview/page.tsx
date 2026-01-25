@@ -93,7 +93,7 @@ export default function OverviewPage() {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 px-6 py-8 max-w-[1800px] mx-auto">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-text-primary">Week overzicht</h1>
