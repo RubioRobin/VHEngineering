@@ -109,20 +109,20 @@ export const Sidebar = () => {
                             key={item.label}
                             href={item.href}
                             onClick={() => setMobileOpen(false)}
-                            className="flex items-center px-4 py-3 rounded-xl text-text-secondary hover:bg-background hover:text-primary transition-colors group"
+                            className="flex items-center px-6 py-5 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group"
                         >
-                            <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                                <item.icon className="w-5 h-5 transition-colors" />
+                            <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                                <item.icon className="w-7 h-7 transition-colors" />
                             </div>
                             <motion.span
                                 initial={false}
                                 animate={{
                                     opacity: collapsed ? 0 : 1,
                                     width: collapsed ? 0 : "auto",
-                                    marginLeft: collapsed ? 0 : 12
+                                    marginLeft: collapsed ? 0 : 16
                                 }}
                                 transition={{ duration: 0.2 }}
-                                className="font-medium text-sm overflow-hidden whitespace-nowrap"
+                                className="font-bold text-lg overflow-hidden whitespace-nowrap"
                             >
                                 {item.label}
                             </motion.span>
@@ -132,40 +132,40 @@ export const Sidebar = () => {
 
                 {/* Bottom Actions - Only show on desktop */}
                 <div className="p-4 border-t border-border/50 space-y-2 hidden md:block">
-                    <Link href="/settings" className="flex items-center px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors">
-                        <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                            <Settings className="w-5 h-5" />
+                    <Link href="/settings" className="flex items-center px-6 py-5 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group">
+                        <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                            <Settings className="w-7 h-7" />
                         </div>
                         <motion.span
                             initial={false}
                             animate={{
                                 opacity: collapsed ? 0 : 1,
                                 width: collapsed ? 0 : "auto",
-                                marginLeft: collapsed ? 0 : 12
+                                marginLeft: collapsed ? 0 : 16
                             }}
                             transition={{ duration: 0.2 }}
-                            className="font-medium text-sm overflow-hidden whitespace-nowrap"
+                            className="font-bold text-lg overflow-hidden whitespace-nowrap"
                         >
                             Settings
                         </motion.span>
                     </Link>
                     <button
                         onClick={toggleSidebar}
-                        className="flex items-center px-4 py-3 w-full rounded-xl text-text-secondary hover:bg-background transition-colors"
+                        className="flex items-center px-6 py-5 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group"
                         title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
-                        <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                            <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
+                        <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                            <ChevronLeft className={`w-7 h-7 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
                         </div>
                         <motion.span
                             initial={false}
                             animate={{
                                 opacity: collapsed ? 0 : 1,
                                 width: collapsed ? 0 : "auto",
-                                marginLeft: collapsed ? 0 : 12
+                                marginLeft: collapsed ? 0 : 16
                             }}
                             transition={{ duration: 0.2 }}
-                            className="font-medium text-sm overflow-hidden whitespace-nowrap"
+                            className="font-bold text-lg overflow-hidden whitespace-nowrap"
                         >
                             Inklappen
                         </motion.span>
