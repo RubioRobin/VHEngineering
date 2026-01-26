@@ -228,28 +228,8 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                                 </div>
                             )}
 
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">Naam *</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={personName}
-                                        onChange={(e) => setPersonName(e.target.value)}
-                                        placeholder="Je naam"
-                                        className="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">Afdeling (optioneel)</label>
-                                    <input
-                                        type="text"
-                                        value={department}
-                                        onChange={(e) => setDepartment(e.target.value)}
-                                        placeholder="Bijv: IT"
-                                        className="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
-                                    />
-                                </div>
+                            <div className="space-y-3 pb-24">
+                                {/* Inputs hidden, using auto-login data */}
                             </div>
 
                             <div className="flex items-center justify-between pt-2">

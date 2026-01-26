@@ -59,16 +59,14 @@ export default function CartItem({
                     <span className="w-12 text-center font-semibold">{item.quantity}</span>
                     <button
                         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                        className="w-8 h-8 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-bold transition-colors"
+                        className="w-8 h-8 rounded-lg bg-primary hover:bg-primary-dark text-white font-bold transition-colors"
                     >
                         +
                     </button>
                 </div>
-                {item.product.price && (
-                    <span className="ml-auto font-semibold text-primary-600">
-                        € {(item.product.price * item.quantity).toFixed(2)}
-                    </span>
-                )}
+                <span className="ml-auto font-semibold text-primary">
+                    € {(item.product.price * item.quantity).toFixed(2)}
+                </span>
             </div>
 
             {/* Comment input */}
