@@ -103,7 +103,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                         {/* Header */}
                         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-primary-50 rounded-lg text-primary-600">
+                                <div className="p-2 bg-primary-glow/20 rounded-lg text-primary">
                                     <ShoppingBag className="w-6 h-6" />
                                 </div>
                                 <div>
@@ -155,11 +155,11 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                             <div className="p-5 border-t border-gray-100 bg-white space-y-4">
                                 <div className="flex items-center justify-between">
                                     <span className="text-gray-600 font-medium">Totaal</span>
-                                    <span className="text-2xl font-bold text-primary-600">€ {total.toFixed(2)}</span>
+                                    <span className="text-2xl font-bold text-primary">€ {total.toFixed(2)}</span>
                                 </div>
                                 <button
                                     onClick={handleCheckout}
-                                    className="w-full py-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                                 >
                                     <span>Afrekenen</span>
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
