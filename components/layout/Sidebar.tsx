@@ -10,7 +10,7 @@ import { useUI } from "../providers/UIProvider";
 const menuItems = [
     { icon: LayoutDashboard, label: 'Het assortiment', href: '/' },
     { icon: ClipboardList, label: 'Overzicht', href: '/overview' },
-    { icon: History, label: 'Mijn bestellingen', href: '/mijn-bestellingen' },
+    { icon: History, label: 'Mijn bestellingen', href: '/my-orders' },
     { icon: FolderOpen, label: 'Archief', href: '/archives' },
 ];
 

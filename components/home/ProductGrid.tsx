@@ -1,0 +1,129 @@
+'use client';
+
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search } from 'lucide-react';
+import ProductCard from '@/components/ProductCard';
+
+interface ProductGridProps {
+    filteredProducts: any[];
+    searchQuery: string;
+    showOnlyFavorites: boolean;
+    selectedCategory: string | null;
+    favorites: Set<string>;
+    isDeadlinePassed: boolean;
+    onAddToCart: (product: any, quantity: number) => void;
+    onToggleFavorite: (id: string) => void;
+    getCategory: (product: any) => string;
+}
+
+export const ProductGrid = ({
+    filteredProducts,
+    searchQuery,
+    showOnlyFavorites,
+    selectedCategory,
+    favorites,
+    isDeadlinePassed,
+    onAddToCart,
+    onToggleFavorite,
+    getCategory
+}: ProductGridProps) => {
+    return (
+        <div className="space-y-12 max-w-[1800px] mx-auto px-6">
+            <AnimatePresence mode="wait">
+                {/* If searching or favorites: Show flat list */}
+                {(searchQuery || showOnlyFavorites) ? (
+                    <motion.div
+                        key="flat-list"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.2 }}
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8"
+                    >
+                        {filteredProducts.length > 0 ? (
+                            filteredProducts.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={onAddToCart}
+                                    disabled={isDeadlinePassed}
+                                    isFavorite={favorites.has(product.id)}
+                                    onToggleFavorite={onToggleFavorite}
+                                />
+                            ))
+                        ) : (
+                            <div className="col-span-full py-20 text-center">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                                    <Search className="w-8 h-8 text-slate-400" />
+                                </div>
+                                <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
+                                <p className="text-slate-500">
+                                    {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
+                                </p>
+                            </div>
+                        )}
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key={`category-list-${selectedCategory || 'all'}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        {/* Default: Group by Category */}
+                        {Array.from(new Set(filteredProducts.map(p => getCategory(p))))
+                            .sort((a, b) => {
+                                // Custom sorting: Belegde broodjes first, then Snacks, then Banket
+                                const order: Record<string, number> = {
+                                    'Belegde broodjes': 1,
+                                    'Broodjes': 1,
+                                    'Snacks': 2,
+                                    'Banket': 3,
+                                    'Frisdrank': 4,
+                                    'Salades': 5,
+                                    'Overig': 99
+                                };
+                                return (order[a] || 99) - (order[b] || 99);
+                            })
+                            .map(category => {
+                                const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
+                                if (productsInCat.length === 0) return null;
+
+                                const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
+
+                                return (
+                                    <section key={category} id={`cat-${category}`} className="scroll-mt-48">
+                                        {/* Minimalist Design - Only show title if NOT filtered by specific category (to avoid double title) */}
+                                        {!selectedCategory && (
+                                            <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-gray-100 mt-12">
+                                                <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                                                    {displayName}
+                                                </h3>
+                                                <span className="text-sm font-bold text-slate-400">
+                                                    {productsInCat.length} opties
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${selectedCategory ? 'mt-6' : ''}`}>
+                                            {productsInCat.map((product) => (
+                                                <ProductCard
+                                                    key={product.id}
+                                                    product={product}
+                                                    onAddToCart={onAddToCart}
+                                                    disabled={isDeadlinePassed}
+                                                    isFavorite={favorites.has(product.id)}
+                                                    onToggleFavorite={onToggleFavorite}
+                                                />
+                                            ))}
+                                        </div>
+                                    </section>
+                                );
+                            })}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}

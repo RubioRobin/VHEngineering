@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { SEED_PRODUCTS } from '@/lib/seed-products';
+import { SEED_PRODUCTS } from '@/prisma/seeds/seed-products';
 
 export const dynamic = 'force-dynamic';
 

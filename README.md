@@ -61,6 +61,7 @@ Brood/
 │   ├── layout.tsx         # Root layout
 │   └── globals.css        # Global styles
 ├── components/            # React components
+│   ├── home/              # Home page specific components (Header, Filter, Grid)
 │   ├── CountdownTimer.tsx # Deadline countdown
 │   ├── ProductCard.tsx    # Broodje card
 │   └── CartItem.tsx       # Winkelmandje item
@@ -70,12 +71,14 @@ Brood/
 │   ├── auth.ts            # Admin authenticatie
 │   └── excel.ts           # Excel export (ExcelJS)
 ├── prisma/
+│   ├── seeds/             # Seed data & scripts
 │   └── schema.prisma      # Database schema
 ├── package.json
 ├── tsconfig.json
 ├── next.config.js
 ├── tailwind.config.ts
 └── .env.local             # Environment variabelen
+└── _archive/              # Oude scripts en documentatie
 ```
 
 ## ⚙️ Configuratie

@@ -2,20 +2,18 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState, useRef } from 'react';
-import { formatName } from '@/lib/utils';
-import ProductCard from '@/components/ProductCard';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Loader2, ShoppingBag, ChevronDown, Sandwich, Pizza, Croissant, Coffee, Carrot } from 'lucide-react';
-import { DashboardCard } from '@/components/ui/DashboardCard';
-import { DashboardButton } from '@/components/ui/DashboardButton';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
 import { useUser } from '@/components/providers/UserProvider';
 import { useOrders } from '@/components/providers/OrdersProvider';
 import { useToast } from '@/components/providers/ToastProvider';
-import { format } from 'date-fns';
-import { nl } from 'date-fns/locale';
+import { HomeHeader } from '@/components/home/HomeHeader';
+import { ProductFilterBar } from '@/components/home/ProductFilterBar';
+import { ProductGrid } from '@/components/home/ProductGrid';
 
 interface Product {
     id: string;
@@ -35,24 +33,13 @@ export default function HomePage() {
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+
     const { user } = useUser();
     const { orders } = useOrders();
     const lastOrder = orders && orders.length > 0 ? orders[0] : null;
-    const [currentWeekOrder, setCurrentWeekOrder] = useState<any>(null);
     const { showToast } = useToast();
 
-    // Helper to clean up categories
-    const getCategory = (p: Product) => {
-        const cat = p.description || 'Overig';
-        if (cat === 'Broodjes') return 'Belegde broodjes';
-        if (cat.toLowerCase().includes('handmatig')) return 'Snacks';
-        return cat;
-    };
-
-    // Timer State
-    const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
+    // Timer / Deadline State
     const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
     const [deadline, setDeadline] = useState<Date | null>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
@@ -60,64 +47,65 @@ export default function HomePage() {
     useEffect(() => {
         Promise.all([
             fetchProducts(),
-            fetchDeadline(),
-            // Last order is now from global state
-            user ? fetchCurrentWeekOrder() : Promise.resolve()
+            fetchDeadline()
         ]).finally(() => {
             setLoading(false);
         });
     }, []);
 
-    // Handle clicking outside of category dropdown
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsCategoryDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    // Update timer when deadline changes
-    useEffect(() => {
-        if (!deadline) return;
-
-        const calculateTimeLeft = () => {
-            const now = new Date();
-            const target = new Date(deadline);
-            const diff = target.getTime() - now.getTime();
-
-            if (diff <= 0) {
-                setIsDeadlinePassed(true);
-                return null;
-            }
-
-            return {
-                d: Math.floor(diff / (1000 * 60 * 60 * 24)),
-                h: Math.floor((diff / (1000 * 60 * 60)) % 24),
-                m: Math.floor((diff / 1000 / 60) % 60),
-                s: Math.floor((diff / 1000) % 60),
-            };
-        };
-
-        const timer = setInterval(() => {
-            setTimeLeft(calculateTimeLeft());
-        }, 1000);
-
-        setTimeLeft(calculateTimeLeft()); // Init
-
-        return () => {
-            clearInterval(timer);
-        };
-    }, [deadline]);
-
+    // Fetch favorites when user loads
     useEffect(() => {
         if (user) {
             fetchFavorites();
         }
     }, [user]);
+
+    // Check deadline status periodically
+    useEffect(() => {
+        if (!deadline) return;
+        const checkDeadline = () => {
+            setIsDeadlinePassed(new Date() > deadline);
+        };
+        checkDeadline();
+        const interval = setInterval(checkDeadline, 1000);
+        return () => clearInterval(interval);
+    }, [deadline]);
+
+    // Filter Logic
+    useEffect(() => {
+        let filtered = products;
+
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(p => p.name.toLowerCase().includes(query));
+        }
+
+        if (showOnlyFavorites) {
+            filtered = filtered.filter(p => favorites.has(p.id));
+        }
+
+        if (selectedCategory) {
+            filtered = filtered.filter(p => getCategory(p) === selectedCategory);
+        }
+
+        setFilteredProducts(filtered);
+    }, [searchQuery, products, showOnlyFavorites, favorites, selectedCategory]);
+
+    // Scroll to top listener
+    useEffect(() => {
+        const handleScroll = () => setShowScrollTop(window.scrollY > 400);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // --- Helpers ---
+
+    const getCategory = (p: Product) => {
+        const cat = p.description || 'Overig';
+        if (cat === 'Broodjes') return 'Belegde broodjes';
+        if (cat.toLowerCase().includes('handmatig')) return 'Snacks';
+        return cat;
+    };
 
     const fetchProducts = async () => {
         try {
@@ -130,41 +118,6 @@ export default function HomePage() {
         } catch (error) {
             console.error('Error fetching products:', error);
         }
-    };
-
-
-
-    const fetchCurrentWeekOrder = async () => {
-        if (!user) return;
-        try {
-            const res = await fetch(`/api/orders/current-week?userId=${user.id}`);
-            if (res.ok) {
-                const data = await res.json();
-                setCurrentWeekOrder(data.order);
-            }
-        } catch (error) {
-            console.error('Error fetching current week order:', error);
-        }
-    };
-
-    const handleReorder = () => {
-        if (!lastOrder || !lastOrder.orderItems) return;
-
-        const newCartItems = lastOrder.orderItems.map((item: any) => ({
-            id: `${Date.now()}-${Math.random()}`,
-            product: {
-                id: item.productId,
-                name: item.product.name,
-                price: item.product.price
-            },
-            quantity: item.quantity,
-            comment: item.comment || ''
-        }));
-
-        localStorage.setItem('cart', JSON.stringify(newCartItems));
-        window.dispatchEvent(new Event('cart-updated'));
-        showToast("Producten opnieuw toegevoegd aan winkelmandje!", "success");
-        setIsCartOpen(true);
     };
 
     const fetchDeadline = async () => {
@@ -193,6 +146,28 @@ export default function HomePage() {
         }
     };
 
+    // --- Handlers ---
+
+    const handleReorder = () => {
+        if (!lastOrder || !lastOrder.orderItems) return;
+
+        const newCartItems = lastOrder.orderItems.map((item: any) => ({
+            id: `${Date.now()}-${Math.random()}`,
+            product: {
+                id: item.productId,
+                name: item.product.name,
+                price: item.product.price
+            },
+            quantity: item.quantity,
+            comment: item.comment || ''
+        }));
+
+        localStorage.setItem('cart', JSON.stringify(newCartItems));
+        window.dispatchEvent(new Event('cart-updated'));
+        showToast("Producten opnieuw toegevoegd aan winkelmandje!", "success");
+        setIsCartOpen(true);
+    };
+
     const toggleFavorite = async (productId: string) => {
         if (!user) {
             showToast("Je moet ingelogd zijn om favorieten op te slaan!", "error");
@@ -203,11 +178,8 @@ export default function HomePage() {
         const wasFavorite = favorites.has(productId);
         setFavorites(prev => {
             const next = new Set(prev);
-            if (wasFavorite) {
-                next.delete(productId);
-            } else {
-                next.add(productId);
-            }
+            if (wasFavorite) next.delete(productId);
+            else next.add(productId);
             return next;
         });
 
@@ -220,29 +192,18 @@ export default function HomePage() {
 
             if (res.ok) {
                 const data = await res.json();
-
                 // Sync with server text just to be sure
                 setFavorites(prev => {
                     const next = new Set(prev);
-                    if (data.favorited) {
-                        next.add(productId);
-                    } else {
-                        next.delete(productId);
-                    }
+                    if (data.favorited) next.add(productId);
+                    else next.delete(productId);
                     return next;
                 });
-
-                if (data.favorited) {
-                    showToast("Toegevoegd aan favorieten!", "success");
-                } else {
-                    showToast("Verwijderd uit favorieten", "success");
-                }
+                showToast(data.favorited ? "Toegevoegd aan favorieten!" : "Verwijderd uit favorieten", "success");
             } else {
                 const errorData = await res.json().catch(() => ({}));
                 if (res.status === 404 || errorData.error === 'User or Product not found') {
                     showToast("Sessie verlopen. Log opnieuw in.", "error");
-                    // Optionally clear local storage or redirect
-                    // localStorage.removeItem("vh_user");
                 } else {
                     throw new Error(errorData.error || "Failed");
                 }
@@ -250,38 +211,15 @@ export default function HomePage() {
         } catch (error) {
             console.error('Error toggling favorite:', error);
             showToast("Fout bij opslaan favoriet", "error");
-
             // Revert on error
             setFavorites(prev => {
                 const next = new Set(prev);
-                if (wasFavorite) {
-                    next.add(productId);
-                } else {
-                    next.delete(productId);
-                }
+                if (wasFavorite) next.add(productId);
+                else next.delete(productId);
                 return next;
             });
         }
     };
-
-    useEffect(() => {
-        let filtered = products;
-
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(p => p.name.toLowerCase().includes(query));
-        }
-
-        if (showOnlyFavorites) {
-            filtered = filtered.filter(p => favorites.has(p.id));
-        }
-
-        if (selectedCategory) {
-            filtered = filtered.filter(p => getCategory(p) === selectedCategory);
-        }
-
-        setFilteredProducts(filtered);
-    }, [searchQuery, products, showOnlyFavorites, favorites, selectedCategory]);
 
     const handleAddToCart = (product: Product, quantity: number) => {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -301,15 +239,7 @@ export default function HomePage() {
         localStorage.setItem('cart', JSON.stringify(cart));
         window.dispatchEvent(new Event('cart-updated'));
         showToast(`${quantity}x ${product.name} toegevoegd!`, "success");
-        // Cart stays closed - user clicks floating button to open
     };
-
-    // Scroll to top listener
-    useEffect(() => {
-        const handleScroll = () => setShowScrollTop(window.scrollY > 400);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -322,6 +252,13 @@ export default function HomePage() {
             </div>
         );
     }
+
+    // Get unique categories for dropdown
+    const categories = Array.from(new Set(products.map(p => getCategory(p))))
+        .sort((a, b) => {
+            const order: Record<string, number> = { 'Belegde broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
+            return (order[a] || 99) - (order[b] || 99);
+        });
 
     return (
         <div className="min-h-screen pb-20 relative">
@@ -341,280 +278,37 @@ export default function HomePage() {
                 </svg>
             </motion.button>
 
-            {/* Dashboard Header & Timer */}
-            <div className="bg-white pt-6 pb-6">
-                <div className="max-w-[1800px] mx-auto px-6">
-                    <div className="flex flex-col md:flex-row items-stretch gap-6">
-                        {/* Timer Card */}
-                        <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
-                            ? 'bg-gradient-to-br from-red-500 to-red-700 animate-pulse shadow-red-500/30'
-                            : 'bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-500/20'
-                            }`}>
-                            <div className="flex flex-col h-full justify-between">
-                                <div className="flex items-center gap-3 opacity-90">
-                                    <ClockIcon />
-                                    <span className="text-sm font-medium uppercase tracking-wider">
-                                        {timeLeft && (timeLeft.d === 0 && timeLeft.h < 4) ? '🚨 SPOED!' : 'Bestellen Sluit Over'}
-                                    </span>
-                                </div>
-                                <div className="mt-4">
-                                    {timeLeft ? (
-                                        <>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-4xl font-mono font-bold">{timeLeft.d}d</span>
-                                                <span className="text-4xl font-mono font-bold">{timeLeft.h}u</span>
-                                                <span className="text-4xl font-mono font-bold">{timeLeft.m}m</span>
-                                            </div>
-                                            {deadline && (
-                                                <p className="text-white/70 text-sm mt-3 font-medium">
-                                                    Deadline: {format(deadline, 'EEEE d MMMM - HH:mm', { locale: nl })} uur
-                                                </p>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <span className="text-3xl font-bold">Gesloten</span>
-                                    )}
-                                </div>
-                            </div>
-                        </DashboardCard>
+            {/* Header */}
+            <HomeHeader
+                deadline={deadline}
+                lastOrder={lastOrder}
+                onReorder={handleReorder}
+            />
 
-                        {/* Recent Order - Reorder */}
-                        {lastOrder && (
-                            <DashboardCard className="flex-1 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                                <div className="mb-3">
-                                    <h3 className="text-lg font-bold text-text-primary">Bestel opnieuw</h3>
-                                </div>
+            {/* Filter Bar */}
+            <ProductFilterBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                showOnlyFavorites={showOnlyFavorites}
+                setShowOnlyFavorites={setShowOnlyFavorites}
+                categories={categories}
+                productCount={filteredProducts.length}
+            />
 
-                                <div className="mb-3 space-y-1">
-                                    {lastOrder.orderItems?.slice(0, 3).map((item: any, idx: number) => (
-                                        <div key={idx} className="text-sm text-text-secondary">
-                                            <span className="font-medium text-text-primary">{item.quantity}x</span> {formatName(item.product.name)}
-                                        </div>
-                                    ))}
-                                    {lastOrder.orderItems?.length > 3 && (
-                                        <div className="text-sm text-text-muted italic">
-                                            +{lastOrder.orderItems.length - 3} meer...
-                                        </div>
-                                    )}
-                                </div>
-
-                                <DashboardButton
-                                    onClick={handleReorder}
-                                    className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 shadow-lg"
-                                >
-                                    Opnieuw bestellen
-                                </DashboardButton>
-                            </DashboardCard>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Sticky Header: Title + Search + Filters */}
-            <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100 transition-all">
-                <div className="max-w-[1800px] mx-auto px-6 py-4">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                        <div>
-                            <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">
-                                {showOnlyFavorites
-                                    ? 'Jouw Favorieten'
-                                    : (selectedCategory || 'Het Assortiment')}
-                            </h2>
-                            <p className="text-slate-500 font-medium text-base mt-2">
-                                {filteredProducts.length} {showOnlyFavorites ? 'favoriete producten' : 'producten'}
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            {/* Category Dropdown */}
-                            {!showOnlyFavorites && !searchQuery && (
-                                <div className="relative min-w-[220px]" ref={dropdownRef}>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                                        className="w-full pl-6 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-200 flex items-center justify-between"
-                                    >
-                                        <span className="truncate">
-                                            {selectedCategory ? selectedCategory : 'Alle Categorieën'}
-                                        </span>
-                                        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
-                                    </button>
-
-                                    {isCategoryDropdownOpen && (
-                                        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                            <button
-                                                onClick={() => {
-                                                    setSelectedCategory(null);
-                                                    setIsCategoryDropdownOpen(false);
-                                                }}
-                                                className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === null
-                                                    ? 'bg-indigo-600 text-white'
-                                                    : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
-                                                    }`}
-                                            >
-                                                Alle Categorieën
-                                            </button>
-                                            {Array.from(new Set(products.map(p => getCategory(p))))
-                                                .sort((a, b) => {
-                                                    const order = { 'Belegde broodjes': 1, 'Snacks': 2, 'Banket': 3, 'Frisdrank': 4, 'Salades': 5, 'Overig': 99 };
-                                                    return (order[a as keyof typeof order] || 99) - (order[b as keyof typeof order] || 99);
-                                                })
-                                                .map(cat => (
-                                                    <button
-                                                        key={cat}
-                                                        onClick={() => {
-                                                            setSelectedCategory(cat);
-                                                            setIsCategoryDropdownOpen(false);
-                                                        }}
-                                                        className={`w-full px-6 py-3 text-left text-sm font-bold transition-all ${selectedCategory === cat
-                                                            ? 'bg-indigo-600 text-white'
-                                                            : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'
-                                                            }`}
-                                                    >
-                                                        {cat}
-                                                    </button>
-                                                ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            <div className="flex items-center gap-3">
-                                {user && (
-                                    <button
-                                        onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
-                                        className={`p-3 rounded-xl border transition-all ${showOnlyFavorites
-                                            ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-inner'
-                                            : 'bg-white border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-sm'}`}
-                                        title={showOnlyFavorites ? "Toon alles" : "Toon alleen favorieten"}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={showOnlyFavorites ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                        </svg>
-                                    </button>
-                                )}
-
-                                <div className="relative flex-1 sm:w-64">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Zoeken..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 shadow-sm rounded-xl text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-400"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Scrollable Product List */}
-            <div className="space-y-12 max-w-[1800px] mx-auto px-6">
-                <AnimatePresence mode="wait">
-                    {/* If searching or favorites: Show flat list */}
-                    {(searchQuery || showOnlyFavorites) ? (
-                        <motion.div
-                            key="flat-list"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.2 }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8"
-                        >
-                            {filteredProducts.length > 0 ? (
-                                filteredProducts.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        product={product}
-                                        onAddToCart={handleAddToCart}
-                                        disabled={isDeadlinePassed}
-                                        isFavorite={favorites.has(product.id)}
-                                        onToggleFavorite={toggleFavorite}
-                                    />
-                                ))
-                            ) : (
-                                <div className="col-span-full py-20 text-center">
-                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                                        <Search className="w-8 h-8 text-slate-400" />
-                                    </div>
-                                    <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
-                                    <p className="text-slate-500">
-                                        {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
-                                    </p>
-                                </div>
-                            )}
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key={`category-list-${selectedCategory || 'all'}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            {/* Default: Group by Category */}
-                            {Array.from(new Set(filteredProducts.map(p => getCategory(p))))
-                                .sort((a, b) => {
-                                    // Custom sorting: Belegde broodjes first, then Snacks, then Banket
-                                    const order: Record<string, number> = {
-                                        'Belegde broodjes': 1,
-                                        'Broodjes': 1,
-                                        'Snacks': 2,
-                                        'Banket': 3,
-                                        'Frisdrank': 4,
-                                        'Salades': 5,
-                                        'Overig': 99
-                                    };
-                                    return (order[a] || 99) - (order[b] || 99);
-                                })
-                                .map(category => {
-                                    const productsInCat = filteredProducts.filter(p => getCategory(p) === category);
-                                    if (productsInCat.length === 0) return null;
-
-                                    const displayName = category === 'Broodjes' ? 'Belegde broodjes' : category;
-
-                                    return (
-                                        <section key={category} id={`cat-${category}`} className="scroll-mt-48">
-                                            {/* Minimalist Design - Only show title if NOT filtered by specific category (to avoid double title) */}
-                                            {!selectedCategory && (
-                                                <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-gray-100 mt-12">
-                                                    <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-                                                        {displayName}
-                                                    </h3>
-                                                    <span className="text-sm font-bold text-slate-400">
-                                                        {productsInCat.length} opties
-                                                    </span>
-                                                </div>
-                                            )}
-
-                                            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${selectedCategory ? 'mt-6' : ''}`}>
-                                                {productsInCat.map((product) => (
-                                                    <ProductCard
-                                                        key={product.id}
-                                                        product={product}
-                                                        onAddToCart={handleAddToCart}
-                                                        disabled={isDeadlinePassed}
-                                                        isFavorite={favorites.has(product.id)}
-                                                        onToggleFavorite={toggleFavorite}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </section>
-                                    );
-                                })}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+            {/* Product Grid */}
+            <ProductGrid
+                filteredProducts={filteredProducts}
+                searchQuery={searchQuery}
+                showOnlyFavorites={showOnlyFavorites}
+                selectedCategory={selectedCategory}
+                favorites={favorites}
+                isDeadlinePassed={isDeadlinePassed}
+                onAddToCart={handleAddToCart}
+                onToggleFavorite={toggleFavorite}
+                getCategory={getCategory}
+            />
         </div>
     );
 }
-
-const ClockIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-    </svg>
-);

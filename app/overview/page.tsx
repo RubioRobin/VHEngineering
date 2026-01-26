@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import * as XLSX from 'xlsx';
+
 import { motion } from 'framer-motion';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
