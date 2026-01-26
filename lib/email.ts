@@ -195,10 +195,18 @@ async function getTopProductsHtml(): Promise<string> {
         });
 
         let finalItems = topItems;
-        let title = "DIT WAREN DE POPULAIRSTE BROODJES AFGELOPEN WEEK"; // Copy per user request
+        // Always use the requested title "DIT WAREN DE POPULAIRSTE BROODJES..."
+        // Even if we fall back to all-time data, this header is what the user wants to see.
+        let title = "DIT WAREN DE POPULAIRSTE BROODJES AFGELOPEN WEEK";
 
         if (finalItems.length === 0) {
-            title = "ONZE AANRADERS";
+            // title = "ONZE AANRADERS"; <--- THE BUG. User wants "Populairste", not "Aanraders".
+            // We keep the title consistent or slightly adjusted but definitely NOT "Onze aanraders" if that's what they dislike.
+            // If strictly 'last week' is empty, we might want to drop "AFGELOPEN WEEK" to be accurate, 
+            // BUT user asked for "iets in de trend van dit waren de populairste broodjes afgelopen week"
+            // So we stick to "POPULAIRSTE BROODJES" or just keep the long one.
+            // Let's stick to the requested text or close to it.
+
             finalItems = await (prisma as any).orderItem.groupBy({
                 by: ['productId'],
                 _count: { productId: true },
