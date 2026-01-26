@@ -9,38 +9,23 @@ import { format } from 'date-fns';
 import { formatName } from '@/lib/utils';
 import { nl } from 'date-fns/locale';
 
+import { useOrders } from '@/components/providers/OrdersProvider';
+
 export default function MijnBestellingenPage() {
-    const [myOrders, setMyOrders] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { orders: myOrders, isLoading: loading, refreshOrders: fetchMyOrders } = useOrders();
     const { user } = useUser();
     const { showToast, showConfirm } = useToast();
     const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(new Set());
 
+    // Auto-expand most recent week when orders load
     useEffect(() => {
-        if (user) {
-            fetchMyOrders();
-        }
-    }, [user]);
-
-    const fetchMyOrders = async () => {
-        if (!user) return;
-        try {
-            const res = await fetch(`/api/orders/user?userId=${user.id}`);
-            if (res.ok) {
-                const data = await res.json();
-                setMyOrders(data.orders || []);
-                // Auto-expand most recent week
-                if (data.orders.length > 0) {
-                    const firstWeek = data.orders[0].orderPeriod?.weekId;
-                    if (firstWeek) setExpandedWeeks(new Set([firstWeek]));
-                }
+        if (myOrders.length > 0) {
+            const firstWeek = myOrders[0].orderPeriod?.weekId;
+            if (firstWeek && expandedWeeks.size === 0) {
+                setExpandedWeeks(new Set([firstWeek]));
             }
-        } catch (error) {
-            console.error('Error fetching orders:', error);
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [myOrders]);
 
     const handleDeleteOrder = async (orderId: string) => {
         showConfirm({

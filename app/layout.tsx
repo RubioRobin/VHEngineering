@@ -8,6 +8,7 @@ import { ToastProvider } from '@/components/providers/ToastProvider';
 import { UIProvider } from '@/components/providers/UIProvider';
 import { UserIdentityModal } from '@/components/modals/UserIdentityModal';
 import { LayoutContent } from '@/components/layout/LayoutContent';
+import { OrdersProvider } from '@/components/providers/OrdersProvider';
 
 const outfit = Outfit({
     subsets: ['latin'],
@@ -37,20 +38,22 @@ export default function RootLayout({
                 <ToastProvider>
                     <UserProvider>
                         <UIProvider>
-                            <UserIdentityModal />
+                            <OrdersProvider>
+                                <UserIdentityModal />
 
-                            <div className="flex min-h-screen">
-                                {/* Sidebar */}
-                                <Sidebar />
+                                <div className="flex min-h-screen">
+                                    {/* Sidebar */}
+                                    <Sidebar />
 
-                                {/* Main Content Area */}
-                                <LayoutContent>
-                                    <main className="min-h-screen flex-1 pb-8">
-                                        {children}
-                                    </main>
-                                    <Footer />
-                                </LayoutContent>
-                            </div>
+                                    {/* Main Content Area */}
+                                    <LayoutContent>
+                                        <main className="min-h-screen flex-1 pb-8">
+                                            {children}
+                                        </main>
+                                        <Footer />
+                                    </LayoutContent>
+                                </div>
+                            </OrdersProvider>
                         </UIProvider>
                     </UserProvider>
                 </ToastProvider>

@@ -57,7 +57,7 @@ export const Sidebar = () => {
                             }}
                             className="whitespace-nowrap ml-3"
                         >
-                            <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
+                            <h1 className="font-medium text-base text-text-primary">{user?.name || 'Gast'}</h1>
                             <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
                         </motion.div>
                     </div>
@@ -84,7 +84,7 @@ export const Sidebar = () => {
                                     ease: "easeInOut",
                                     delay: collapsed ? 0 : 0.1
                                 }}
-                                className="font-bold text-base overflow-hidden whitespace-nowrap ml-3"
+                                className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                             >
                                 {item.label}
                             </motion.span>
@@ -108,7 +108,7 @@ export const Sidebar = () => {
                                 ease: "easeInOut",
                                 delay: collapsed ? 0 : 0.1
                             }}
-                            className="font-bold text-base overflow-hidden whitespace-nowrap ml-3"
+                            className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                         >
                             Settings
                         </motion.span>
@@ -131,7 +131,7 @@ export const Sidebar = () => {
                                 ease: "easeInOut",
                                 delay: collapsed ? 0 : 0.1
                             }}
-                            className="font-bold text-base overflow-hidden whitespace-nowrap ml-3"
+                            className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                         >
                             Inklappen
                         </motion.span>
