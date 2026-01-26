@@ -15,7 +15,11 @@ interface CartSidebarProps {
 export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
     const router = useRouter();
     const [cartItems, setCartItems] = useState<CartItemData[]>([]);
+    const [personName, setPersonName] = useState('');
+    const [department, setDepartment] = useState('');
+    const [clientToken, setClientToken] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     // Close on click outside
     // (Implementation omitted for brevity, focusing on core logic)
@@ -43,6 +47,13 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
         setCartItems(items);
         window.dispatchEvent(new Event('cart-updated')); // Keep sync
     };
+
+    // Load user info on mount
+    useEffect(() => {
+        setPersonName(localStorage.getItem('personName') || '');
+        setDepartment(localStorage.getItem('department') || '');
+        setClientToken(localStorage.getItem('clientToken') || '');
+    }, []);
 
     const handleUpdateQuantity = (id: string, quantity: number) => {
         const updated = cartItems.map((item) =>
@@ -72,9 +83,68 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
         }, 0);
     };
 
-    const handleCheckout = () => {
-        onClose();
-        router.push('/cart'); // Navigate to full cart page
+    const handleSubmitOrder = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+
+        if (!personName.trim()) {
+            setError('Naam is verplicht');
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        // Ensure token
+        let currentToken = clientToken;
+        if (!currentToken) {
+            currentToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            setClientToken(currentToken);
+            localStorage.setItem('clientToken', currentToken);
+        }
+
+        // Save user info
+        localStorage.setItem('personName', personName.trim());
+        localStorage.setItem('department', department.trim());
+
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    personName,
+                    department,
+                    clientToken: currentToken,
+                    items: cartItems.map((item) => ({
+                        productId: item.product.id,
+                        quantity: item.quantity,
+                        comment: item.comment,
+                    })),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to submit order');
+            }
+
+            // Success
+            localStorage.removeItem('cart');
+            setCartItems([]);
+            // Dispatch success event for Modal
+            const orderDetails = {
+                orderId: data.id,
+                totalAmount: calculateTotal(),
+                itemCount: cartItems.reduce((acc, item) => acc + item.quantity, 0)
+            };
+            window.dispatchEvent(new CustomEvent('order-success', { detail: orderDetails }));
+
+            onClose(); // Close sidebar
+        } catch (err: any) {
+            setError(err.message || 'Er is iets misgegaan');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const total = calculateTotal();
@@ -150,24 +220,60 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                             )}
                         </div>
 
-                        {/* Footer */}
-                        {cartItems.length > 0 && (
-                            <div className="p-5 border-t border-gray-100 bg-white space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600 font-medium">Totaal</span>
-                                    <span className="text-2xl font-bold text-primary">€ {total.toFixed(2)}</span>
+                        <div className="p-5 border-t border-gray-100 bg-white space-y-4">
+
+                            {error && (
+                                <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg">
+                                    {error}
                                 </div>
-                                <button
-                                    onClick={handleCheckout}
-                                    className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                                >
-                                    <span>Afrekenen</span>
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </button>
+                            )}
+
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Naam *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={personName}
+                                        onChange={(e) => setPersonName(e.target.value)}
+                                        placeholder="Je naam"
+                                        className="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Afdeling (optioneel)</label>
+                                    <input
+                                        type="text"
+                                        value={department}
+                                        onChange={(e) => setDepartment(e.target.value)}
+                                        placeholder="Bijv: IT"
+                                        className="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                                    />
+                                </div>
                             </div>
-                        )}
+
+                            <div className="flex items-center justify-between pt-2">
+                                <span className="text-gray-600 font-medium">Totaal</span>
+                                <span className="text-2xl font-bold text-primary">€ {total.toFixed(2)}</span>
+                            </div>
+
+                            <button
+                                onClick={handleSubmitOrder}
+                                disabled={isSubmitting}
+                                className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? (
+                                    <span>Bezig...</span>
+                                ) : (
+                                    <>
+                                        <span>Plaats Bestelling</span>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </motion.div>
                 </>
             )}
