@@ -128,11 +128,11 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
-        // Create Order with department from user profile
-        let department = null;
+        // Create Order with department from user profile or body
+        let department = (body.department as string) || null;
         if (userId) {
             const user = await prisma.user.findUnique({ where: { id: userId } });
-            if (user) {
+            if (user && user.department) {
                 department = user.department;
             }
         }

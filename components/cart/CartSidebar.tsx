@@ -122,7 +122,8 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    personName,
+                    userName: personName, // Map to API expectation
+                    userId: user?.id,
                     department,
                     clientToken: currentToken,
                     items: cartItems.map((item) => ({
@@ -239,7 +240,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                                 </div>
                             )}
 
-                            <div className="space-y-3 pb-24">
+                            <div className="space-y-3">
                                 {/* Inputs hidden, using auto-login data */}
                             </div>
 
