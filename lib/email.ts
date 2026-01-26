@@ -320,6 +320,20 @@ export async function sendReminderToAll() {
     return { success: true, sent, failed, total: subscribers.length, results: promiseResults };
 }
 
+
+/**
+ * Default plain text email template
+ */
+export function getDefaultEmailText(): string {
+    return `Hallo {{name}}! 👋
+    
+Dit is je reminder: de deadline nadert! ⏰
+
+Wist je dat? "{{quote}}"
+
+Bekijk onze tips van de week onderaan de mail en bestel snel!`.trim();
+}
+
 export function generateHtmlFromText(text: string, quote?: string, topProductsHtml?: string): string {
     if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
         return text.replace('{{quote}}', quote || '').replace('{{topProducts}}', topProductsHtml || '');
