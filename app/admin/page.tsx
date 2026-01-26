@@ -16,6 +16,28 @@ export default function AdminPage() {
     const [adminToken, setAdminToken] = useState<string | null>(null);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+    // Session Timeout Logic
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        const resetTimer = () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                handleLogout();
+                showToast('Automatisch uitgelogd wegens inactiviteit', 'info');
+            }, 3600000); // 1 hour
+        };
+
+        window.addEventListener('mousemove', resetTimer);
+        window.addEventListener('keypress', resetTimer);
+        resetTimer();
+
+        return () => {
+            clearTimeout(timeout);
+            window.removeEventListener('mousemove', resetTimer);
+            window.removeEventListener('keypress', resetTimer);
+        };
+    }, []);
+
     // Dashboard State
     const [currentDeadline, setCurrentDeadline] = useState<Date | null>(null);
     const [emailList, setEmailList] = useState<any[]>([]);
@@ -588,10 +610,10 @@ export default function AdminPage() {
                     <div>
                         <div className="flex items-center gap-4 mb-4 text-cyan-600">
                             <Database className="w-8 h-8" />
-                            <h2 className="text-xl font-bold">Assortiment Resetten</h2>
+                            <h2 className="text-xl font-bold">Standaardlijst Herstellen</h2>
                         </div>
                         <p className="text-text-secondary mb-4 text-sm">
-                            Zet het assortiment terug naar de basis (haalt producten opnieuw op).
+                            Zet het assortiment terug naar de basis (Vervangt huidige producten met standaardlijst).
                         </p>
                     </div>
                     <DashboardButton
@@ -601,7 +623,7 @@ export default function AdminPage() {
                         icon={<RefreshCcw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
                         isLoading={refreshing}
                     >
-                        {refreshing ? 'Producten ophalen...' : 'Assortiment resetten'}
+                        {refreshing ? 'Producten ophalen...' : 'Standaardlijst herstellen'}
                     </DashboardButton>
                 </DashboardCard>
 

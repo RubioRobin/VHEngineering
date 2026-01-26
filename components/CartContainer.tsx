@@ -57,7 +57,8 @@ export default function CartContainer() {
         saveCart(updated);
     };
 
-    const handleRemove = (id: string) => {
+    const handleRemove = (id: string, force = false) => {
+        if (!force && !window.confirm('Weet je zeker dat je dit item wilt verwijderen?')) return;
         const updated = cartItems.filter((item) => item.id !== id);
         saveCart(updated);
     };
@@ -132,7 +133,16 @@ export default function CartContainer() {
             localStorage.removeItem('editingOrderId');
             // alert(editingOrderId ? 'Bestelling aangepast!' : 'Bestelling geplaatst! Bedankt voor je bestelling.');
             setToast({ message: editingOrderId ? 'Bestelling aangepast!' : 'Bestelling geplaatst!', type: 'success' });
-            setTimeout(() => router.push('/my-orders'), 1500);
+
+            // Dispatch success event for Modal
+            const orderDetails = {
+                orderId: data.id,
+                totalAmount: calculateTotal(),
+                itemCount: cartItems.reduce((acc, item) => acc + item.quantity, 0)
+            };
+            window.dispatchEvent(new CustomEvent('order-success', { detail: orderDetails }));
+
+            setTimeout(() => router.push('/my-orders'), 2000);
         } catch (err: any) {
             setError(err.message || 'Er is iets misgegaan');
         } finally {

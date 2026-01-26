@@ -14,6 +14,9 @@ import { useToast } from '@/components/providers/ToastProvider';
 import { HomeHeader } from '@/components/home/HomeHeader';
 import { ProductFilterBar } from '@/components/home/ProductFilterBar';
 import { ProductGrid } from '@/components/home/ProductGrid';
+import { OrderSuccessModal } from '@/components/modals/OrderSuccessModal';
+import { differenceInHours, differenceInMinutes } from 'date-fns';
+import { Clock } from 'lucide-react';
 
 interface Product {
     id: string;
@@ -22,6 +25,7 @@ interface Product {
     description: string | null;
     imageUrl: string | null;
     allergens: string | null;
+    category?: string | null;
 }
 
 export default function HomePage() {
@@ -44,6 +48,9 @@ export default function HomePage() {
     const [deadline, setDeadline] = useState<Date | null>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
 
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [lastOrderDetails, setLastOrderDetails] = useState<{ orderId: string, totalAmount: number, itemCount: number } | null>(null);
+
     useEffect(() => {
         Promise.all([
             fetchProducts(),
@@ -51,6 +58,14 @@ export default function HomePage() {
         ]).finally(() => {
             setLoading(false);
         });
+
+        // Listen for order success event
+        const handleOrderSuccess = (e: CustomEvent) => {
+            setLastOrderDetails(e.detail);
+            setShowSuccessModal(true);
+        };
+        window.addEventListener('order-success', handleOrderSuccess as EventListener);
+        return () => window.removeEventListener('order-success', handleOrderSuccess as EventListener);
     }, []);
 
     // Fetch favorites when user loads
@@ -101,6 +116,9 @@ export default function HomePage() {
     // --- Helpers ---
 
     const getCategory = (p: Product) => {
+        // Use database category if available, with fallbacks for legacy/mixed data
+        if (p.category) return p.category;
+
         const cat = p.description || 'Overig';
         if (cat === 'Broodjes') return 'Belegde broodjes';
         if (cat.toLowerCase().includes('handmatig')) return 'Snacks';
@@ -264,6 +282,25 @@ export default function HomePage() {
         <div className="min-h-screen pb-20 relative">
             <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
             <FloatingCartButton onClick={() => setIsCartOpen(true)} />
+            <OrderSuccessModal
+                isOpen={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                orderData={lastOrderDetails}
+            />
+
+            {/* Deadline Sticky Bar (Appears 4 hours before deadline) */}
+            {deadline && !isDeadlinePassed && differenceInHours(deadline, new Date()) < 4 && (
+                <motion.div
+                    initial={{ y: -50 }}
+                    animate={{ y: 0 }}
+                    className="fixed top-0 left-0 right-0 z-40 bg-orange-500 text-white py-2 px-4 shadow-md flex justify-center items-center text-sm font-bold"
+                >
+                    <Clock className="w-4 h-4 mr-2 animate-pulse" />
+                    <span>
+                        Let op! Deadline over {differenceInHours(deadline, new Date())}u {differenceInMinutes(deadline, new Date()) % 60}m
+                    </span>
+                </motion.div>
+            )}
 
             {/* Back to Top Button */}
             <motion.button

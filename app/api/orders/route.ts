@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getISOWeek, getYear } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
+
+const TIMEZONE = 'Europe/Amsterdam';
 
 // Helper to get current Week ID (e.g., "2024-05")
 const getCurrentWeekId = () => {
     const now = new Date();
-    return `${getYear(now)}-${getISOWeek(now)}`;
+    const zonedNow = toZonedTime(now, TIMEZONE);
+    return `${getYear(zonedNow)}-${getISOWeek(zonedNow)}`;
 };
 
 // Helper to get admin deadline from global settings
@@ -16,7 +20,8 @@ const getAdminDeadline = async (): Promise<Date> => {
     });
 
     const now = new Date();
-    let targetDate = new Date(now);
+    const zonedNow = toZonedTime(now, TIMEZONE);
+    let targetDate = new Date(zonedNow);
     let targetDay = 4; // Default: Thursday
     let targetHours = 14;
     let targetMinutes = 0;
@@ -34,18 +39,18 @@ const getAdminDeadline = async (): Promise<Date> => {
     }
 
     // Calculate next occurrence of target Day + Time
-    let daysUntil = targetDay - now.getDay();
+    let daysUntil = targetDay - zonedNow.getDay();
 
     // Check if we passed the time today
     const passedTimeToday = daysUntil === 0 &&
-        (now.getHours() > targetHours || (now.getHours() === targetHours && now.getMinutes() >= targetMinutes));
+        (zonedNow.getHours() > targetHours || (zonedNow.getHours() === targetHours && zonedNow.getMinutes() >= targetMinutes));
 
     if (daysUntil < 0 || passedTimeToday) {
         daysUntil += 7;
     }
 
-    const deadline = new Date(now);
-    deadline.setDate(now.getDate() + daysUntil);
+    const deadline = new Date(zonedNow);
+    deadline.setDate(zonedNow.getDate() + daysUntil);
     deadline.setHours(targetHours, targetMinutes, 0, 0);
 
     return deadline;
@@ -116,7 +121,8 @@ export async function POST(request: Request) {
 
         // Check if deadline has passed
         const now = new Date();
-        if (period.deadline < now) {
+        const zonedNow = toZonedTime(now, TIMEZONE);
+        if (period.deadline < zonedNow) {
             return NextResponse.json({
                 error: 'De besteldeadline is verstreken. Bestellingen voor deze week zijn gesloten.'
             }, { status: 400 });

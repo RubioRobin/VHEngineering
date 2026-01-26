@@ -5,7 +5,8 @@ export const SEED_PRODUCTS = [
         "price": 4.85,
         "description": "Belegde broodjes",
         "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-40120-DIEMS-BROODJE-GEZOND.jpg.webp",
-        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/"
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/belegde-broodjes/",
+        "category": "Belegde broodjes"
     },
     {
         "name": "Gesorteerd luxe belegd broodje",
@@ -292,7 +293,8 @@ export const SEED_PRODUCTS = [
         "price": 2.35,
         "description": "Snacks",
         "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60100-SAUCIJZEN.jpg.webp",
-        "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/"
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/snacks/",
+        "category": "Snacks"
     },
     {
         "name": "Appelflap",
@@ -397,7 +399,8 @@ export const SEED_PRODUCTS = [
         "price": 2.35,
         "description": "Banket",
         "imageUrl": "https://www.brood-shop.nl/app/webp-express/webp-images/uploads/2025/12/Product-60100-SAUCIJZEN.jpg.webp",
-        "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/"
+        "sourceUrl": "https://www.brood-shop.nl/assortiment/banket/",
+        "category": "Banket"
     },
     {
         "name": "Appelflap",

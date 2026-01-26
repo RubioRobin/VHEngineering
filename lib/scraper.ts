@@ -7,6 +7,7 @@ interface ScrapedProduct {
     description: string | null;
     imageUrl: string | null;
     sourceUrl: string | null;
+    category?: string | null;
 }
 
 /**
@@ -33,6 +34,7 @@ export async function saveScrapedProducts(products: ScrapedProduct[]): Promise<n
                         imageUrl: product.imageUrl,
                         sourceUrl: product.sourceUrl,
                         allergens: (product as any).allergens || null,
+                        category: product.category || null,
                     } as any,
                 });
             } else {
@@ -63,7 +65,8 @@ export async function runScraper(): Promise<{ success: boolean; message: string;
             if (!uniqueProducts.has(p.name)) {
                 uniqueProducts.set(p.name, {
                     ...p,
-                    sourceUrl: p.sourceUrl || null
+                    sourceUrl: p.sourceUrl || null,
+                    category: (p as any).category || null,
                 });
             }
         });
