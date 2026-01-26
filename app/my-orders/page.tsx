@@ -117,12 +117,10 @@ export default function MijnBestellingenPage() {
                     ))}
                 </div>
             ) : myOrders.length === 0 ? (
-                <DashboardCard className="p-12">
-                    <div className="text-center">
-                        <User className="w-16 h-16 mx-auto text-text-muted mb-4" />
-                        <p className="text-text-muted text-lg">Geen bestellingen gevonden</p>
-                    </div>
-                </DashboardCard>
+                <div className="col-span-full py-20 text-center bg-background rounded-3xl border-2 border-dashed border-border/80">
+                    <User className="w-16 h-16 mx-auto text-text-muted mb-4 opacity-20" />
+                    <h3 className="text-lg font-medium text-text-secondary">Geen bestellingen gevonden</h3>
+                </div>
             ) : (
                 <div className="space-y-3">
                     {Object.entries(ordersByWeek).map(([weekId, weekOrders]: [string, any]) => {

@@ -90,9 +90,6 @@ export default function ArchivesPage() {
             className="space-y-8 px-6 py-8 max-w-[1800px] mx-auto"
         >
             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                    <FolderOpen className="w-6 h-6" />
-                </div>
                 <div>
                     <h1 className="text-3xl font-bold text-text-primary">Archief</h1>
                     <p className="text-text-muted">Bekijk bestellingen van voorgaande weken</p>
