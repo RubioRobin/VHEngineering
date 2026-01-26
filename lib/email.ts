@@ -237,7 +237,7 @@ export function generateHtmlFromText(text: string): string {
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td align="center">
-                                        <a href="http://localhost:3000" style="display: inline-block; background-color: #4F46E5; background-image: linear-gradient(to right, #4F46E5, #6366F1); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 50px; font-size: 18px; font-weight: 700; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
+                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; background-image: linear-gradient(to right, #4F46E5, #6366F1); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 50px; font-size: 18px; font-weight: 700; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
                                             Nu Bestellen
                                         </a>
                                     </td>
@@ -253,9 +253,9 @@ export function generateHtmlFromText(text: string): string {
                                 Eet smakelijk alvast! &#129366;
                             </p>
                             <div style="margin-top: 12px;">
-                                <a href="http://localhost:3000/archives" style="color: #6B7280; text-decoration: none; font-size: 12px; margin: 0 8px;">Archief</a>
+                                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/archives" style="color: #6B7280; text-decoration: none; font-size: 12px; margin: 0 8px;">Archief</a>
                                 <span style="color: #E5E7EB;">|</span>
-                                <a href="http://localhost:3000/settings" style="color: #6B7280; text-decoration: none; font-size: 12px; margin: 0 8px;">Instellingen</a>
+                                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings" style="color: #6B7280; text-decoration: none; font-size: 12px; margin: 0 8px;">Instellingen</a>
                             </div>
                         </td>
                     </tr>
