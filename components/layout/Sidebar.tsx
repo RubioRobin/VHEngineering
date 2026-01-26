@@ -14,14 +14,19 @@ const menuItems = [
     { icon: FolderOpen, label: 'Archief', href: '/archives' },
 ];
 
+// Shared animation config for perfect synchronization
+const springConfig = {
+    type: "spring" as const,
+    stiffness: 350,
+    damping: 30
+};
+
 export const Sidebar = () => {
     const { isSidebarCollapsed: collapsed, toggleSidebar } = useUI();
     const { user } = useUser();
 
     return (
         <>
-
-
             {/* Sidebar - Desktop always visible, Mobile slides in */}
             <motion.aside
                 initial={false}
@@ -29,11 +34,7 @@ export const Sidebar = () => {
                     width: collapsed ? 80 : 240,
                     x: 0
                 }}
-                transition={{
-                    type: "tween",
-                    duration: 0.25,
-                    ease: [0.4, 0.0, 0.2, 1]
-                }}
+                transition={springConfig}
                 style={{ willChange: 'width' }}
                 className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-slate-300 shadow-soft flex flex-col md:z-40 overflow-hidden"
             >
@@ -42,7 +43,7 @@ export const Sidebar = () => {
                     animate={{
                         paddingLeft: collapsed ? 20 : 24 // 20px centers 40px avatar in 80px. 24px is px-6.
                     }}
-                    transition={{ duration: 0.2 }}
+                    transition={springConfig}
                     className="h-20 flex items-center border-b border-border/50"
                 >
                     <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
@@ -56,7 +57,7 @@ export const Sidebar = () => {
                             opacity: collapsed ? 0 : 1,
                             marginLeft: collapsed ? 0 : 12,
                         }}
-                        transition={{ duration: 0.2 }}
+                        transition={springConfig}
                         className="overflow-hidden flex flex-col justify-center h-10"
                     >
                         <div className="whitespace-nowrap">
@@ -79,7 +80,7 @@ export const Sidebar = () => {
                                     paddingLeft: 16, // Always 16px! (Parent px-3 = 12px. 12+16=28px start. Icon 24px. Center 40px)
                                     paddingRight: collapsed ? 0 : 12
                                 }}
-                                transition={{ duration: 0.2 }}
+                                transition={springConfig}
                                 className="flex items-center py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
                                 title={collapsed ? item.label : undefined}
                             >
@@ -93,7 +94,7 @@ export const Sidebar = () => {
                                         width: collapsed ? 0 : 'auto',
                                         marginLeft: collapsed ? 0 : 12
                                     }}
-                                    transition={{ duration: 0.2 }}
+                                    transition={springConfig}
                                     className="font-medium text-base overflow-hidden whitespace-nowrap"
                                 >
                                     {item.label}
@@ -111,7 +112,7 @@ export const Sidebar = () => {
                                 paddingLeft: 16, // Always 16px
                                 paddingRight: collapsed ? 0 : 12
                             }}
-                            transition={{ duration: 0.2 }}
+                            transition={springConfig}
                             className="flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
                             title={collapsed ? "Instellingen" : undefined}
                         >
@@ -124,7 +125,7 @@ export const Sidebar = () => {
                                     width: collapsed ? 0 : 'auto',
                                     marginLeft: collapsed ? 0 : 12
                                 }}
-                                transition={{ duration: 0.2 }}
+                                transition={springConfig}
                                 className="font-medium text-base overflow-hidden whitespace-nowrap"
                             >
                                 Settings
@@ -137,7 +138,7 @@ export const Sidebar = () => {
                             paddingLeft: 16, // Always 16px
                             paddingRight: collapsed ? 0 : 12
                         }}
-                        transition={{ duration: 0.2 }}
+                        transition={springConfig}
                         className="flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group"
                         title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
@@ -150,7 +151,7 @@ export const Sidebar = () => {
                                 width: collapsed ? 0 : 'auto',
                                 marginLeft: collapsed ? 0 : 12
                             }}
-                            transition={{ duration: 0.2 }}
+                            transition={springConfig}
                             className="font-medium text-base overflow-hidden whitespace-nowrap"
                         >
                             Inklappen
