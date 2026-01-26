@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
         // FALLBACK: If DB is empty (local dev without seed), use static seed data
         if (products.length === 0 && !query) {
-            console.log('⚠️ Database empty. Using SEED_PRODUCTS fallback.');
+
             // Add ID to seed products to match interface
             products = SEED_PRODUCTS.map((p, i) => ({
                 id: `seed-${i}`,

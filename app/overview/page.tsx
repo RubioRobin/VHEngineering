@@ -49,8 +49,8 @@ export default function OverviewPage() {
     const getTop5Products = () => {
         const productCounts: Record<string, { name: string; count: number; price: number }> = {};
 
-        orders.forEach((order: any) => {
-            order.orderItems.forEach((item: any) => {
+        orders.forEach((order: Order) => {
+            order.orderItems.forEach((item: OrderItem) => {
                 const key = item.product.name;
                 if (!productCounts[key]) {
                     productCounts[key] = { name: item.product.name, count: 0, price: item.product.price };
@@ -158,7 +158,7 @@ export default function OverviewPage() {
                             </div>
 
                             <div className="p-4 space-y-3">
-                                {order.orderItems.map((item: any) => (
+                                {order.orderItems.map((item: OrderItem) => (
                                     <div key={item.id} className="flex justify-between items-start text-sm">
                                         <div className="flex gap-2">
                                             <span className="font-bold w-6 text-center bg-gray-100 rounded text-text-primary">

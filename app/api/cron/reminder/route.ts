@@ -13,7 +13,7 @@ export async function GET(request: Request) {
             return new NextResponse('Unauthorized', { status: 401 });
         }
 
-        console.log('[Cron] Starting hourly check...');
+
 
         // 1. Get current week period
         const weekId = `${getYear(new Date())}-${getISOWeek(new Date())}`;
@@ -22,12 +22,12 @@ export async function GET(request: Request) {
         });
 
         if (!period) {
-            console.log('[Cron] No active period for this week.');
+
             return NextResponse.json({ message: 'No active period' });
         }
 
         if (period.reminderSent) {
-            console.log('[Cron] Reminder already sent for this period.');
+
             return NextResponse.json({ message: 'Reminder already sent' });
         }
 
@@ -39,10 +39,10 @@ export async function GET(request: Request) {
             today.getMonth() === deadline.getMonth() &&
             today.getDate() === deadline.getDate();
 
-        console.log(`[Cron] Check: Today(${today.toDateString()}) === Deadline(${deadline.toDateString()})?`);
+
 
         if (isSameDay) {
-            console.log('[Cron] ⏰ It is deadline day! Sending reminders...');
+
 
             // 3. Send Emails
             const result = await sendReminderToAll();
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
                 result
             });
         } else {
-            console.log('[Cron] Not deadline day yet.');
+
             return NextResponse.json({
                 message: 'Not deadline day',
                 deadline: deadline.toISOString(),

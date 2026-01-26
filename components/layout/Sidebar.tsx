@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, ClipboardList, Settings, Menu, X, History, FolderOpen, ChevronLeft } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Settings, History, FolderOpen, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useUser } from "../providers/UserProvider";
