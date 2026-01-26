@@ -238,7 +238,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                         </div>
 
                         {/* Items */}
-                        <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50">
+                        <div className="flex-1 overflow-y-auto p-5 bg-gray-50/50 flex flex-col gap-4 items-center">
                             {cartItems.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
                                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
@@ -257,13 +257,14 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                                 </div>
                             ) : (
                                 cartItems.map((item) => (
-                                    <CartItem
-                                        key={item.id}
-                                        item={item}
-                                        onUpdateQuantity={handleUpdateQuantity}
-                                        onUpdateComment={handleUpdateComment}
-                                        onRemove={handleRemove}
-                                    />
+                                    <div key={item.id} className="w-full">
+                                        <CartItem
+                                            item={item}
+                                            onUpdateQuantity={handleUpdateQuantity}
+                                            onUpdateComment={handleUpdateComment}
+                                            onRemove={handleRemove}
+                                        />
+                                    </div>
                                 ))
                             )}
                         </div>
