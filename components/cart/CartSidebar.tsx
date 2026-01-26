@@ -58,8 +58,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
         saveCart(updated);
     };
 
-    const handleRemove = (id: string, force = false) => {
-        if (!force && !window.confirm('Weet je zeker dat je dit item wilt verwijderen?')) return;
+    const handleRemove = (id: string) => {
         const updated = cartItems.filter((item) => item.id !== id);
         saveCart(updated);
     };
