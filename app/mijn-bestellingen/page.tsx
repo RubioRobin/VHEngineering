@@ -11,6 +11,7 @@ import { nl } from 'date-fns/locale';
 
 export default function MijnBestellingenPage() {
     const [myOrders, setMyOrders] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const { user } = useUser();
     const { showToast, showConfirm } = useToast();
     const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(new Set());
@@ -36,6 +37,8 @@ export default function MijnBestellingenPage() {
             }
         } catch (error) {
             console.error('Error fetching orders:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,7 +125,13 @@ export default function MijnBestellingenPage() {
                 <p className="text-text-muted mt-1 text-sm">Bestelgeschiedenis per week</p>
             </div>
 
-            {myOrders.length === 0 ? (
+            {loading ? (
+                <div className="space-y-4">
+                    {[1, 2].map((i) => (
+                        <div key={i} className="h-40 bg-gray-100 rounded-xl animate-pulse" />
+                    ))}
+                </div>
+            ) : myOrders.length === 0 ? (
                 <DashboardCard className="p-12">
                     <div className="text-center">
                         <User className="w-16 h-16 mx-auto text-text-muted mb-4" />
