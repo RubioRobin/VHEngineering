@@ -12,6 +12,7 @@ import { DashboardButton } from '@/components/ui/DashboardButton';
 import { CartSidebar } from '@/components/cart/CartSidebar';
 import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
 import { useUser } from '@/components/providers/UserProvider';
+import { useOrders } from '@/components/providers/OrdersProvider';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -37,7 +38,8 @@ export default function HomePage() {
     const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { user } = useUser();
-    const [lastOrder, setLastOrder] = useState<any>(null);
+    const { orders } = useOrders();
+    const lastOrder = orders && orders.length > 0 ? orders[0] : null;
     const [currentWeekOrder, setCurrentWeekOrder] = useState<any>(null);
     const { showToast } = useToast();
 
@@ -59,7 +61,7 @@ export default function HomePage() {
         Promise.all([
             fetchProducts(),
             fetchDeadline(),
-            user ? fetchLastOrder() : Promise.resolve(),
+            // Last order is now from global state
             user ? fetchCurrentWeekOrder() : Promise.resolve()
         ]).finally(() => {
             setLoading(false);
@@ -130,18 +132,7 @@ export default function HomePage() {
         }
     };
 
-    const fetchLastOrder = async () => {
-        if (!user) return;
-        try {
-            const res = await fetch(`/api/orders/last?userId=${user.id}`);
-            if (res.ok) {
-                const data = await res.json();
-                setLastOrder(data.order);
-            }
-        } catch (error) {
-            console.error('Error fetching last order:', error);
-        }
-    };
+
 
     const fetchCurrentWeekOrder = async () => {
         if (!user) return;
