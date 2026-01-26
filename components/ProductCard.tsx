@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, Minus, ShoppingCart, Heart } from "lucide-react";
+import Image from "next/image";
 import React, { useState } from "react";
 import { DashboardButton } from "./ui/DashboardButton";
 import { useUser } from "./providers/UserProvider";
@@ -43,10 +44,12 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
             {/* Image Area */}
             <div className="aspect-[4/3] w-full overflow-hidden bg-gray-50 relative">
                 {product.imageUrl ? (
-                    <img
+                    <Image
                         src={product.imageUrl}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">

@@ -44,7 +44,7 @@ export const Sidebar = () => {
                         paddingLeft: collapsed ? 20 : 24 // 20px centers 40px avatar in 80px. 24px is px-6.
                     }}
                     transition={springConfig}
-                    className="h-20 flex items-center border-b border-border/50"
+                    className="h-20 flex items-center border-b border-border/50 pl-5"
                 >
                     <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
                         {user?.name?.charAt(0).toUpperCase() || 'G'}

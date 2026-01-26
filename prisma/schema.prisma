@@ -21,6 +21,8 @@ model Product {
   allergens   String?
   favorites   Favorite[]
   orderItems  OrderItem[]
+
+  @@index([name])
 }
 
 model User {
@@ -54,6 +56,8 @@ model OrderPeriod {
   reminderSent  Boolean  @default(false)
   createdAt     DateTime @default(now())
   orders    Order[]
+
+  @@index([isClosed])
 }
 
 model Order {
