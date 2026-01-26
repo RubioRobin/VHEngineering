@@ -89,12 +89,14 @@ export const Sidebar = () => {
                         <motion.div
                             initial={false}
                             animate={{
-                                opacity: collapsed ? 0 : 1,
-                                width: collapsed ? 0 : "auto",
-                                marginLeft: collapsed ? 0 : 12
+                                opacity: collapsed ? 0 : 1
                             }}
-                            transition={{ duration: 0.2 }}
-                            className="whitespace-nowrap"
+                            transition={{
+                                duration: 0.2,
+                                ease: "easeInOut",
+                                delay: collapsed ? 0 : 0.1 // Delay fade-in slightly
+                            }}
+                            className="whitespace-nowrap ml-3"
                         >
                             <h1 className="font-bold text-base text-text-primary">{user?.name || 'Gast'}</h1>
                             <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
@@ -117,12 +119,14 @@ export const Sidebar = () => {
                             <motion.span
                                 initial={false}
                                 animate={{
-                                    opacity: collapsed ? 0 : 1,
-                                    width: collapsed ? 0 : "auto",
-                                    marginLeft: collapsed ? 0 : 12
+                                    opacity: collapsed ? 0 : 1
                                 }}
-                                transition={{ duration: 0.2 }}
-                                className="font-bold text-base overflow-hidden whitespace-nowrap"
+                                transition={{
+                                    duration: 0.2,
+                                    ease: "easeInOut",
+                                    delay: collapsed ? 0 : 0.1
+                                }}
+                                className="font-bold text-base overflow-hidden whitespace-nowrap ml-3"
                             >
                                 {item.label}
                             </motion.span>
@@ -139,12 +143,14 @@ export const Sidebar = () => {
                         <motion.span
                             initial={false}
                             animate={{
-                                opacity: collapsed ? 0 : 1,
-                                width: collapsed ? 0 : "auto",
-                                marginLeft: collapsed ? 0 : 12
+                                opacity: collapsed ? 0 : 1
                             }}
-                            transition={{ duration: 0.2 }}
-                            className="font-bold text-base overflow-hidden whitespace-nowrap"
+                            transition={{
+                                duration: 0.2,
+                                ease: "easeInOut",
+                                delay: collapsed ? 0 : 0.1
+                            }}
+                            className="font-bold text-base overflow-hidden whitespace-nowrap ml-3"
                         >
                             Settings
                         </motion.span>
@@ -160,12 +166,14 @@ export const Sidebar = () => {
                         <motion.span
                             initial={false}
                             animate={{
-                                opacity: collapsed ? 0 : 1,
-                                width: collapsed ? 0 : "auto",
-                                marginLeft: collapsed ? 0 : 12
+                                opacity: collapsed ? 0 : 1
                             }}
-                            transition={{ duration: 0.2 }}
-                            className="font-bold text-base overflow-hidden whitespace-nowrap"
+                            transition={{
+                                duration: 0.2,
+                                ease: "easeInOut",
+                                delay: collapsed ? 0 : 0.1
+                            }}
+                            className="font-bold text-base overflow-hidden whitespace-nowrap ml-3"
                         >
                             Inklappen
                         </motion.span>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { Trash2, Clock, Users, ArrowRight, FolderOpen, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -82,7 +83,12 @@ export default function ArchivesPage() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 px-6 py-8 max-w-[1800px] mx-auto">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="space-y-8 px-6 py-8 max-w-[1800px] mx-auto"
+        >
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
                     <FolderOpen className="w-6 h-6" />
@@ -156,6 +162,6 @@ export default function ArchivesPage() {
                 title="Archief verwijderen"
                 description="Voer de admin code in om door te gaan"
             />
-        </div>
+        </motion.div>
     );
 }
