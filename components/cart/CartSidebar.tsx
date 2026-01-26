@@ -103,6 +103,11 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
             return;
         }
 
+        if (cartItems.length === 0) {
+            setError('Je winkelmandje is leeg');
+            return;
+        }
+
         setIsSubmitting(true);
 
         // Ensure token

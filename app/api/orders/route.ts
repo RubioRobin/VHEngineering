@@ -146,7 +146,7 @@ export async function POST(request: Request) {
                 orderPeriodId: period.id,
                 orderItems: {
                     create: items.map((item: any) => ({
-                        productId: item.product.id,
+                        productId: item.productId,
                         quantity: item.quantity,
                         comment: item.comment || ''
                     }))
