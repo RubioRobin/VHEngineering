@@ -16,15 +16,6 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// Professional / Friendly closings or subtitles
-const SUBTITLES = [
-    "Vergeet niet je bestelling te plaatsen voor de deadline.",
-    "De keuken staat klaar voor een verse lunch.",
-    "Geniet van een gezonde en lekkere pauze.",
-    "Bestel op tijd en vermijd teleurstelling.",
-    "Een goede lunch geeft energie voor de rest van de dag."
-];
-
 /**
  * Get the active reminder email template
  */
@@ -36,11 +27,10 @@ export async function getReminderTemplate() {
         }
     });
 
-    // Use a random professional subtitle instead of a "quote"
-    const subtitle = SUBTITLES[Math.floor(Math.random() * SUBTITLES.length)];
     const topProducts = await getTopProductsHtml();
 
-    const freshHtml = generateHtmlFromText(template ? template.bodyText : getDefaultEmailText(), subtitle, topProducts);
+    // No subtitle/quote anymore
+    const freshHtml = generateHtmlFromText(template ? template.bodyText : getDefaultEmailText(), undefined, topProducts);
 
     return {
         subject: template ? template.subject : 'Plaats je lunchbestelling',
@@ -58,7 +48,7 @@ interface DeadlineInfo {
 
 /**
  * Get detailed deadline info (time + day context)
- * NOW USES EXACT SAME LOGIC AS FRONTEND (getNextDeadline)
+ * Use the EXACT same calculation as the frontend/API
  */
 export async function getDeadlineInfo(): Promise<DeadlineInfo> {
     // Current time in Amsterdam
@@ -113,18 +103,14 @@ export async function sendReminderEmail(
     const senderEmail = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
     const senderName = process.env.SENDER_NAME || 'VH Engineering';
 
-    // Construct the Professional Deadline Widget
-    // Clean, light gray background, clear dark text, side highlight
+    // Construct the Website-Match Deadline Badge
+    // Based on components/DeadlineBadge.tsx: bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full
     const deadlineHtml = `
-        <div style="margin: 32px 0; background-color: #F8FAFC; border-left: 4px solid #4F46E5; padding: 20px; border-radius: 4px;">
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <div style="margin: 32px 0; text-align: center;">
+            <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto;">
                 <tr>
-                    <td>
-                        <p style="margin: 0; color: #64748B; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Deadline ${deadlineInfo.label}</p>
-                        <p style="margin: 4px 0 0 0; color: #0F172A; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">${deadlineInfo.time}</p>
-                    </td>
-                    <td align="right" style="vertical-align: middle;">
-                         <span style="background-color: #EEF2FF; color: #4F46E5; padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 600;">Vergeet het niet</span>
+                    <td style="background: linear-gradient(90deg, #f97316 0%, #ef4444 100%); background-color: #f97316; padding: 12px 24px; border-radius: 99px; color: #ffffff; font-weight: 700; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                        <span style="display: block;">⏰ Bestellen sluit ${deadlineInfo.label.toLowerCase() === 'vandaag' || deadlineInfo.label.toLowerCase() === 'morgen' ? deadlineInfo.label.toLowerCase() : 'op ' + deadlineInfo.label.toLowerCase()} om ${deadlineInfo.time}</span>
                     </td>
                 </tr>
             </table>
@@ -186,7 +172,7 @@ async function getTopProductsHtml(): Promise<string> {
         });
 
         let finalItems = topItems;
-        let title = "Favorieten van vorige week";
+        let title = "Populairste vorige week";
 
         if (finalItems.length === 0) {
             title = "Onze aanraders";
@@ -213,7 +199,7 @@ async function getTopProductsHtml(): Promise<string> {
         // Compact, side-by-side if possible or clean rows
         return `
             <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
-                <h4 style="margin: 0 0 16px 0; color: #475569; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${title}</h4>
+                <h4 style="margin: 0 0 16px 0; color: #475569; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${title}</h4>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                     ${orderedProducts.map((p: any) => `
                         <tr>
@@ -221,10 +207,10 @@ async function getTopProductsHtml(): Promise<string> {
                                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                     <tr>
                                         <td style="padding: 8px 0; vertical-align: middle;">
-                                            <span style="font-weight: 500; color: #1E293B; font-size: 14px; display: block;">${p.name}</span>
+                                            <span style="font-weight: 500; color: #1E293B; font-size: 15px; display: block;">${p.name}</span>
                                         </td>
                                         <td style="padding: 8px 0; text-align: right; vertical-align: middle; white-space: nowrap;">
-                                            <span style="color: #64748B; font-size: 14px; font-weight: 400;">€ ${p.price.toFixed(2)}</span>
+                                            <span style="color: #64748B; font-size: 14px; font-weight: 500;">€ ${p.price.toFixed(2)}</span>
                                         </td>
                                     </tr>
                                 </table>
@@ -269,8 +255,6 @@ export function getDefaultEmailText(): string {
     return `Beste {{name}},
     
 Dit is u herinnering om uw lunchbestelling te plaatsen. De deadline is {{deadlineTime}}.
-
-{{quote}}
 
 We zien uw bestelling graag tegemoet.`.trim();
 }
@@ -319,22 +303,15 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
                                 ${contentHtml.replace('{{quote}}', '')}
                             </div>
 
-                            <!-- Dynamic Deadline Widget -->
+                            <!-- Dynamic Deadline Widget (Website Style) -->
                             {{deadlineWidget}}
-
-                            <!-- Subtitle/Tip (Previously Quote) -->
-                            ${subtitle ? `
-                                <div style="margin: 24px 0; padding: 16px; background-color: #F1F5F9; border-radius: 8px;">
-                                    <p style="margin: 0; color: #475569; font-size: 14px; font-style: italic;">${subtitle}</p>
-                                </div>
-                            ` : ''}
 
                             ${topProductsHtml || ''}
 
-                            <!-- CTA Button - Professional Indigo -->
+                            <!-- CTA Button - Centered Bottom -->
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 32px;">
                                 <tr>
-                                    <td>
+                                    <td align="center">
                                         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center; transition: background-color 0.2s;">
                                             Bestelling Plaatsen
                                         </a>
@@ -346,7 +323,7 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
 
                     <!-- Quiet Footer -->
                     <tr>
-                        <td style="padding: 24px 32px; background-color: #F8FAFC; border-top: 1px solid #E2E8F0; text-align: left;">
+                        <td style="padding: 24px 32px; background-color: #F8FAFC; border-top: 1px solid #E2E8F0; text-align: center;">
                             <p style="margin: 0; color: #94A3B8; font-size: 12px;">© ${new Date().getFullYear()} VH Engineering</p>
                             <div style="margin-top: 8px;">
                                 <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings" style="color: #64748B; text-decoration: none; font-size: 12px; font-weight: 500;">Meldingen beheren</a>
