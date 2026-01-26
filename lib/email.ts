@@ -46,8 +46,8 @@ export async function getReminderTemplate() {
         }
     });
 
-    // Default template if none exists
-    if (!template) {
+    // Default template if none exists OR if it's the old default (force upgrade)
+    if (!template || template.subject === '🍞 Vergeet niet te bestellen!') {
         const quote = FUN_QUOTES[Math.floor(Math.random() * FUN_QUOTES.length)];
         const topProducts = await getTopProductsHtml();
 
