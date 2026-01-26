@@ -7,6 +7,7 @@ import { DashboardButton } from "../ui/DashboardButton";
 import { useUser } from "../providers/UserProvider";
 import { formatName } from "@/lib/utils";
 import { useToast } from "../providers/ToastProvider";
+import { useOrders } from "../providers/OrdersProvider";
 
 interface CartItem {
     id: string;
@@ -22,6 +23,7 @@ interface CartItem {
 export const CartSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const { user } = useUser();
     const { showToast } = useToast();
+    const { refreshOrders } = useOrders();
     const [cart, setCart] = useState<CartItem[]>([]);
     const [generalComment, setGeneralComment] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -135,7 +137,9 @@ export const CartSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 setGeneralComment("");
                 window.dispatchEvent(new Event('cart-updated'));
                 onClose();
+                onClose();
                 showToast("Bestelling succesvol geplaatst! Bedankt.", "success");
+                refreshOrders();
             } else {
                 const data = await res.json();
                 showToast(data.error || "Er ging iets mis bij het plaatsen van de bestelling.", "error");

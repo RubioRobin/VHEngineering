@@ -79,7 +79,10 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
     }, [fetchOrders]);
 
     const refreshOrders = async () => {
-        await fetchOrders(true);
+        await Promise.all([
+            fetchOrders(true),
+            fetchWeekOrders(true)
+        ]);
     };
 
     return (
