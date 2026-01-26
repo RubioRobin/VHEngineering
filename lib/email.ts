@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import prisma from './prisma';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { getISOWeek, getYear } from 'date-fns';
+import { getISOWeek, getYear, startOfWeek, endOfWeek, subWeeks } from 'date-fns';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -46,31 +46,17 @@ export async function getReminderTemplate() {
         }
     });
 
-    // Default template if none exists OR if it's the old default (force upgrade)
-    if (!template || template.subject === '🍞 Vergeet niet te bestellen!') {
-        const quote = FUN_QUOTES[Math.floor(Math.random() * FUN_QUOTES.length)];
-        const topProducts = await getTopProductsHtml();
-
-        return {
-            subject: '🍞 De lunch-klok tikt!',
-            bodyHtml: generateHtmlFromText(getDefaultEmailText(), quote, topProducts),
-            bodyText: getDefaultEmailText() // Text fallback is simple
-        };
-    }
-
+    // Always force the new Premium design
     const quote = FUN_QUOTES[Math.floor(Math.random() * FUN_QUOTES.length)];
     const topProducts = await getTopProductsHtml();
 
-    // FORCE RE-GENERATION of HTML
-    // This ensures we always wrap the content in our new "Premium" layout (with quotes/table), 
-    // even if the user saved an old version of the template in the DB.
-    // We ignore the stored 'template.bodyHtml' because it lacks the {{quote}} placeholders.
-    const freshHtml = generateHtmlFromText(template.bodyText, quote, topProducts);
+    // Generate fresh HTML adhering to the new Premium design
+    const freshHtml = generateHtmlFromText(template ? template.bodyText : getDefaultEmailText(), quote, topProducts);
 
     return {
-        subject: template.subject,
+        subject: template ? template.subject : '🍞 De lunch-klok tikt!',
         bodyHtml: freshHtml,
-        bodyText: template.bodyText
+        bodyText: template ? template.bodyText : getDefaultEmailText()
     };
 }
 
@@ -181,11 +167,28 @@ Bekijk onze tips van de week onderaan de mail en bestel snel!`.trim();
 /**
  * Fetch top 3 products and format as HTML list
  */
+/**
+ * Fetch top 3 products FROM LAST WEEK and format as Premium HTML cards
+ */
 async function getTopProductsHtml(): Promise<string> {
     try {
-        // Aggregate order items to find top products
+        // Calculate date range for the previous week
+        const today = new Date();
+        const lastWeekDate = subWeeks(today, 1);
+        const startDate = startOfWeek(lastWeekDate, { weekStartsOn: 1 }); // Monday
+        const endDate = endOfWeek(lastWeekDate, { weekStartsOn: 1 });     // Sunday
+
+        // Aggregate order items from orders created last week
         const topItems = await (prisma as any).orderItem.groupBy({
             by: ['productId'],
+            where: {
+                order: {
+                    createdAt: {
+                        gte: startDate,
+                        lte: endDate
+                    }
+                }
+            },
             _count: {
                 productId: true
             },
@@ -197,30 +200,56 @@ async function getTopProductsHtml(): Promise<string> {
             take: 3
         });
 
-        if (topItems.length === 0) return '';
+        // If no orders last week, fallback to all-time popular to avoid empty section
+        let finalItems = topItems;
+        let title = "🏆 Top 3 van Vorige Week";
+
+        if (finalItems.length === 0) {
+            console.log('[Email] No orders found for last week, falling back to all-time.');
+            title = "🔥 All-time Favorieten";
+            finalItems = await (prisma as any).orderItem.groupBy({
+                by: ['productId'],
+                _count: { productId: true },
+                orderBy: { _count: { productId: 'desc' } },
+                take: 3
+            });
+        }
+
+        if (finalItems.length === 0) return '';
 
         // Fetch product details
-        const productIds = topItems.map((item: any) => item.productId);
+        const productIds = finalItems.map((item: any) => item.productId);
         const products = await (prisma as any).product.findMany({
             where: { id: { in: productIds } }
         });
 
         // Map back to maintain order
-        const orderedProducts = topItems
+        const orderedProducts = finalItems
             .map((item: any) => products.find((p: any) => p.id === item.productId))
             .filter(Boolean);
 
+        // Premium Grid Layout
         return `
-            <div style="margin-top: 32px; padding-top: 24px; border-top: 1px dashed #E5E7EB;">
-                <h4 style="margin: 0 0 16px 0; color: #4F46E5; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Populairste Broodjes</h4>
+            <div style="margin-top: 40px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 20px 0; color: #1F2937; font-size: 18px; font-weight: 800; text-align: center; letter-spacing: -0.5px;">${title}</h4>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                    ${orderedProducts.map((p: any) => `
+                    ${orderedProducts.map((p: any, index: number) => `
                         <tr>
-                            <td style="padding: 8px 0; vertical-align: middle;">
-                                <span style="font-weight: 600; color: #1F2937;">${p.name}</span>
-                            </td>
-                            <td style="padding: 8px 0; text-align: right; vertical-align: middle;">
-                                <span style="background-color: #EEF2FF; color: #4F46E5; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">€ ${p.price.toFixed(2)}</span>
+                            <td style="padding-bottom: 12px;">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F9FAFB; border-radius: 12px; border: 1px solid #E5E7EB;">
+                                    <tr>
+                                        <td style="padding: 16px; width: 40px; text-align: center; font-size: 20px;">
+                                            ${index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                                        </td>
+                                        <td style="padding: 16px 8px; vertical-align: middle;">
+                                            <span style="font-weight: 700; color: #1F2937; font-size: 15px; display: block;">${p.name}</span>
+                                            ${p.description ? `<span style="font-size: 12px; color: #6B7280; display: block; margin-top: 2px;">${p.description.substring(0, 50)}${p.description.length > 50 ? '...' : ''}</span>` : ''}
+                                        </td>
+                                        <td style="padding: 16px; text-align: right; vertical-align: middle; white-space: nowrap;">
+                                            <span style="background-color: #ffffff; color: #4F46E5; padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; border: 1px solid #E0E7FF; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">€ ${p.price.toFixed(2)}</span>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     `).join('')}
@@ -301,10 +330,20 @@ export function generateHtmlFromText(text: string, quote?: string, topProductsHt
         .join('');
 
     const quoteHtml = quote ? `
-        <div style="background-color: #F8FAFC; border-left: 4px solid #4F46E5; padding: 16px; margin: 0 0 24px 0; font-style: italic; color: #555;">
-            "${quote}"
+        <div style="margin: 0 0 32px 0; text-align: center;">
+            <div style="display: inline-block; background-color: #F3F4F6; padding: 16px 24px; border-radius: 16px; position: relative;">
+                <span style="font-size: 24px; position: absolute; top: -10px; left: 10px;">❝</span>
+                <p style="margin: 0; font-style: italic; color: #4B5563; font-weight: 500; font-size: 15px; line-height: 1.6;">${quote}</p>
+                <span style="font-size: 24px; position: absolute; bottom: -15px; right: 10px; line-height: 1;">❞</span>
+            </div>
         </div>
     ` : '';
+
+    const contentSection = `
+        <div style="background-color: #ffffff; padding: 32px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            ${contentHtml.replace('{{quote}}', '')}
+        </div>
+    `;
 
     return `
 <!DOCTYPE html>
@@ -320,63 +359,64 @@ export function generateHtmlFromText(text: string, quote?: string, topProductsHt
             <td align="center" style="padding: 40px 20px;">
                 
                 <!-- Main Container -->
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px;">
                     
-                    <!-- Simple Header -->
+                    <!-- Modern Header -->
                     <tr>
-                        <td style="padding: 40px 40px 0 40px; text-align: center;">
-                            <h1 style="margin: 0; color: #4F46E5; font-size: 36px; font-weight: 800; letter-spacing: -1px;">Lunch Time!</h1>
+                        <td style="padding: 0 0 32px 0; text-align: center;">
+                            <h1 style="margin: 0; color: #111827; font-size: 32px; font-weight: 800; letter-spacing: -1px;">Lunch Time! 🥪</h1>
+                            <p style="margin: 8px 0 0 0; color: #6B7280; font-size: 15px;">Tijd om te bestellen</p>
                         </td>
                     </tr>
 
-                    <!-- Body Content -->
+                    <!-- Quote Hero -->
                     <tr>
-                        <td style="padding: 48px 40px 32px 40px;">
+                        <td>
                             ${quoteHtml}
-                            ${contentHtml.replace('{{quote}}', '')} 
+                        </td>
+                    </tr>
 
-                            <!-- Premium Deadline Widget -->
-                            <div style="background-color: #FFF7ED; border: 2px dashed #FDBA74; border-radius: 16px; padding: 24px; margin: 32px 0; text-align: center;">
-                                <div style="display: inline-block; background-color: #FFEDD5; color: #C2410C; border-radius: 50px; padding: 6px 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; tracking-wide; margin-bottom: 12px;">Deadline Vandaag</div>
-                                <h3 style="margin: 0; color: #9A3412; font-size: 24px; font-weight: 800;">{{deadlineTime}} uur</h3>
-                                <p style="margin: 8px 0 0 0; color: #C2410C; font-size: 14px;">Zorg dat je bestelling binnen is!</p>
+                    <!-- Main Card -->
+                    <tr>
+                        <td style="background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);">
+                            <div style="padding: 40px;">
+                                
+                                <div style="color: #374151; font-size: 16px; line-height: 1.8;">
+                                    ${contentHtml.replace('{{quote}}', '')}
+                                </div>
+
+                                <!-- Dynamic Deadline Widget -->
+                                <div style="margin-top: 32px; background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid #FED7AA;">
+                                    <p style="margin: 0; color: #9A3412; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Deadline Vandaag</p>
+                                    <div style="font-size: 36px; font-weight: 800; color: #C2410C; line-height: 1.2; margin: 4px 0;">{{deadlineTime}}</div>
+                                    <p style="margin: 0; color: #EA580C; font-size: 14px;">Wees er snel bij!</p>
+                                </div>
+
+                                ${topProductsHtml || ''}
+
+                                <!-- Big CTA -->
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 32px;">
+                                    <tr>
+                                        <td align="center">
+                                            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; background-image: linear-gradient(to right, #4F46E5, #6366F1); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 16px; font-size: 18px; font-weight: 700; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s;">
+                                                Nu Bestellen
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
-
-                            ${topProductsHtml || ''}
-
-                            <!-- Big CTA -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 32px;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; background-image: linear-gradient(to right, #4F46E5, #6366F1); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 50px; font-size: 18px; font-weight: 700; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
-                                            Nu Bestellen
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
                         </td>
                     </tr>
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #F9FAFB; padding: 24px 40px; text-align: center; border-top: 1px solid #F3F4F6;">
-                            <p style="margin: 0; color: #9CA3AF; font-size: 13px; font-weight: 500;">
-                                Eet smakelijk alvast! &#129366;
+                        <td style="padding: 32px; text-align: center;">
+                            <p style="margin: 0; color: #9CA3AF; font-size: 13px;">
+                                &copy; ${new Date().getFullYear()} VH Engineering
                             </p>
                             <div style="margin-top: 12px;">
-                                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/archives" style="color: #6B7280; text-decoration: none; font-size: 12px; margin: 0 8px;">Archief</a>
-                                <span style="color: #E5E7EB;">|</span>
-                                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings" style="color: #6B7280; text-decoration: none; font-size: 12px; margin: 0 8px;">Instellingen</a>
+                                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings" style="color: #6B7280; text-decoration: none; font-size: 12px; font-weight: 500;">Instellingen beheren</a>
                             </div>
-                        </td>
-                    </tr>
-                </table>
-
-                <!-- Bottom Copyright -->
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin-top: 24px;">
-                    <tr>
-                        <td align="center">
-                             <p style="margin: 0; color: #9CA3AF; font-size: 12px;">&copy; ${new Date().getFullYear()} VH Engineering</p>
                         </td>
                     </tr>
                 </table>
