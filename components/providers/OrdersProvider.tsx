@@ -6,18 +6,24 @@ import { useToast } from "./ToastProvider";
 
 interface OrdersContextType {
     orders: any[];
+    weekOrders: any[];
     isLoading: boolean;
+    isWeekLoading: boolean;
     refreshOrders: () => Promise<void>;
+    fetchWeekOrders: (force?: boolean) => Promise<void>;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
 export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
     const [orders, setOrders] = useState<any[]>([]);
+    const [weekOrders, setWeekOrders] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isWeekLoading, setIsWeekLoading] = useState(false);
     const { user } = useUser();
     const { showToast } = useToast();
     const [hasFetched, setHasFetched] = useState(false);
+    const [hasFetchedWeek, setHasFetchedWeek] = useState(false);
 
     const fetchOrders = useCallback(async (isRefresh = false) => {
         if (!user) {
@@ -48,6 +54,26 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [user, hasFetched, showToast]);
 
+    const fetchWeekOrders = useCallback(async (force = false) => {
+        if (!force && hasFetchedWeek) return;
+
+        if (!hasFetchedWeek) setIsWeekLoading(true);
+
+        try {
+            const res = await fetch('/api/orders');
+            if (res.ok) {
+                const data = await res.json();
+                setWeekOrders(data.orders || []);
+                setHasFetchedWeek(true);
+            }
+        } catch (error) {
+            console.error('Error fetching week orders:', error);
+            if (force) showToast("Kon weekoverzicht niet verversen", "error");
+        } finally {
+            setIsWeekLoading(false);
+        }
+    }, [hasFetchedWeek, showToast]);
+
     useEffect(() => {
         fetchOrders();
     }, [fetchOrders]);
@@ -57,7 +83,7 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <OrdersContext.Provider value={{ orders, isLoading, refreshOrders }}>
+        <OrdersContext.Provider value={{ orders, weekOrders, isLoading, isWeekLoading, refreshOrders, fetchWeekOrders }}>
             {children}
         </OrdersContext.Provider>
     );

@@ -11,6 +11,7 @@ import { nl } from 'date-fns/locale';
 import { useUser } from '@/components/providers/UserProvider';
 import { useToast } from '@/components/providers/ToastProvider';
 import { formatName } from '@/lib/utils';
+import { useOrders } from '@/components/providers/OrdersProvider';
 
 interface OrderItem {
     id: string;
@@ -33,35 +34,23 @@ interface Order {
 const SHIPPING_COST = 1.95;
 
 export default function OverviewPage() {
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { weekOrders: orders, isWeekLoading: loading, fetchWeekOrders } = useOrders();
     const { user } = useUser();
     const { showToast } = useToast();
 
     useEffect(() => {
-        fetchOrders();
-    }, []);
+        // Trigger fetch if not already loaded (handled by provider)
+        fetchWeekOrders();
+    }, [fetchWeekOrders]);
 
-    const fetchOrders = async () => {
-        try {
-            const res = await fetch('/api/orders');
-            if (res.ok) {
-                const data = await res.json();
-                setOrders(data.orders);
-            }
-        } catch (error) {
-            console.error('Error fetching orders:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
 
     const getTop5Products = () => {
         const productCounts: Record<string, { name: string; count: number; price: number }> = {};
 
-        orders.forEach(order => {
-            order.orderItems.forEach(item => {
+        orders.forEach((order: any) => {
+            order.orderItems.forEach((item: any) => {
                 const key = item.product.name;
                 if (!productCounts[key]) {
                     productCounts[key] = { name: item.product.name, count: 0, price: item.product.price };
@@ -169,7 +158,7 @@ export default function OverviewPage() {
                             </div>
 
                             <div className="p-4 space-y-3">
-                                {order.orderItems.map((item) => (
+                                {order.orderItems.map((item: any) => (
                                     <div key={item.id} className="flex justify-between items-start text-sm">
                                         <div className="flex gap-2">
                                             <span className="font-bold w-6 text-center bg-gray-100 rounded text-text-primary">
