@@ -51,10 +51,7 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                         </motion.div>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Bestelling Geplaatst!</h2>
-                    <p className="text-gray-500 mb-6 text-sm">
-                        Je bestelling is succesvol ontvangen. Zorg dat je op tijd betaalt (indien van toepassing).
-                    </p>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Bestelling geplaatst!</h2>
 
                     {orderData && (
                         <div className="w-full bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">

@@ -157,6 +157,12 @@ export async function POST(request: Request) {
         return NextResponse.json(order);
     } catch (error) {
         console.error('Order creation error:', error);
+
+        // Check for specific Prisma errors (e.g., Foreign Key constraint failed)
+        if ((error as any).code === 'P2003') {
+            return NextResponse.json({ error: 'Een of meer producten in je bestelling bestaan niet meer. Ververs de pagina.' }, { status: 400 });
+        }
+
         return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
     }
 }

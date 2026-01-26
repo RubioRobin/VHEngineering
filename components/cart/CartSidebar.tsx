@@ -148,6 +148,9 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
             // Success
             localStorage.removeItem('cart');
             setCartItems([]);
+            // Update global cart state
+            window.dispatchEvent(new Event('cart-updated'));
+
             // Dispatch success event for Modal
             const orderDetails = {
                 orderId: data.id,
@@ -245,9 +248,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                                 </div>
                             )}
 
-                            <div className="space-y-3">
-                                {/* Inputs hidden, using auto-login data */}
-                            </div>
+
 
                             <div className="flex items-center justify-between pt-2">
                                 <span className="text-gray-600 font-medium">Totaal</span>
