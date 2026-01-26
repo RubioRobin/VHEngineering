@@ -53,12 +53,11 @@ export const Sidebar = () => {
                     <motion.div
                         initial={false}
                         animate={{
-                            width: collapsed ? 0 : "auto",
                             opacity: collapsed ? 0 : 1,
-                            marginLeft: collapsed ? 0 : 12,
+                            x: collapsed ? -10 : 0
                         }}
                         transition={springConfig}
-                        className="overflow-hidden flex flex-col justify-center h-10"
+                        className="overflow-hidden flex flex-col justify-center h-10 ml-3"
                     >
                         <div className="whitespace-nowrap">
                             <h1 className="font-medium text-base text-text-primary">{user?.name || 'Gast'}</h1>
@@ -91,11 +90,10 @@ export const Sidebar = () => {
                                     initial={false}
                                     animate={{
                                         opacity: collapsed ? 0 : 1,
-                                        width: collapsed ? 0 : 'auto',
-                                        marginLeft: collapsed ? 0 : 12
+                                        x: collapsed ? -10 : 0
                                     }}
                                     transition={springConfig}
-                                    className="font-medium text-base overflow-hidden whitespace-nowrap"
+                                    className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                                 >
                                     {item.label}
                                 </motion.span>
@@ -122,11 +120,10 @@ export const Sidebar = () => {
                             <motion.span
                                 animate={{
                                     opacity: collapsed ? 0 : 1,
-                                    width: collapsed ? 0 : 'auto',
-                                    marginLeft: collapsed ? 0 : 12
+                                    x: collapsed ? -10 : 0
                                 }}
                                 transition={springConfig}
-                                className="font-medium text-base overflow-hidden whitespace-nowrap"
+                                className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                             >
                                 Settings
                             </motion.span>
@@ -148,11 +145,10 @@ export const Sidebar = () => {
                         <motion.span
                             animate={{
                                 opacity: collapsed ? 0 : 1,
-                                width: collapsed ? 0 : 'auto',
-                                marginLeft: collapsed ? 0 : 12
+                                x: collapsed ? -10 : 0
                             }}
                             transition={springConfig}
-                            className="font-medium text-base overflow-hidden whitespace-nowrap"
+                            className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                         >
                             Inklappen
                         </motion.span>
