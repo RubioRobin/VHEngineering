@@ -64,9 +64,11 @@ export default function CartItem({
                         +
                     </button>
                 </div>
-                <span className="ml-auto font-semibold text-primary">
-                    € {(item.product.price * item.quantity).toFixed(2)}
-                </span>
+                {item.product.price != null && (
+                    <span className="ml-auto font-semibold text-primary">
+                        € {(item.product.price * item.quantity).toFixed(2)}
+                    </span>
+                )}
             </div>
 
             {/* Comment input */}
