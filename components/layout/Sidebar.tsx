@@ -80,7 +80,7 @@ export const Sidebar = () => {
                                     paddingRight: collapsed ? 0 : 12
                                 }}
                                 transition={springConfig}
-                                className="flex items-center py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
+                                className="flex items-center pl-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
                                 title={collapsed ? item.label : undefined}
                             >
                                 <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -111,7 +111,7 @@ export const Sidebar = () => {
                                 paddingRight: collapsed ? 0 : 12
                             }}
                             transition={springConfig}
-                            className="flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
+                            className="flex items-center pl-4 py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
                             title={collapsed ? "Instellingen" : undefined}
                         >
                             <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -136,7 +136,7 @@ export const Sidebar = () => {
                             paddingRight: collapsed ? 0 : 12
                         }}
                         transition={springConfig}
-                        className="flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group"
+                        className="flex items-center pl-4 py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group"
                         title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
                         <div className="w-6 h-6 flex items-center justify-center shrink-0">
