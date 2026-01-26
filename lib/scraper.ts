@@ -1,5 +1,5 @@
 import prisma from './prisma';
-import { SEED_PRODUCTS } from './seed-products';
+import { SEED_PRODUCTS } from '@/prisma/seeds/seed-products';
 
 interface ScrapedProduct {
     name: string;
