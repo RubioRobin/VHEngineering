@@ -168,7 +168,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col"
+                        className="fixed inset-y-0 right-0 z-[100] w-full max-w-md bg-white shadow-2xl flex flex-col"
                     >
                         {/* Header */}
                         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white">
