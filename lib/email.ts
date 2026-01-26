@@ -61,9 +61,15 @@ export async function getReminderTemplate() {
     const quote = FUN_QUOTES[Math.floor(Math.random() * FUN_QUOTES.length)];
     const topProducts = await getTopProductsHtml();
 
+    // FORCE RE-GENERATION of HTML
+    // This ensures we always wrap the content in our new "Premium" layout (with quotes/table), 
+    // even if the user saved an old version of the template in the DB.
+    // We ignore the stored 'template.bodyHtml' because it lacks the {{quote}} placeholders.
+    const freshHtml = generateHtmlFromText(template.bodyText, quote, topProducts);
+
     return {
         subject: template.subject,
-        bodyHtml: generateHtmlFromText(template.bodyHtml, quote, topProducts), // Inject into DB template too (if placeholders exist, otherwise just wraps)
+        bodyHtml: freshHtml,
         bodyText: template.bodyText
     };
 }
