@@ -12,6 +12,29 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+const FUN_QUOTES = [
+    "Broodje aap? Nee, lekker vers!",
+    "Life is like a sandwich, you have to fill it with the best ingredients.",
+    "Beter een broodje in de hand dan tien in de lucht.",
+    "Lunch is de belangrijkste maaltijd tussen ontbijt en diner.",
+    "Keep calm and eat a sandwich.",
+    "A balanced diet is a sandwich in each hand.",
+    "Happiness is a warm sandwich.",
+    "Tijd voor broodnodige versterking!",
+    "Make sandwiches, not war.",
+    "Een dag niet geluncht is een dag niet geleefd.",
+    "Sandwiches are wonderful. You don't need a spoon or a plate!",
+    "Ask not what you can do for your country. Ask what's for lunch.",
+    "Powered by bread.",
+    "You can't buy happiness, but you can buy a sandwich.",
+    "All you need is love and a good sandwich.",
+    "De beste ideeën komen na de lunch.",
+    "Honger maakt rauwe bonen zoet, maar broodjes smaken beter.",
+    "Het leven is beter met kaas.",
+    "Don't worry, eat veggie.",
+    "Verser dan dit wordt het niet."
+];
+
 /**
  * Get the active reminder email template
  */
@@ -25,16 +48,22 @@ export async function getReminderTemplate() {
 
     // Default template if none exists
     if (!template) {
+        const quote = FUN_QUOTES[Math.floor(Math.random() * FUN_QUOTES.length)];
+        const topProducts = await getTopProductsHtml();
+
         return {
-            subject: '🍞 Vergeet niet te bestellen!',
-            bodyHtml: generateHtmlFromText(getDefaultEmailText()),
-            bodyText: getDefaultEmailText()
+            subject: '🍞 De lunch-klok tikt!',
+            bodyHtml: generateHtmlFromText(getDefaultEmailText(), quote, topProducts),
+            bodyText: getDefaultEmailText() // Text fallback is simple
         };
     }
 
+    const quote = FUN_QUOTES[Math.floor(Math.random() * FUN_QUOTES.length)];
+    const topProducts = await getTopProductsHtml();
+
     return {
         subject: template.subject,
-        bodyHtml: template.bodyHtml,
+        bodyHtml: generateHtmlFromText(template.bodyHtml, quote, topProducts), // Inject into DB template too (if placeholders exist, otherwise just wraps)
         bodyText: template.bodyText
     };
 }
@@ -136,9 +165,66 @@ export async function sendReminderEmail(
 export function getDefaultEmailText(): string {
     return `Hallo {{name}}! 👋
     
-Dit is je vriendelijke reminder om je broodje te bestellen! ⏰
+Dit is je reminder: de deadline nadert! ⏰
 
-Kies je favoriete broodje en geniet van een heerlijke lunch.`.trim();
+Wist je dat? "{{quote}}"
+
+Bekijk onze tips van de week onderaan de mail en bestel snel!`.trim();
+}
+
+/**
+ * Fetch top 3 products and format as HTML list
+ */
+async function getTopProductsHtml(): Promise<string> {
+    try {
+        // Aggregate order items to find top products
+        const topItems = await (prisma as any).orderItem.groupBy({
+            by: ['productId'],
+            _count: {
+                productId: true
+            },
+            orderBy: {
+                _count: {
+                    productId: 'desc'
+                }
+            },
+            take: 3
+        });
+
+        if (topItems.length === 0) return '';
+
+        // Fetch product details
+        const productIds = topItems.map((item: any) => item.productId);
+        const products = await (prisma as any).product.findMany({
+            where: { id: { in: productIds } }
+        });
+
+        // Map back to maintain order
+        const orderedProducts = topItems
+            .map((item: any) => products.find((p: any) => p.id === item.productId))
+            .filter(Boolean);
+
+        return `
+            <div style="margin-top: 32px; padding-top: 24px; border-top: 1px dashed #E5E7EB;">
+                <h4 style="margin: 0 0 16px 0; color: #4F46E5; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Populairste Broodjes</h4>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    ${orderedProducts.map((p: any) => `
+                        <tr>
+                            <td style="padding: 8px 0; vertical-align: middle;">
+                                <span style="font-weight: 600; color: #1F2937;">${p.name}</span>
+                            </td>
+                            <td style="padding: 8px 0; text-align: right; vertical-align: middle;">
+                                <span style="background-color: #EEF2FF; color: #4F46E5; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">€ ${p.price.toFixed(2)}</span>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </table>
+            </div>
+        `;
+    } catch (e) {
+        console.error('Error fetching top products for email:', e);
+        return '';
+    }
 }
 
 /**
@@ -156,6 +242,7 @@ export async function sendReminderToAll() {
 
     // Pre-fetch data ONCE
     console.log('[Email] Pre-fetching template & deadline info...');
+    // Note: getReminderTemplate now internally fetches quotes and top products
     const [template, deadlineTime] = await Promise.all([
         getReminderTemplate(),
         getDeadlineTime()
@@ -192,12 +279,26 @@ export async function sendReminderToAll() {
  * Default HTML email template generator
  * Matches the Indigo/Portal branding
  */
-export function generateHtmlFromText(text: string): string {
+export function generateHtmlFromText(text: string, quote?: string, topProductsHtml?: string): string {
+    // If text already looks like full HTML (starts with <!DOCTYPE or <html), return it as is
+    if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+        // Just inject dynamic values if placeholders exist
+        return text
+            .replace('{{quote}}', quote || '')
+            .replace('{{topProducts}}', topProductsHtml || '');
+    }
+
     // Clean up text: convert newlines to paragraphs
     const contentHtml = text
         .split('\n\n')
         .map(para => `<p style="margin: 0 0 24px 0; color: #4B5563; font-size: 16px; line-height: 1.8;">${para.replace(/\n/g, '<br>')}</p>`)
         .join('');
+
+    const quoteHtml = quote ? `
+        <div style="background-color: #F8FAFC; border-left: 4px solid #4F46E5; padding: 16px; margin: 0 0 24px 0; font-style: italic; color: #555;">
+            "${quote}"
+        </div>
+    ` : '';
 
     return `
 <!DOCTYPE html>
@@ -225,7 +326,8 @@ export function generateHtmlFromText(text: string): string {
                     <!-- Body Content -->
                     <tr>
                         <td style="padding: 48px 40px 32px 40px;">
-                            ${contentHtml}
+                            ${quoteHtml}
+                            ${contentHtml.replace('{{quote}}', '')} 
 
                             <!-- Premium Deadline Widget -->
                             <div style="background-color: #FFF7ED; border: 2px dashed #FDBA74; border-radius: 16px; padding: 24px; margin: 32px 0; text-align: center;">
@@ -234,8 +336,10 @@ export function generateHtmlFromText(text: string): string {
                                 <p style="margin: 8px 0 0 0; color: #C2410C; font-size: 14px;">Zorg dat je bestelling binnen is!</p>
                             </div>
 
+                            ${topProductsHtml || ''}
+
                             <!-- Big CTA -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 32px;">
                                 <tr>
                                     <td align="center">
                                         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; background-image: linear-gradient(to right, #4F46E5, #6366F1); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 50px; font-size: 18px; font-weight: 700; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
