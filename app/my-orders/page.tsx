@@ -42,6 +42,7 @@ export default function MyOrdersPage() {
     const [error, setError] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState<string | null>(null);
+    const [cancellingId, setCancellingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchData();
@@ -78,6 +79,7 @@ export default function MyOrdersPage() {
 
     const handleCancelOrder = async (orderId: string) => {
         const token = localStorage.getItem('clientToken');
+        setCancellingId(orderId);
         try {
             const res = await fetch(`/api/orders/${orderId}?token=${token}`, {
                 method: 'DELETE',
@@ -94,6 +96,8 @@ export default function MyOrdersPage() {
         } catch (err) {
             console.error('Er is een fout opgetreden');
             showToast("Netwerkfout bij annuleren.", "error");
+        } finally {
+            setCancellingId(null);
         }
     };
 
@@ -216,9 +220,10 @@ export default function MyOrdersPage() {
                                                         </button>
                                                         <button
                                                             onClick={() => handleCancelOrder(order.id)}
-                                                            className="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg font-bold transition-colors text-sm"
+                                                            className="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg font-bold transition-colors text-sm flex items-center gap-2"
+                                                            disabled={cancellingId === order.id}
                                                         >
-                                                            Annuleren
+                                                            {cancellingId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Annuleren'}
                                                         </button>
                                                     </>
                                                 )}

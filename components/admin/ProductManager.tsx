@@ -29,6 +29,9 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
 
     // New Product State
     const [isCreating, setIsCreating] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [savingEditId, setSavingEditId] = useState<string | null>(null);
     const [newProduct, setNewProduct] = useState({ name: '', price: '', category: 'Belegde broodjes', imageUrl: '' });
 
     const { showToast, showConfirm } = useToast();
@@ -69,6 +72,7 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
     const handleSaveEdit = async () => {
         if (!editingId || !editForm.name || !editForm.price) return;
 
+        setSavingEditId(editingId);
         try {
             const res = await fetch(`/api/admin/products/${editingId}`, {
                 method: 'PUT',
@@ -89,6 +93,8 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
             }
         } catch (error) {
             showToast('Netwerkfout', 'error');
+        } finally {
+            setSavingEditId(null);
         }
     };
 
@@ -96,6 +102,7 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
         showConfirm({
             message: `Weet je zeker dat je "${name}" wilt verwijderen?`,
             onConfirm: async () => {
+                setDeletingId(id);
                 try {
                     const res = await fetch(`/api/admin/products/${id}`, {
                         method: 'DELETE',
@@ -113,6 +120,8 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
                     }
                 } catch (error) {
                     showToast('Netwerkfout', 'error');
+                } finally {
+                    setDeletingId(null);
                 }
             }
         });
@@ -130,6 +139,7 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
             return;
         }
 
+        setIsSubmitting(true);
         try {
             const res = await fetch('/api/admin/products', {
                 method: 'POST',
@@ -157,6 +167,8 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
             }
         } catch (error) {
             showToast('Netwerkfout', 'error');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -263,7 +275,7 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
                         />
                     </div>
                     <div className="flex justify-end">
-                        <DashboardButton onClick={handleCreate} className="bg-emerald-600">Opslaan</DashboardButton>
+                        <DashboardButton onClick={handleCreate} className="bg-emerald-600" isLoading={isSubmitting}>Opslaan</DashboardButton>
                     </div>
                 </div>
             )}
@@ -336,7 +348,13 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
                                             className="flex-1 px-3 py-1 border rounded"
                                             placeholder="Afbeelding URL"
                                         />
-                                        <button onClick={handleSaveEdit} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded"><Save className="w-4 h-4" /></button>
+                                        <button
+                                            onClick={handleSaveEdit}
+                                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded"
+                                            disabled={savingEditId === product.id}
+                                        >
+                                            {savingEditId === product.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                        </button>
                                         <button onClick={handleCancelEdit} className="p-2 text-red-500 hover:bg-red-50 rounded"><X className="w-4 h-4" /></button>
                                     </div>
                                 </div>
@@ -364,8 +382,12 @@ export function ProductManager({ adminToken, onUnauthorized }: ProductManagerPro
                                         <button onClick={() => handleEditClick(product)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                                             <Edit2 className="w-4 h-4" />
                                         </button>
-                                        <button onClick={() => handleDelete(product.id, product.name)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                            <Trash2 className="w-4 h-4" />
+                                        <button
+                                            onClick={() => handleDelete(product.id, product.name)}
+                                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            disabled={deletingId === product.id}
+                                        >
+                                            {deletingId === product.id ? <Loader2 className="w-4 h-4 animate-spin text-red-500" /> : <Trash2 className="w-4 h-4" />}
                                         </button>
                                     </div>
                                 </>

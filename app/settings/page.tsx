@@ -14,6 +14,7 @@ export default function SettingsPage() {
     const [newName, setNewName] = useState(user?.name || '');
     const [newDepartment, setNewDepartment] = useState((user as any)?.department || '');
     const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -25,9 +26,16 @@ export default function SettingsPage() {
 
     const handleSaveProfile = async () => {
         if (newName.trim().length >= 2 && newDepartment) {
-            await login(newName.trim(), newDepartment);
-            setIsEditing(false);
-            showToast("Profiel succesvol opgeslagen", "success");
+            setIsSaving(true);
+            try {
+                await login(newName.trim(), newDepartment);
+                setIsEditing(false);
+                showToast("Profiel succesvol opgeslagen", "success");
+            } catch (e) {
+                showToast("Fout bij opslaan profiel", "error");
+            } finally {
+                setIsSaving(false);
+            }
         } else {
             showToast("Vul naam (min 2 tekens) en afdeling in", "error");
         }
@@ -77,7 +85,7 @@ export default function SettingsPage() {
                                     </div>
                                 </div>
                                 <div className="pt-2">
-                                    <DashboardButton onClick={handleSaveProfile} className="w-full rounded-xl py-3 ">Opslaan</DashboardButton>
+                                    <DashboardButton onClick={handleSaveProfile} className="w-full rounded-xl py-3 " isLoading={isSaving}>Opslaan</DashboardButton>
                                 </div>
                             </div>
                         ) : (

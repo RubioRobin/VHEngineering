@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, AlertCircle, X } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, X, Loader2 } from 'lucide-react';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -14,7 +14,7 @@ interface Toast {
 
 interface ConfirmOptions {
     message: string;
-    onConfirm: () => void;
+    onConfirm: () => void | Promise<void>;
     onCancel?: () => void;
     confirmText?: string;
     cancelText?: string;
@@ -36,6 +36,7 @@ export const useToast = () => {
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [toasts, setToasts] = useState<Toast[]>([]);
     const [confirmDialog, setConfirmDialog] = useState<ConfirmOptions | null>(null);
+    const [isConfirming, setIsConfirming] = useState(false);
 
     const showToast = (message: string, type: ToastType = 'info') => {
         const id = Date.now().toString();
@@ -50,9 +51,27 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
         setConfirmDialog(options);
     };
 
-    const handleConfirm = () => {
-        confirmDialog?.onConfirm();
-        setConfirmDialog(null);
+    const handleConfirm = async () => {
+        if (!confirmDialog) return;
+
+        const result = confirmDialog.onConfirm();
+
+        // Check if it's a promise
+        if (result instanceof Promise) {
+            setIsConfirming(true);
+            try {
+                await result;
+                setConfirmDialog(null);
+            } catch (error) {
+                console.error("Confirm action failed", error);
+                // Optionally keep dialog open or close it
+                setConfirmDialog(null);
+            } finally {
+                setIsConfirming(false);
+            }
+        } else {
+            setConfirmDialog(null);
+        }
     };
 
     const handleCancel = () => {
@@ -139,14 +158,17 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
                                 <div className="flex gap-3 justify-end">
                                     <button
                                         onClick={handleCancel}
-                                        className="px-4 py-2 rounded-lg border border-border text-text-secondary hover:bg-gray-50 transition-colors font-medium"
+                                        disabled={isConfirming}
+                                        className="px-4 py-2 rounded-lg border border-border text-text-secondary hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
                                     >
                                         {confirmDialog.cancelText || 'Annuleren'}
                                     </button>
                                     <button
                                         onClick={handleConfirm}
-                                        className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white transition-colors font-medium"
+                                        disabled={isConfirming}
+                                        className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white transition-colors font-medium disabled:opacity-70 flex items-center gap-2"
                                     >
+                                        {isConfirming && <Loader2 className="w-4 h-4 animate-spin" />}
                                         {confirmDialog.confirmText || 'Bevestigen'}
                                     </button>
                                 </div>
