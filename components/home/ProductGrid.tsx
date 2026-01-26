@@ -53,11 +53,11 @@ export const ProductGrid = ({
                             ))
                         ) : (
                             <div className="col-span-full py-20 text-center">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                                    <Search className="w-8 h-8 text-slate-400" />
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-highlight mb-4">
+                                    <Search className="w-8 h-8 text-text-muted" />
                                 </div>
-                                <h3 className="text-lg font-medium text-slate-900">Geen producten gevonden</h3>
-                                <p className="text-slate-500">
+                                <h3 className="text-lg font-medium text-text-primary">Geen producten gevonden</h3>
+                                <p className="text-text-muted">
                                     {showOnlyFavorites ? "Je hebt nog geen favorieten." : "Probeer een andere zoekterm."}
                                 </p>
                             </div>
@@ -96,11 +96,11 @@ export const ProductGrid = ({
                                     <section key={category} id={`cat-${category}`} className="scroll-mt-48">
                                         {/* Minimalist Design - Only show title if NOT filtered by specific category (to avoid double title) */}
                                         {!selectedCategory && (
-                                            <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-gray-100 mt-12">
-                                                <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                                            <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-border mt-12">
+                                                <h3 className="text-3xl font-extrabold text-text-primary tracking-tight">
                                                     {displayName}
                                                 </h3>
-                                                <span className="text-sm font-bold text-slate-400">
+                                                <span className="text-sm font-bold text-text-muted">
                                                     {productsInCat.length} opties
                                                 </span>
                                             </div>

@@ -38,7 +38,7 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="group h-full flex flex-col bg-white rounded-2xl border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden relative"
+            className="group h-full flex flex-col bg-surface rounded-2xl border border-border shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden relative"
         >
             {/* Image Area */}
             <div className="aspect-[4/3] w-full overflow-hidden bg-gray-50 relative">
@@ -57,7 +57,7 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
 
                 {/* Price Tag - Top Left */}
                 {product.price && (
-                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-indigo-600 px-3 py-1.5 rounded-full font-bold shadow-sm text-sm border border-indigo-100">
+                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-primary px-3 py-1.5 rounded-full font-bold shadow-sm text-sm border border-primary/10">
                         € {product.price.toFixed(2)}
                     </div>
                 )}
@@ -81,12 +81,12 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
             {/* Content Area */}
             <div className="p-5 flex flex-col flex-1">
                 <div className="flex justify-between items-start gap-4 mb-2">
-                    <h3 className="font-bold text-lg text-slate-800 leading-tight" title={product.name}>
+                    <h3 className="font-bold text-lg text-text-primary leading-tight" title={product.name}>
                         {formatName(product.name)}
                     </h3>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-gray-50 flex items-center gap-3">
+                <div className="mt-auto pt-4 border-t border-border flex items-center gap-3">
                     {/* Add Button - First now */}
                     <DashboardButton
                         onClick={handleAdd}
@@ -98,20 +98,20 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                     </DashboardButton>
 
                     {/* Compact Quantity Selector - Second now */}
-                    <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
+                    <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-border/60">
                         <button
                             onClick={handleDecrement}
-                            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            className="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-lg transition-colors disabled:opacity-50"
                             disabled={disabled}
                         >
                             <Minus className="w-5 h-5" />
                         </button>
-                        <span className="font-bold text-sm text-slate-700 min-w-[2rem] text-center">
+                        <span className="font-bold text-sm text-text-primary min-w-[1.5rem] text-center">
                             {quantity}
                         </span>
                         <button
                             onClick={handleIncrement}
-                            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            className="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-lg transition-colors disabled:opacity-50"
                             disabled={disabled}
                         >
                             <Plus className="w-5 h-5" />

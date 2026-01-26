@@ -24,9 +24,9 @@ export const DashboardButton = ({
 
     const variants = {
         primary: "bg-primary text-white shadow-md hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20",
-        secondary: "bg-white border border-border text-text-secondary hover:bg-gray-50 hover:border-gray-300 hover:text-text-primary",
-        accent: "bg-accent text-white shadow-md hover:bg-yellow-500",
-        ghost: "bg-transparent text-text-secondary hover:bg-background hover:text-primary",
+        secondary: "bg-white border border-border text-text-secondary hover:bg-surface-highlight hover:border-gray-300 hover:text-text-primary",
+        accent: "bg-accent text-white shadow-md hover:brightness-110",
+        ghost: "bg-transparent text-text-secondary hover:bg-surface-highlight hover:text-primary",
     };
 
     const sizes = {
@@ -40,7 +40,8 @@ export const DashboardButton = ({
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             className={cn(
-                "relative inline-flex items-center justify-center gap-2 rounded-xl transition-all duration-200",
+                "relative inline-flex items-center justify-center gap-2 rounded-xl transition-all duration-200 outline-none",
+                "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 "disabled:opacity-50 disabled:pointer-events-none disabled:grayscale",
                 variants[variant],
                 sizes[size],

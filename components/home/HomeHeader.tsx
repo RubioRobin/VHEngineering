@@ -66,7 +66,7 @@ export const HomeHeader = ({ deadline, lastOrder, onReorder }: HomeHeaderProps) 
                     {/* Timer Card */}
                     <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
                         ? 'bg-gradient-to-br from-red-500 to-red-700 animate-pulse shadow-red-500/30'
-                        : 'bg-gradient-to-br from-indigo-600 to-violet-700 shadow-indigo-500/20'
+                        : 'bg-gradient-to-br from-primary to-primary-dark shadow-primary/20'
                         }`}>
                         <div className="flex flex-col h-full justify-between">
                             <div className="flex items-center gap-3 opacity-90">
