@@ -1,10 +1,16 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import prisma from './prisma';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { getISOWeek, getYear } from 'date-fns';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+    },
+});
 
 /**
  * Get the active reminder email template
@@ -106,21 +112,16 @@ export async function sendReminderEmail(
         .replace(/\{\{deadlineTime\}\}/g, deadlineTime);
 
     try {
-        const { data, error } = await resend.emails.send({
-            from: `${senderName} <${senderEmail}>`,
-            to: [email],
+        const info = await transporter.sendMail({
+            from: `"${senderName}" <${senderEmail}>`,
+            to: email,
             subject: template.subject,
             html: personalizedHtml,
             text: personalizedText,
         });
 
-        if (error) {
-            console.error(`Failed to send email to ${email}:`, error);
-            return { success: false, error: error.message };
-        }
-
-        console.log(`Email sent successfully to ${email}:`, data?.id);
-        return { success: true, messageId: data?.id };
+        console.log(`Email sent successfully to ${email}:`, info.messageId);
+        return { success: true, messageId: info.messageId };
     } catch (error: any) {
         console.error(`Error sending email to ${email}:`, error);
         return { success: false, error: error.message };

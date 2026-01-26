@@ -5,13 +5,13 @@ import { sendReminderToAll } from '@/lib/email';
 export async function POST() {
     console.log('[TestEmail] Starting request...');
     try {
-        // Check if API key is configured
-        if (!process.env.RESEND_API_KEY) {
-            console.error('[TestEmail] Missing RESEND_API_KEY');
+        // Check if Gmail credentials are configured
+        if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+            console.error('[TestEmail] Missing GMAIL_USER or GMAIL_APP_PASSWORD');
             return NextResponse.json({
                 success: false,
-                error: 'Resend API key not configured in .env'
-            }, { status: 400 }); // 400 instead of 500 to avoid some client network error interpretations
+                error: 'Gmail credentials not configured in .env'
+            }, { status: 400 });
         }
 
         console.log('[TestEmail] Key found, sending...');
