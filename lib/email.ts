@@ -362,7 +362,7 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
                 </table>
 
                 <!-- Helper Text outside card -->
-                 <p style="margin-top: 24px; font-family: 'Outfit', sans-serif; color: #94A3B8; font-size: 12px; text-align: center;">VH Engineering Lunch Service</p>
+                 <p style="margin-top: 24px; font-family: 'Outfit', sans-serif; color: #94A3B8; font-size: 14px; text-align: center; font-style: italic;">Alvast eet smakelijk!</p>
 
             </td>
         </tr>
