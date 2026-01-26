@@ -38,17 +38,23 @@ export const Sidebar = () => {
                 className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-slate-300 shadow-soft flex flex-col md:z-40 overflow-hidden"
             >
                 {/* User Profile Area (replaces logo) */}
-                <div className={`h-20 flex items-center border-b border-border/50 transition-[padding] duration-300 ease-in-out ${collapsed ? 'pl-[22px]' : 'px-6'}`}>
+                <motion.div
+                    animate={{
+                        paddingLeft: collapsed ? 20 : 24 // 20px centers 40px avatar in 80px. 24px is px-6.
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="h-20 flex items-center border-b border-border/50"
+                >
                     <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
                         {user?.name?.charAt(0).toUpperCase() || 'G'}
                     </div>
-                    {/* Text Container - Scroll width/opacity/margin */}
+                    {/* Text Container */}
                     <motion.div
                         initial={false}
                         animate={{
                             width: collapsed ? 0 : "auto",
                             opacity: collapsed ? 0 : 1,
-                            marginLeft: collapsed ? 0 : 12, // ml-3 is 12px
+                            marginLeft: collapsed ? 0 : 12,
                         }}
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden flex flex-col justify-center h-10"
@@ -58,7 +64,7 @@ export const Sidebar = () => {
                             <p className="text-xs text-text-muted">{(user as any)?.department || 'Gast'}</p>
                         </div>
                     </motion.div>
-                </div>
+                </motion.div>
 
                 {/* Menu */}
                 <nav className="flex-1 pt-2 pb-4 px-3 space-y-2">
@@ -66,17 +72,68 @@ export const Sidebar = () => {
                         <Link
                             key={item.label}
                             href={item.href}
-                            // Collapsed: 80px width. Icon 24px. Center = 28px padding.
-                            // Expanded: pl-4 (16px).
-                            // using pl-[28px] centers the 24px icon in 80px container
-                            className={`flex items-center py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all duration-300 group ${collapsed ? 'pl-[28px] pr-0' : 'pl-4 pr-3'}`}
-                            title={collapsed ? item.label : undefined}
+                            // Using motion.div wrapper or similar? No, Link can wrap motion.
+                            // But Link expects string href.
+                            // We will use a div inside link for the padding animation? 
+                            // Or standard motion works on Link if we cast it?
+                            // Safest: Animate padding via style prop or motion div inside? 
+                            // Let's use CSS class for hover, but Motion for layout.
+                            // Actually, let's keep it simple: Render Link as container, 
+                            // but use motion.div as the inner content which accepts the padding? 
+                            // No, padding needs to be on the container.
+                            // Strategy: Use style prop driven by Framer or just CSS transition with adjusted ease.
+                            // The user complained about smoothness. Framer is smoothest.
+                            // Let's use motion.create(Link) - wait, that's complex with Next.js
+                            // Let's use a motion.div surrounding the content inside the Link? No.
+                            // Let's use `motion.a` (but we lose prefetch).
+                            // Solution: Link > motion.div acting as the button.
+                            passHref
+                        >
+                            <motion.div
+                                animate={{
+                                    paddingLeft: collapsed ? 28 : 16, // 28px centers 24px icon in 80px. 16px is pl-4.
+                                    paddingRight: collapsed ? 0 : 12 // 12px is pr-3.
+                                }}
+                                transition={{ duration: 0.2 }}
+                                className="flex items-center py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
+                                title={collapsed ? item.label : undefined}
+                            >
+                                <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                                    <item.icon className="w-6 h-6 transition-colors" />
+                                </div>
+                                <motion.span
+                                    initial={false}
+                                    animate={{
+                                        opacity: collapsed ? 0 : 1,
+                                        width: collapsed ? 0 : 'auto',
+                                        marginLeft: collapsed ? 0 : 12
+                                    }}
+                                    transition={{ duration: 0.2 }}
+                                    className="font-medium text-base overflow-hidden whitespace-nowrap"
+                                >
+                                    {item.label}
+                                </motion.span>
+                            </motion.div>
+                        </Link>
+                    ))}
+                </nav>
+
+                {/* Bottom Actions - Only show on desktop */}
+                <div className="p-3 border-t border-border/50 space-y-2 hidden md:block">
+                    <Link href="/settings" passHref>
+                        <motion.div
+                            animate={{
+                                paddingLeft: collapsed ? 28 : 16,
+                                paddingRight: collapsed ? 0 : 12
+                            }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
+                            title={collapsed ? "Instellingen" : undefined}
                         >
                             <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                                <item.icon className="w-6 h-6 transition-colors" />
+                                <Settings className="w-6 h-6" />
                             </div>
                             <motion.span
-                                initial={false}
                                 animate={{
                                     opacity: collapsed ? 0 : 1,
                                     width: collapsed ? 0 : 'auto',
@@ -85,45 +142,24 @@ export const Sidebar = () => {
                                 transition={{ duration: 0.2 }}
                                 className="font-medium text-base overflow-hidden whitespace-nowrap"
                             >
-                                {item.label}
+                                Settings
                             </motion.span>
-                        </Link>
-                    ))}
-                </nav>
-
-                {/* Bottom Actions - Only show on desktop */}
-                <div className="p-3 border-t border-border/50 space-y-2 hidden md:block">
-                    <Link
-                        href="/settings"
-                        className={`flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all duration-300 group ${collapsed ? 'pl-[28px] pr-0' : 'pl-4 pr-3'}`}
-                        title={collapsed ? "Instellingen" : undefined}
-                    >
-                        <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                            <Settings className="w-6 h-6" />
-                        </div>
-                        <motion.span
-                            initial={false}
-                            animate={{
-                                opacity: collapsed ? 0 : 1,
-                                width: collapsed ? 0 : 'auto',
-                                marginLeft: collapsed ? 0 : 12
-                            }}
-                            transition={{ duration: 0.2 }}
-                            className="font-medium text-base overflow-hidden whitespace-nowrap"
-                        >
-                            Settings
-                        </motion.span>
+                        </motion.div>
                     </Link>
-                    <button
+                    <motion.button
                         onClick={toggleSidebar}
-                        className={`flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all duration-300 group ${collapsed ? 'pl-[28px] pr-0' : 'pl-4 pr-3'}`}
+                        animate={{
+                            paddingLeft: collapsed ? 28 : 16,
+                            paddingRight: collapsed ? 0 : 12
+                        }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group"
                         title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
                         <div className="w-6 h-6 flex items-center justify-center shrink-0">
                             <ChevronLeft className={`w-6 h-6 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
                         </div>
                         <motion.span
-                            initial={false}
                             animate={{
                                 opacity: collapsed ? 0 : 1,
                                 width: collapsed ? 0 : 'auto',
@@ -134,7 +170,7 @@ export const Sidebar = () => {
                         >
                             Inklappen
                         </motion.span>
-                    </button>
+                    </motion.button>
                 </div>
             </motion.aside>
         </>
