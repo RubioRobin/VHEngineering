@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendReminderToAll, getDeadlineTime } from '@/lib/email';
+import { sendReminderToAll, getDeadlineInfo } from '@/lib/email';
 import prisma from '@/lib/prisma';
 import { getISOWeek, getYear, differenceInHours, subHours, isAfter } from 'date-fns';
 
