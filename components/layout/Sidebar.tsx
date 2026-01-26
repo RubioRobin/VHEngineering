@@ -72,27 +72,12 @@ export const Sidebar = () => {
                         <Link
                             key={item.label}
                             href={item.href}
-                            // Using motion.div wrapper or similar? No, Link can wrap motion.
-                            // But Link expects string href.
-                            // We will use a div inside link for the padding animation? 
-                            // Or standard motion works on Link if we cast it?
-                            // Safest: Animate padding via style prop or motion div inside? 
-                            // Let's use CSS class for hover, but Motion for layout.
-                            // Actually, let's keep it simple: Render Link as container, 
-                            // but use motion.div as the inner content which accepts the padding? 
-                            // No, padding needs to be on the container.
-                            // Strategy: Use style prop driven by Framer or just CSS transition with adjusted ease.
-                            // The user complained about smoothness. Framer is smoothest.
-                            // Let's use motion.create(Link) - wait, that's complex with Next.js
-                            // Let's use a motion.div surrounding the content inside the Link? No.
-                            // Let's use `motion.a` (but we lose prefetch).
-                            // Solution: Link > motion.div acting as the button.
                             passHref
                         >
                             <motion.div
                                 animate={{
-                                    paddingLeft: collapsed ? 28 : 16, // 28px centers 24px icon in 80px. 16px is pl-4.
-                                    paddingRight: collapsed ? 0 : 12 // 12px is pr-3.
+                                    paddingLeft: 16, // Always 16px! (Parent px-3 = 12px. 12+16=28px start. Icon 24px. Center 40px)
+                                    paddingRight: collapsed ? 0 : 12
                                 }}
                                 transition={{ duration: 0.2 }}
                                 className="flex items-center py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors group cursor-pointer"
@@ -123,7 +108,7 @@ export const Sidebar = () => {
                     <Link href="/settings" passHref>
                         <motion.div
                             animate={{
-                                paddingLeft: collapsed ? 28 : 16,
+                                paddingLeft: 16, // Always 16px
                                 paddingRight: collapsed ? 0 : 12
                             }}
                             transition={{ duration: 0.2 }}
@@ -149,7 +134,7 @@ export const Sidebar = () => {
                     <motion.button
                         onClick={toggleSidebar}
                         animate={{
-                            paddingLeft: collapsed ? 28 : 16,
+                            paddingLeft: 16, // Always 16px
                             paddingRight: collapsed ? 0 : 12
                         }}
                         transition={{ duration: 0.2 }}
