@@ -7,7 +7,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
     return (
         <div
-            className={`flex-1 flex flex-col ${isSidebarCollapsed ? 'pl-[80px]' : 'pl-[280px]'
+            className={`flex-1 flex flex-col ${isSidebarCollapsed ? 'pl-[80px]' : 'pl-[240px]'
                 }`}
             style={{
                 transition: 'padding-left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)',

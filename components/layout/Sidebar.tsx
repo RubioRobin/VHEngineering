@@ -26,7 +26,7 @@ export const Sidebar = () => {
             <motion.aside
                 initial={false}
                 animate={{
-                    width: collapsed ? 80 : 280,
+                    width: collapsed ? 80 : 240,
                     x: 0
                 }}
                 transition={{
