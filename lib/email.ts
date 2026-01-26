@@ -4,6 +4,7 @@ import { format, isSameDay, nextDay, set, getDay, isTomorrow, isPast, difference
 import { nl } from 'date-fns/locale';
 import { getISOWeek, getYear, startOfWeek, endOfWeek, subWeeks } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
+import { getNextDeadline } from './orderPeriod';
 
 const TIMEZONE = 'Europe/Amsterdam';
 
@@ -70,6 +71,7 @@ interface DeadlineInfo {
 
 /**
  * Get detailed deadline info (time + day context)
+ * NOW USES EXACT SAME LOGIC AS FRONTEND (getNextDeadline)
  */
 export async function getDeadlineInfo(): Promise<DeadlineInfo> {
     // Current time in Amsterdam
@@ -77,67 +79,29 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
     const nowZoned = toZonedTime(nowUtc, TIMEZONE);
 
     try {
-        const weekId = `${getYear(nowZoned)}-${getISOWeek(nowZoned)}`;
-        const period = await (prisma as any).orderPeriod.findUnique({
-            where: { weekId }
-        });
+        // Use the EXACT same calculation as the frontend/API
+        // This ensures 1-to-1 consistency
+        const deadlineUtc = await getNextDeadline();
+        const deadlineZoned = toZonedTime(deadlineUtc, TIMEZONE);
 
-        if (period && period.deadline) {
-            const deadlineUtc = new Date(period.deadline);
-            const deadlineZoned = toZonedTime(deadlineUtc, TIMEZONE);
+        const timeStr = format(deadlineZoned, 'HH:mm');
 
-            const timeStr = format(deadlineZoned, 'HH:mm');
+        let label = format(deadlineZoned, 'EEEE', { locale: nl }); // e.g. "vrijdag"
 
-            let label = format(deadlineZoned, 'EEEE', { locale: nl }); // e.g. "vrijdag"
+        // Compare calendar days in the correct timezone
+        const diffDays = differenceInCalendarDays(deadlineZoned, nowZoned);
 
-            // Compare calendar days in the correct timezone
-            const diffDays = differenceInCalendarDays(deadlineZoned, nowZoned);
+        const isToday = diffDays === 0;
+        const isTomorrow = diffDays === 1;
 
-            const isToday = diffDays === 0;
-            const isTomorrow = diffDays === 1;
+        if (isToday) label = 'Vandaag';
+        else if (isTomorrow) label = 'Morgen';
 
-            if (isToday) label = 'Vandaag';
-            else if (isTomorrow) label = 'Morgen';
+        // Capitalize
+        label = label.charAt(0).toUpperCase() + label.slice(1);
 
-            // Capitalize
-            label = label.charAt(0).toUpperCase() + label.slice(1);
+        return { time: timeStr, label, isToday, isTomorrow };
 
-            return { time: timeStr, label, isToday, isTomorrow };
-        }
-
-        // Fallback to global setting
-        const daySetting = await (prisma as any).globalSetting.findUnique({ where: { key: 'DEADLINE_DAY' } });
-        const hourSetting = await (prisma as any).globalSetting.findUnique({ where: { key: 'DEADLINE_HOUR' } });
-        const minuteSetting = await (prisma as any).globalSetting.findUnique({ where: { key: 'DEADLINE_MINUTE' } });
-
-        if (daySetting && hourSetting) {
-            const targetDay = parseInt(daySetting.value); // 1=Monday, 5=Friday
-            const hour = parseInt(hourSetting.value);
-            const minute = parseInt(minuteSetting?.value || '0');
-
-            const currentDay = getDay(nowZoned); // 0=Sunday, 1=Monday based on local time
-
-            const days = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
-            let label = days[targetDay] || 'Vrijdag';
-
-            // Fixed comparison logic
-            // differenceInCalendarDays is better than custom math for "Next Day" logic
-            // but here we just have a target day index (0-6)
-
-            const isToday = currentDay === targetDay;
-            // logic for tomorrow: (currentDay + 1) % 7 === targetDay
-            const isTomorrow = (currentDay + 1) % 7 === targetDay;
-
-            if (isToday) label = 'Vandaag';
-            if (isTomorrow) label = 'Morgen';
-
-            return {
-                time: `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`,
-                label,
-                isToday,
-                isTomorrow
-            };
-        }
     } catch (e) {
         console.error('Error fetching deadline info:', e);
     }
