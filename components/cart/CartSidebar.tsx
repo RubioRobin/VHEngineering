@@ -49,11 +49,22 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
     };
 
     // Load user info on mount
+    const { user } = useUser();
+
+    // ...
+
+    // Load user info on mount or when user changes
     useEffect(() => {
-        setPersonName(localStorage.getItem('personName') || '');
-        setDepartment(localStorage.getItem('department') || '');
+        if (user) {
+            setPersonName(user.name);
+            setDepartment(user.department || '');
+        } else {
+            // Fallback for non-logged in users (if any)
+            setPersonName(localStorage.getItem('personName') || '');
+            setDepartment(localStorage.getItem('department') || '');
+        }
         setClientToken(localStorage.getItem('clientToken') || '');
-    }, []);
+    }, [user]);
 
     const handleUpdateQuantity = (id: string, quantity: number) => {
         const updated = cartItems.map((item) =>
