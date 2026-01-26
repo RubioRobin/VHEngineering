@@ -165,8 +165,7 @@ export async function GET(request: Request) {
         // Fetch current open period
         const period = await prisma.orderPeriod.findFirst({
             where: {
-                weekId,
-                isClosed: false
+                weekId
             }
         });
 
