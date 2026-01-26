@@ -38,6 +38,8 @@ export default function OverviewPage() {
     const { user } = useUser();
     const { showToast } = useToast();
 
+    const [isExporting, setIsExporting] = useState(false);
+
     useEffect(() => {
         // Trigger fetch if not already loaded (handled by provider)
         fetchWeekOrders();
@@ -66,8 +68,32 @@ export default function OverviewPage() {
 
     const shippingPerPerson = orders.length > 0 ? SHIPPING_COST / orders.length : 0;
 
-    const handleExport = () => {
-        window.location.href = '/api/orders/export';
+    const handleExport = async () => {
+        try {
+            setIsExporting(true);
+            const response = await fetch('/api/orders/export');
+
+            if (!response.ok) {
+                throw new Error('Export failed');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bestellingen-${format(new Date(), 'dd-MM-yyyy')}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showToast('Export succesvol', 'success');
+        } catch (error) {
+            console.error('Export error:', error);
+            showToast('Er ging iets mis bij het exporteren', 'error');
+        } finally {
+            setIsExporting(false);
+        }
     };
 
     const calculateTotal = (orderItems: any[]) => {
@@ -88,7 +114,7 @@ export default function OverviewPage() {
                     <h1 className="text-3xl font-bold text-text-primary">Week overzicht</h1>
                     <p className="text-text-secondary">Alle bestellingen voor deze week</p>
                 </div>
-                <DashboardButton onClick={handleExport} icon={<Download className="w-4 h-4" />}>
+                <DashboardButton onClick={handleExport} isLoading={isExporting} icon={<Download className="w-4 h-4" />}>
                     Export naar Excel
                 </DashboardButton>
             </div>
