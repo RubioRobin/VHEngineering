@@ -38,9 +38,7 @@ export const Sidebar = () => {
                 className="fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-slate-300 shadow-soft flex flex-col md:z-40 overflow-hidden"
             >
                 {/* User Profile Area (replaces logo) */}
-                <div className="h-20 flex items-center px-6 border-b border-border/50">
-
-
+                <div className={`h-20 flex items-center border-b border-border/50 transition-all ${collapsed ? 'justify-center px-0' : 'px-6'}`}>
                     <div className="w-10 h-10 bg-gradient-to-tr from-primary to-primary-light rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
                         {user?.name?.charAt(0).toUpperCase() || 'G'}
                     </div>
@@ -48,12 +46,8 @@ export const Sidebar = () => {
                         <motion.div
                             initial={false}
                             animate={{
-                                opacity: collapsed ? 0 : 1
-                            }}
-                            transition={{
-                                duration: 0.2,
-                                ease: "easeInOut",
-                                delay: collapsed ? 0 : 0.1 // Delay fade-in slightly
+                                opacity: collapsed ? 0 : 1,
+                                width: collapsed ? 0 : 'auto'
                             }}
                             className="whitespace-nowrap ml-3"
                         >
@@ -69,7 +63,7 @@ export const Sidebar = () => {
                         <Link
                             key={item.label}
                             href={item.href}
-                            className="flex items-center pl-4 pr-3 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group"
+                            className={`flex items-center py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group ${collapsed ? 'justify-center px-0' : 'pl-4 pr-3'}`}
                         >
                             <div className="w-6 h-6 flex items-center justify-center shrink-0">
                                 <item.icon className="w-6 h-6 transition-colors" />
@@ -77,12 +71,8 @@ export const Sidebar = () => {
                             <motion.span
                                 initial={false}
                                 animate={{
-                                    opacity: collapsed ? 0 : 1
-                                }}
-                                transition={{
-                                    duration: 0.2,
-                                    ease: "easeInOut",
-                                    delay: collapsed ? 0 : 0.1
+                                    opacity: collapsed ? 0 : 1,
+                                    width: collapsed ? 0 : 'auto'
                                 }}
                                 className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                             >
@@ -94,19 +84,18 @@ export const Sidebar = () => {
 
                 {/* Bottom Actions - Only show on desktop */}
                 <div className="p-3 border-t border-border/50 space-y-2 hidden md:block">
-                    <Link href="/settings" className="flex items-center pl-4 pr-3 py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group">
+                    <Link
+                        href="/settings"
+                        className={`flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group ${collapsed ? 'justify-center px-0' : 'pl-4 pr-3'}`}
+                    >
                         <div className="w-6 h-6 flex items-center justify-center shrink-0">
                             <Settings className="w-6 h-6" />
                         </div>
                         <motion.span
                             initial={false}
                             animate={{
-                                opacity: collapsed ? 0 : 1
-                            }}
-                            transition={{
-                                duration: 0.2,
-                                ease: "easeInOut",
-                                delay: collapsed ? 0 : 0.1
+                                opacity: collapsed ? 0 : 1,
+                                width: collapsed ? 0 : 'auto'
                             }}
                             className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                         >
@@ -115,7 +104,7 @@ export const Sidebar = () => {
                     </Link>
                     <button
                         onClick={toggleSidebar}
-                        className="flex items-center pl-4 pr-3 py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group"
+                        className={`flex items-center py-3 w-full rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-primary transition-all group ${collapsed ? 'justify-center px-0' : 'pl-4 pr-3'}`}
                         title={collapsed ? "Uitklappen" : "Inklappen"}
                     >
                         <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -124,12 +113,8 @@ export const Sidebar = () => {
                         <motion.span
                             initial={false}
                             animate={{
-                                opacity: collapsed ? 0 : 1
-                            }}
-                            transition={{
-                                duration: 0.2,
-                                ease: "easeInOut",
-                                delay: collapsed ? 0 : 0.1
+                                opacity: collapsed ? 0 : 1,
+                                width: collapsed ? 0 : 'auto'
                             }}
                             className="font-medium text-base overflow-hidden whitespace-nowrap ml-3"
                         >
