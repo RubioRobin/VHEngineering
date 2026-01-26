@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
-import { sendReminderToAll } from '@/lib/email';
+import { sendReminderToAll, getDeadlineInfo } from '@/lib/email';
 
 // POST - Send test email to all active subscribers
 export async function POST() {
     console.log('[TestEmail] Starting request...');
     try {
+        // Debug: Fetch deadline info
+        const debugDeadline = await getDeadlineInfo();
+        console.log('[TestEmail] Debug Deadline:', debugDeadline);
+
         // Check if Gmail credentials are configured
         if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
             console.error('[TestEmail] Missing GMAIL_USER or GMAIL_APP_PASSWORD');
@@ -21,7 +25,8 @@ export async function POST() {
         if (result.sent === 0 && result.total === 0) {
             return NextResponse.json({
                 success: true,
-                message: 'Geen actieve ontvangers gevonden. Voeg eerst emails toe.'
+                message: 'Geen actieve ontvangers gevonden. Voeg eerst emails toe.',
+                debugWithDeadline: debugDeadline
             });
         }
 
@@ -31,7 +36,8 @@ export async function POST() {
             sent: result.sent,
             failed: result.failed,
             total: result.total,
-            details: result.results
+            details: result.results,
+            debugWithDeadline: debugDeadline
         });
     } catch (error: any) {
         console.error('[TestEmail] Critical error:', error);
