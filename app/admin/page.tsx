@@ -21,7 +21,14 @@ export default function AdminPage() {
     const [emailList, setEmailList] = useState<any[]>([]);
     const [newEmail, setNewEmail] = useState('');
     const [newName, setNewName] = useState('');
+    // Loading States
     const [refreshing, setRefreshing] = useState(false);
+    const [isResettingWeek, setIsResettingWeek] = useState(false);
+    const [isSavingHeadline, setIsSavingHeadline] = useState(false);
+    const [isAddingEmail, setIsAddingEmail] = useState(false);
+    const [isSendingTestEmail, setIsSendingTestEmail] = useState(false);
+    const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+    const [deletingEmailId, setDeletingEmailId] = useState<string | null>(null);
 
     // Recurring settings (Initialize with CURRENT TIME)
     const [deadlinesSettings, setDeadlineSettings] = useState(() => {
@@ -190,6 +197,7 @@ export default function AdminPage() {
             return;
         }
 
+        setIsSavingTemplate(true);
         try {
             const res = await fetch('/api/admin/email-template', {
                 method: 'POST',
@@ -212,6 +220,8 @@ export default function AdminPage() {
             }
         } catch (error) {
             showToast('Netwerkfout', 'error');
+        } finally {
+            setIsSavingTemplate(false);
         }
     };
 
@@ -221,6 +231,7 @@ export default function AdminPage() {
             return;
         }
 
+        setIsAddingEmail(true);
         try {
             const res = await fetch('/api/admin/emails', {
                 method: 'POST',
@@ -243,6 +254,8 @@ export default function AdminPage() {
             }
         } catch (error) {
             showToast('Netwerkfout', 'error');
+        } finally {
+            setIsAddingEmail(false);
         }
     };
 
@@ -250,6 +263,7 @@ export default function AdminPage() {
         showConfirm({
             message: 'Email verwijderen uit de lijst?',
             onConfirm: async () => {
+                setDeletingEmailId(id);
                 try {
                     const res = await fetch('/api/admin/emails', {
                         method: 'DELETE',
@@ -269,6 +283,8 @@ export default function AdminPage() {
                     }
                 } catch (error) {
                     showToast('Netwerkfout', 'error');
+                } finally {
+                    setDeletingEmailId(null);
                 }
             }
         });
@@ -303,6 +319,7 @@ export default function AdminPage() {
     const handleSaveRecurrentDeadline = async () => {
         if (!adminToken) return;
 
+        setIsSavingHeadline(true);
         try {
             const res = await fetch('/api/admin/settings', {
                 method: 'POST',
@@ -323,6 +340,8 @@ export default function AdminPage() {
             }
         } catch (error) {
             showToast('Netwerkfout', 'error');
+        } finally {
+            setIsSavingHeadline(false);
         }
     };
 
@@ -353,6 +372,7 @@ export default function AdminPage() {
     };
 
     const handleSendTestEmail = async () => {
+        setIsSendingTestEmail(true);
         try {
             const res = await fetch('/api/admin/test-email', {
                 method: 'POST',
@@ -370,6 +390,8 @@ export default function AdminPage() {
         } catch (error) {
             console.error('Network error sending test email:', error);
             showToast('Netwerkfout bij versturen', 'error');
+        } finally {
+            setIsSendingTestEmail(false);
         }
     };
 
@@ -555,6 +577,7 @@ export default function AdminPage() {
                     <DashboardButton
                         onClick={handleSaveRecurrentDeadline}
                         className="w-full bg-emerald-600 hover:bg-emerald-700 h-11"
+                        isLoading={isSavingHeadline}
                     >
                         Opslaan
                     </DashboardButton>
@@ -576,6 +599,7 @@ export default function AdminPage() {
                         disabled={refreshing}
                         className="w-full bg-cyan-600 hover:bg-cyan-700 font-semibold"
                         icon={<RefreshCcw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
+                        isLoading={refreshing}
                     >
                         {refreshing ? 'Producten ophalen...' : 'Assortiment resetten'}
                     </DashboardButton>
@@ -607,6 +631,7 @@ export default function AdminPage() {
                         onClick={handleSendTestEmail}
                         className="bg-blue-600 hover:bg-blue-700 md:w-auto w-full"
                         icon={<Send className="w-4 h-4" />}
+                        isLoading={isSendingTestEmail}
                     >
                         Test email versturen
                     </DashboardButton>
@@ -637,6 +662,7 @@ export default function AdminPage() {
                         onClick={handleAddEmail}
                         className="bg-blue-600 hover:bg-blue-700 md:w-auto w-full shadow-lg shadow-blue-600/20"
                         icon={<Plus className="w-4 h-4" />}
+                        isLoading={isAddingEmail}
                     >
                         Toevoegen
                     </DashboardButton>
@@ -664,10 +690,10 @@ export default function AdminPage() {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => handleDeleteEmail(subscriber.id)}
                                     className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                    disabled={deletingEmailId === subscriber.id}
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    {deletingEmailId === subscriber.id ? <Loader2 className="w-4 h-4 animate-spin text-red-500" /> : <Trash2 className="w-4 h-4" />}
                                 </button>
                             </div>
                         ))
@@ -695,6 +721,7 @@ export default function AdminPage() {
                         <DashboardButton
                             onClick={handleSaveTemplate}
                             className="bg-purple-600 hover:bg-purple-700"
+                            isLoading={isSavingTemplate}
                         >
                             Opslaan
                         </DashboardButton>
