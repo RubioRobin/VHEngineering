@@ -1,8 +1,11 @@
 import nodemailer from 'nodemailer';
 import prisma from './prisma';
-import { format, isSameDay, nextDay, set, getDay, isTomorrow, isPast } from 'date-fns';
+import { format, isSameDay, nextDay, set, getDay, isTomorrow, isPast, differenceInCalendarDays } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { getISOWeek, getYear, startOfWeek, endOfWeek, subWeeks } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
+
+const TIMEZONE = 'Europe/Amsterdam';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -69,29 +72,37 @@ interface DeadlineInfo {
  * Get detailed deadline info (time + day context)
  */
 export async function getDeadlineInfo(): Promise<DeadlineInfo> {
-    const now = new Date();
+    // Current time in Amsterdam
+    const nowUtc = new Date();
+    const nowZoned = toZonedTime(nowUtc, TIMEZONE);
 
     try {
-        const weekId = `${getYear(now)}-${getISOWeek(now)}`;
+        const weekId = `${getYear(nowZoned)}-${getISOWeek(nowZoned)}`;
         const period = await (prisma as any).orderPeriod.findUnique({
             where: { weekId }
         });
 
         if (period && period.deadline) {
-            const date = new Date(period.deadline);
-            const timeStr = format(date, 'HH:mm');
+            const deadlineUtc = new Date(period.deadline);
+            const deadlineZoned = toZonedTime(deadlineUtc, TIMEZONE);
 
-            let label = format(date, 'EEEE', { locale: nl }); // e.g. "vrijdag"
-            const todayIsDeadline = isSameDay(date, now);
-            const tomorrowIsDeadline = isTomorrow(date);
+            const timeStr = format(deadlineZoned, 'HH:mm');
 
-            if (todayIsDeadline) label = 'Vandaag';
-            else if (tomorrowIsDeadline) label = 'Morgen';
+            let label = format(deadlineZoned, 'EEEE', { locale: nl }); // e.g. "vrijdag"
+
+            // Compare calendar days in the correct timezone
+            const diffDays = differenceInCalendarDays(deadlineZoned, nowZoned);
+
+            const isToday = diffDays === 0;
+            const isTomorrow = diffDays === 1;
+
+            if (isToday) label = 'Vandaag';
+            else if (isTomorrow) label = 'Morgen';
 
             // Capitalize
             label = label.charAt(0).toUpperCase() + label.slice(1);
 
-            return { time: timeStr, label, isToday: todayIsDeadline, isTomorrow: tomorrowIsDeadline };
+            return { time: timeStr, label, isToday, isTomorrow };
         }
 
         // Fallback to global setting
@@ -104,10 +115,14 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
             const hour = parseInt(hourSetting.value);
             const minute = parseInt(minuteSetting?.value || '0');
 
-            const currentDay = getDay(now); // 0=Sunday, 1=Monday
+            const currentDay = getDay(nowZoned); // 0=Sunday, 1=Monday based on local time
 
             const days = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
             let label = days[targetDay] || 'Vrijdag';
+
+            // Fixed comparison logic
+            // differenceInCalendarDays is better than custom math for "Next Day" logic
+            // but here we just have a target day index (0-6)
 
             const isToday = currentDay === targetDay;
             // logic for tomorrow: (currentDay + 1) % 7 === targetDay
