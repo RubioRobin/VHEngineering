@@ -29,11 +29,11 @@ export async function getReminderTemplate() {
 
     const topProducts = await getTopProductsHtml();
 
-    // No subtitle/quote anymore
+    // "Explosive" title logic handled in subject line below and header in generateHtmlFromText
     const freshHtml = generateHtmlFromText(template ? template.bodyText : getDefaultEmailText(), undefined, topProducts);
 
     return {
-        subject: template ? template.subject : 'Plaats je lunchbestelling',
+        subject: template ? template.subject : '🔥 BESTELLEN NU! De deadline nadert.',
         bodyHtml: freshHtml,
         bodyText: template ? template.bodyText : getDefaultEmailText()
     };
@@ -44,6 +44,7 @@ interface DeadlineInfo {
     label: string;
     isTomorrow: boolean;
     isToday: boolean;
+    fullDate: string;
 }
 
 /**
@@ -62,6 +63,7 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
         const deadlineZoned = toZonedTime(deadlineUtc, TIMEZONE);
 
         const timeStr = format(deadlineZoned, 'HH:mm');
+        const fullDate = format(deadlineZoned, "EEEE d MMMM", { locale: nl });
 
         let label = format(deadlineZoned, 'EEEE', { locale: nl }); // e.g. "vrijdag"
 
@@ -77,13 +79,13 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
         // Capitalize
         label = label.charAt(0).toUpperCase() + label.slice(1);
 
-        return { time: timeStr, label, isToday, isTomorrow };
+        return { time: timeStr, label, isToday, isTomorrow, fullDate: fullDate.charAt(0).toUpperCase() + fullDate.slice(1) };
 
     } catch (e) {
         console.error('Error fetching deadline info:', e);
     }
 
-    return { time: '14:00', label: 'Vandaag', isToday: true, isTomorrow: false };
+    return { time: '14:00', label: 'Vandaag', isToday: true, isTomorrow: false, fullDate: 'Vandaag' };
 }
 
 /**
@@ -103,14 +105,36 @@ export async function sendReminderEmail(
     const senderEmail = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
     const senderName = process.env.SENDER_NAME || 'VH Engineering';
 
-    // Construct the Website-Match Deadline Badge
-    // Based on components/DeadlineBadge.tsx: bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full
+    // Construct the "Blue Timer" Card (Gradient)
+    // Replicating the image: Purple/Blue gradient, rounded corners, white text.
+    // CSS Gradient: linear-gradient(to right, #4f46e5, #7c3aed) -> Indigo to Violet
     const deadlineHtml = `
-        <div style="margin: 32px 0; text-align: center;">
-            <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto;">
+        <div style="margin: 32px 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%); background-color: #4338ca; border-radius: 16px; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
                 <tr>
-                    <td style="background: linear-gradient(90deg, #f97316 0%, #ef4444 100%); background-color: #f97316; padding: 12px 24px; border-radius: 99px; color: #ffffff; font-weight: 700; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                        <span style="display: block;">⏰ Bestellen sluit ${deadlineInfo.label.toLowerCase() === 'vandaag' || deadlineInfo.label.toLowerCase() === 'morgen' ? deadlineInfo.label.toLowerCase() : 'op ' + deadlineInfo.label.toLowerCase()} om ${deadlineInfo.time}</span>
+                    <td style="padding: 24px;">
+                        
+                        <!-- Header: Icon + Is Closing -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="vertical-align: middle;">
+                                    <p style="margin: 0; font-family: monospace; font-size: 14px; font-weight: 700; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">
+                                        ⏱️ BESTELLEN SLUIT ${deadlineInfo.label.toUpperCase()}
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Big Time -->
+                        <p style="margin: 16px 0 8px 0; font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -1px;">
+                            ${deadlineInfo.time}
+                        </p>
+
+                        <!-- Footer: Full Date -->
+                        <p style="margin: 0; font-size: 14px; opacity: 0.8; font-weight: 500;">
+                            Deadline: ${deadlineInfo.fullDate}
+                        </p>
+
                     </td>
                 </tr>
             </table>
@@ -172,7 +196,7 @@ async function getTopProductsHtml(): Promise<string> {
         });
 
         let finalItems = topItems;
-        let title = "Populairste vorige week";
+        let title = "Dit waren de populairste broodjes afgelopen week";
 
         if (finalItems.length === 0) {
             title = "Onze aanraders";
@@ -254,7 +278,7 @@ export async function sendReminderToAll() {
 export function getDefaultEmailText(): string {
     return `Beste {{name}},
     
-Dit is u herinnering om uw lunchbestelling te plaatsen. De deadline is {{deadlineTime}}.
+Dit is u herinnering om uw broodjes te bestellen. De deadline is {{deadlineTime}}.
 
 We zien uw bestelling graag tegemoet.`.trim();
 }
@@ -290,8 +314,9 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
                     <!-- Professional Header with Indigo accent -->
                     <tr>
                         <td style="padding: 32px 32px 0 32px;">
-                            <h1 style="margin: 0; color: #0F172A; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">VH Engineering</h1>
-                            <p style="margin: 4px 0 0 0; color: #64748B; font-size: 14px; font-weight: 500;">Lunch Service</p>
+                            <!-- EXPLOSIVE TITLE / HEADER -->
+                            <h1 style="margin: 0; color: #0F172A; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">VH ENGINEERING</h1>
+                            <p style="margin: 4px 0 0 0; color: #64748B; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Broodjes Service</p>
                         </td>
                     </tr>
 
@@ -303,7 +328,7 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
                                 ${contentHtml.replace('{{quote}}', '')}
                             </div>
 
-                            <!-- Dynamic Deadline Widget (Website Style) -->
+                            <!-- "Blue Timer" Gradient Deadline Widget -->
                             {{deadlineWidget}}
 
                             ${topProductsHtml || ''}
@@ -312,7 +337,7 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 32px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center; transition: background-color 0.2s;">
+                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 700; text-align: center; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">
                                             Bestelling Plaatsen
                                         </a>
                                     </td>
