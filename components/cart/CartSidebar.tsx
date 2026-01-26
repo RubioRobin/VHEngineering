@@ -49,7 +49,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
     };
 
     // Load user info on mount
-    const { user } = useUser();
+    const { user, login } = useUser();
 
     // ...
 
@@ -123,12 +123,35 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
         localStorage.setItem('department', department.trim());
 
         try {
+            // Ensure we have a valid UserId, even if the user didn't explicitly login via the modal
+            let activeUserId = user?.id;
+
+            if (!activeUserId) {
+                // Auto-create/find user to ensure order history works
+                try {
+                    const userRes = await fetch("/api/user", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name: personName, department }),
+                    });
+
+                    if (userRes.ok) {
+                        const userData = await userRes.json();
+                        activeUserId = userData.id;
+                        // Also update global state silently so "My Orders" works immediately
+                        if (login) login(personName, department);
+                    }
+                } catch (e) {
+                    console.error("Auto-link user failed", e);
+                }
+            }
+
             const response = await fetch('/api/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    userName: personName, // Map to API expectation
-                    userId: user?.id,
+                    userName: personName,
+                    userId: activeUserId, // Use the resolved ID
                     department,
                     clientToken: currentToken,
                     items: cartItems.map((item) => ({
