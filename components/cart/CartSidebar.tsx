@@ -155,7 +155,12 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
             const orderDetails = {
                 orderId: data.id,
                 totalAmount: calculateTotal(),
-                itemCount: cartItems.reduce((acc, item) => acc + item.quantity, 0)
+                itemCount: cartItems.reduce((acc, item) => acc + item.quantity, 0),
+                items: cartItems.map(item => ({
+                    name: item.product.name,
+                    quantity: item.quantity,
+                    price: item.product.price
+                }))
             };
             window.dispatchEvent(new CustomEvent('order-success', { detail: orderDetails }));
 

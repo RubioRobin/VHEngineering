@@ -13,6 +13,7 @@ interface OrderSuccessModalProps {
         orderId: string;
         totalAmount: number;
         itemCount: number;
+        items?: { name: string; quantity: number; price: number | null }[];
     } | null;
 }
 
@@ -38,7 +39,7 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                 exit={{ opacity: 0, scale: 0.9 }}
                 className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden p-6 relative"
             >
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-emerald-600" />
+
 
                 <div className="flex flex-col items-center text-center mt-4">
                     <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600">
@@ -59,12 +60,22 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                                 <span className="text-gray-500 text-sm">Aantal items</span>
                                 <span className="font-semibold text-gray-800">{orderData.itemCount}</span>
                             </div>
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-gray-500 text-sm">Ordernummer</span>
-                                <span className="font-mono text-xs bg-white px-2 py-1 rounded border overflow-ellipsis max-w-[120px]">
-                                    {orderData.orderId.slice(-6).toUpperCase()}
-                                </span>
-                            </div>
+
+                            {/* Item Summary List */}
+                            {orderData.items && orderData.items.length > 0 && (
+                                <div className="mb-4 mt-2 max-h-40 overflow-y-auto border-t border-b border-gray-100 py-2">
+                                    <ul className="space-y-2">
+                                        {orderData.items.map((item, index) => (
+                                            <li key={index} className="flex justify-between text-sm">
+                                                <span className="text-gray-700 truncate max-w-[200px]" title={item.name}>
+                                                    {item.quantity}x {item.name}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
                             <div className="flex justify-between items-center pt-2 border-t border-gray-200 mt-2">
                                 <span className="text-gray-600 font-medium">Totaal</span>
                                 <span className="font-bold text-emerald-600">€ {orderData.totalAmount.toFixed(2)}</span>

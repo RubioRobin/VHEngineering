@@ -49,7 +49,12 @@ export default function HomePage() {
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [lastOrderDetails, setLastOrderDetails] = useState<{ orderId: string, totalAmount: number, itemCount: number } | null>(null);
+    const [lastOrderDetails, setLastOrderDetails] = useState<{
+        orderId: string,
+        totalAmount: number,
+        itemCount: number,
+        items?: { name: string, quantity: number, price: number | null }[]
+    } | null>(null);
 
     useEffect(() => {
         Promise.all([
