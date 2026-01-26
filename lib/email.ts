@@ -29,11 +29,10 @@ export async function getReminderTemplate() {
 
     const topProducts = await getTopProductsHtml();
 
-    // "Explosive" title logic handled in subject line below and header in generateHtmlFromText
     const freshHtml = generateHtmlFromText(template ? template.bodyText : getDefaultEmailText(), undefined, topProducts);
 
     return {
-        subject: template ? template.subject : '🔥 BESTELLEN NU! De deadline nadert.',
+        subject: template ? template.subject : '🔥 BESTEL NU! Deadline nadert.',
         bodyHtml: freshHtml,
         bodyText: template ? template.bodyText : getDefaultEmailText()
     };
@@ -58,7 +57,6 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
 
     try {
         // Use the EXACT same calculation as the frontend/API
-        // This ensures 1-to-1 consistency
         const deadlineUtc = await getNextDeadline();
         const deadlineZoned = toZonedTime(deadlineUtc, TIMEZONE);
 
@@ -73,11 +71,9 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
         const isToday = diffDays === 0;
         const isTomorrow = diffDays === 1;
 
-        if (isToday) label = 'Vandaag';
-        else if (isTomorrow) label = 'Morgen';
-
-        // Capitalize
-        label = label.charAt(0).toUpperCase() + label.slice(1);
+        if (isToday) label = 'VANDAAG';
+        else if (isTomorrow) label = 'MORGEN';
+        else label = label.toUpperCase();
 
         return { time: timeStr, label, isToday, isTomorrow, fullDate: fullDate.charAt(0).toUpperCase() + fullDate.slice(1) };
 
@@ -85,7 +81,7 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
         console.error('Error fetching deadline info:', e);
     }
 
-    return { time: '14:00', label: 'Vandaag', isToday: true, isTomorrow: false, fullDate: 'Vandaag' };
+    return { time: '14:00', label: 'VANDAAG', isToday: true, isTomorrow: false, fullDate: 'Vandaag' };
 }
 
 /**
@@ -105,33 +101,36 @@ export async function sendReminderEmail(
     const senderEmail = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
     const senderName = process.env.SENDER_NAME || 'VH Engineering';
 
-    // Construct the "Blue Timer" Card (Gradient)
-    // Replicating the image: Purple/Blue gradient, rounded corners, white text.
-    // CSS Gradient: linear-gradient(to right, #4f46e5, #7c3aed) -> Indigo to Violet
+    // Construct the "Blue Timer" Card (Gradient) Matches image provided
+    // Gradient: indigo-purple (#4f46e5 -> #7c3aed to match website 'primary' glow)
     const deadlineHtml = `
         <div style="margin: 32px 0;">
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%); background-color: #4338ca; border-radius: 16px; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); background-color: #4f46e5; border-radius: 12px; color: #ffffff; overflow: hidden;">
                 <tr>
                     <td style="padding: 24px;">
                         
                         <!-- Header: Icon + Is Closing -->
                         <table width="100%" cellpadding="0" cellspacing="0" border="0">
                             <tr>
+                                <td style="vertical-align: middle; width: 24px; padding-right: 8px;">
+                                     <!-- Clock Icon (simulated with emoji or image, emoji safest for now) -->
+                                     <span style="font-size: 16px;">⏱️</span>
+                                </td>
                                 <td style="vertical-align: middle;">
-                                    <p style="margin: 0; font-family: monospace; font-size: 14px; font-weight: 700; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">
-                                        ⏱️ BESTELLEN SLUIT ${deadlineInfo.label.toUpperCase()}
+                                    <p style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;">
+                                        BESTELLEN SLUIT ${deadlineInfo.label}
                                     </p>
                                 </td>
                             </tr>
                         </table>
 
                         <!-- Big Time -->
-                        <p style="margin: 16px 0 8px 0; font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -1px;">
+                        <p style="margin: 12px 0 8px 0; font-family: 'Outfit', sans-serif; font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -1px;">
                             ${deadlineInfo.time}
                         </p>
 
                         <!-- Footer: Full Date -->
-                        <p style="margin: 0; font-size: 14px; opacity: 0.8; font-weight: 500;">
+                        <p style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 14px; opacity: 0.8; font-weight: 500;">
                             Deadline: ${deadlineInfo.fullDate}
                         </p>
 
@@ -196,10 +195,10 @@ async function getTopProductsHtml(): Promise<string> {
         });
 
         let finalItems = topItems;
-        let title = "Dit waren de populairste broodjes afgelopen week";
+        let title = "DIT WAREN DE POPULAIRSTE BROODJES AFGELOPEN WEEK"; // Copy per user request
 
         if (finalItems.length === 0) {
-            title = "Onze aanraders";
+            title = "ONZE AANRADERS";
             finalItems = await (prisma as any).orderItem.groupBy({
                 by: ['productId'],
                 _count: { productId: true },
@@ -220,21 +219,20 @@ async function getTopProductsHtml(): Promise<string> {
             .filter(Boolean);
 
         // Professional List Design
-        // Compact, side-by-side if possible or clean rows
         return `
-            <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
-                <h4 style="margin: 0 0 16px 0; color: #475569; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${title}</h4>
+            <div style="margin-top: 40px;">
+                <h4 style="margin: 0 0 20px 0; color: #64748B; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${title}</h4>
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                     ${orderedProducts.map((p: any) => `
                         <tr>
-                            <td style="padding-bottom: 8px;">
+                            <td style="padding-bottom: 12px;">
                                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                     <tr>
-                                        <td style="padding: 8px 0; vertical-align: middle;">
-                                            <span style="font-weight: 500; color: #1E293B; font-size: 15px; display: block;">${p.name}</span>
+                                        <td style="padding: 0 0; vertical-align: middle;">
+                                            <span style="font-family: 'Outfit', sans-serif; font-weight: 500; color: #1E293B; font-size: 15px; display: block;">${p.name}</span>
                                         </td>
-                                        <td style="padding: 8px 0; text-align: right; vertical-align: middle; white-space: nowrap;">
-                                            <span style="color: #64748B; font-size: 14px; font-weight: 500;">€ ${p.price.toFixed(2)}</span>
+                                        <td style="padding: 0 0; text-align: right; vertical-align: middle; white-space: nowrap;">
+                                            <span style="font-family: 'Outfit', sans-serif; color: #64748B; font-size: 14px; font-weight: 500;">€ ${p.price.toFixed(2)}</span>
                                         </td>
                                     </tr>
                                 </table>
@@ -284,7 +282,7 @@ We zien uw bestelling graag tegemoet.`.trim();
 }
 
 /**
- * Professional/Clean HTML Generator
+ * Card Design HTML Generator
  */
 export function generateHtmlFromText(text: string, subtitle?: string, topProductsHtml?: string): string {
     if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
@@ -293,7 +291,7 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
 
     const contentHtml = text
         .split('\n\n')
-        .map(para => `<p style="margin: 0 0 16px 0; color: #475569; font-size: 15px; line-height: 1.6;">${para.replace(/\n/g, '<br>')}</p>`)
+        .map(para => `<p style="margin: 0 0 16px 0; color: #334155; font-family: 'Outfit', sans-serif; font-size: 15px; line-height: 1.6;">${para.replace(/\n/g, '<br>')}</p>`)
         .join('');
 
     return `
@@ -303,62 +301,60 @@ export function generateHtmlFromText(text: string, subtitle?: string, topProduct
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VH Engineering</title>
+    <!-- Import Google Font Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap');
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; background-color: #F8FAFC; color: #1E293B;">
+<body style="margin: 0; padding: 0; background-color: #F8FAFC; color: #1E293B;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F8FAFC; width: 100%;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 540px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); overflow: hidden;">
-                    
-                    <!-- Professional Header with Indigo accent -->
+                <!-- Main Card with Rounded Corners -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 500px; background-color: #ffffff; border-radius: 20px; box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.05); overflow: hidden;">
                     <tr>
-                        <td style="padding: 32px 32px 0 32px;">
-                            <!-- EXPLOSIVE TITLE / HEADER -->
-                            <h1 style="margin: 0; color: #0F172A; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">VH ENGINEERING</h1>
-                            <p style="margin: 4px 0 0 0; color: #64748B; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Broodjes Service</p>
-                        </td>
-                    </tr>
-
-                    <!-- Body Content -->
-                    <tr>
-                        <td style="padding: 32px;">
+                        <td style="padding: 40px;">
                             
-                            <div style="color: #334155;">
+                            <!-- Header Code -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td>
+                                        <h1 style="margin: 0; font-family: 'Outfit', sans-serif; color: #0F172A; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">VH ENGINEERING</h1>
+                                        <p style="margin: 4px 0 0 0; font-family: 'Outfit', sans-serif; color: #64748B; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">BROODJES SERVICE</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Body Content -->
+                            <div style="margin-top: 32px; color: #334155;">
                                 ${contentHtml.replace('{{quote}}', '')}
                             </div>
 
-                            <!-- "Blue Timer" Gradient Deadline Widget -->
+                            <!-- Blue Timer Gradient Deadline Widget -->
                             {{deadlineWidget}}
 
                             ${topProductsHtml || ''}
 
                             <!-- CTA Button - Centered Bottom -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 32px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 40px;">
                                 <tr>
                                     <td align="center">
-                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 700; text-align: center; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">
+                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; text-align: center; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">
                                             Bestelling Plaatsen
                                         </a>
                                     </td>
                                 </tr>
                             </table>
-                        </td>
-                    </tr>
 
-                    <!-- Quiet Footer -->
-                    <tr>
-                        <td style="padding: 24px 32px; background-color: #F8FAFC; border-top: 1px solid #E2E8F0; text-align: center;">
-                            <p style="margin: 0; color: #94A3B8; font-size: 12px;">© ${new Date().getFullYear()} VH Engineering</p>
-                            <div style="margin-top: 8px;">
-                                <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings" style="color: #64748B; text-decoration: none; font-size: 12px; font-weight: 500;">Meldingen beheren</a>
-                            </div>
                         </td>
                     </tr>
                 </table>
 
                 <!-- Helper Text outside card -->
-                 <p style="margin-top: 24px; color: #94A3B8; font-size: 12px; text-align: center;">Dit is een automatisch bericht.</p>
+                 <p style="margin-top: 24px; font-family: 'Outfit', sans-serif; color: #94A3B8; font-size: 12px; text-align: center;">VH Engineering Lunch Service</p>
 
             </td>
         </tr>
