@@ -106,12 +106,7 @@ export default function ArchivesPage() {
                             className="group cursor-pointer"
                         >
                             <div className="flex flex-col h-full">
-                                <div className="flex justify-between items-center mb-6">
-                                    <div className="flex items-center gap-2">
-                                        <div className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                            Week {period.weekId.split('-')[1]}
-                                        </div>
-                                    </div>
+                                <div className="flex justify-end items-center mb-6">
                                     <div className="flex items-center gap-4">
                                         <button
                                             onClick={(e) => handleDeleteArchive(e, period.id)}
@@ -124,8 +119,13 @@ export default function ArchivesPage() {
                                     </div>
                                 </div>
 
-                                <h3 className="text-xl font-bold text-text-primary mb-4">
+                                <h3 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-3">
                                     Orderronde {period.weekId}
+                                    {!period.isClosed && (
+                                        <div className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tight animate-pulse">
+                                            Lopend
+                                        </div>
+                                    )}
                                 </h3>
 
                                 <div className="space-y-2 mt-auto pt-4 border-t border-border/50">
