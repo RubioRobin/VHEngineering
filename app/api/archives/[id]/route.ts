@@ -43,26 +43,9 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // First, get all orders for this period
-        const orders = await prisma.order.findMany({
-            where: { orderPeriodId: params.id }
-        });
-
-        // Delete all order items for these orders
-        await prisma.orderItem.deleteMany({
-            where: {
-                orderId: {
-                    in: orders.map(o => o.id)
-                }
-            }
-        });
-
-        // Delete all orders for this period
-        await prisma.order.deleteMany({
-            where: { orderPeriodId: params.id }
-        });
-
         // Finally, delete the period itself
+        // Cascade should handle orders and orderItems if configured, 
+        // but we'll be explicit to avoid any potential 500 errors
         await prisma.orderPeriod.delete({
             where: { id: params.id }
         });

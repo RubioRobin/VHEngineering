@@ -62,6 +62,7 @@ export default function ArchivesPage() {
                     if (res.ok) {
                         showToast('Archief verwijderd', 'success');
                         fetchArchives();
+                        router.refresh();
                     } else {
                         const data = await res.json();
                         showToast(data.error || 'Er is een fout opgetreden.', 'error');

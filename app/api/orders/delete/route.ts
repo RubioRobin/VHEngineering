@@ -33,6 +33,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Error deleting order:', error);
-        return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 });
+
+        // Detailed error for debugging
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`Detailed deletion error for order ${orderId}:`, errorMessage);
+
+        return NextResponse.json({
+            error: 'Failed to delete order',
+            details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+        }, { status: 500 });
     }
 }

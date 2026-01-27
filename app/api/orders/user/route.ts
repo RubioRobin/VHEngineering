@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkAndCloseExpiredPeriods } from '@/lib/orderPeriod';
 
 export async function GET(request: Request) {
     try {
@@ -10,7 +11,10 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
         }
 
-        const orders = await (prisma as any).order.findMany({
+        // Ensure periods are up-to-date before fetching
+        await checkAndCloseExpiredPeriods();
+
+        const orders = await prisma.order.findMany({
             where: { userId },
             orderBy: { createdAt: 'desc' },
             include: {

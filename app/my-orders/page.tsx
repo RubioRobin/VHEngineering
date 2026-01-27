@@ -81,7 +81,10 @@ export default function MijnBestellingenPage() {
     const SHIPPING_COST = 1.95;
 
     const calculateTotal = (orderItems: any[], participantsCount: number = 1) => {
-        const itemsTotal = orderItems.reduce((acc, item) => acc + (item.quantity * item.product.price), 0);
+        const itemsTotal = orderItems.reduce((acc, item) => {
+            const price = item.product?.price || 0;
+            return acc + (item.quantity * price);
+        }, 0);
         return itemsTotal + (participantsCount > 0 ? SHIPPING_COST / participantsCount : 0);
     };
 
