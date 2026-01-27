@@ -68,11 +68,11 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
     try {
-        // Close expired periods first
-        await checkAndCloseExpiredPeriods();
-
-        // Fetch current period (using shared logic)
+        // Ensure periods are up to date
+        // 1. Standardize/Claim current period
         const period = await getCurrentOrderPeriod();
+        // 2. Cleanup redundant ones
+        await checkAndCloseExpiredPeriods();
 
         if (!period) {
             return NextResponse.json({ orders: [], total: 0 });

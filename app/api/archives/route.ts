@@ -7,8 +7,10 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
     try {
         // Ensure periods are up to date
-        await checkAndCloseExpiredPeriods();
+        // Canonicalize the current period first
         await getCurrentOrderPeriod();
+        // Then close any others that are now redundant or expired
+        await checkAndCloseExpiredPeriods();
 
         const archives = await prisma.orderPeriod.findMany({
             include: {

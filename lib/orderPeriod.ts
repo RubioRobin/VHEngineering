@@ -115,8 +115,19 @@ export async function getCurrentOrderPeriod() {
     const endDate = fromZonedTime(weekEnd, TIMEZONE);
 
     // Find or create period
-    let period = await prisma.orderPeriod.findUnique({
-        where: { weekId: periodId },
+    // Try both canonical and padded for robustness
+    const parts = periodId.split('-');
+    const year = parts[0];
+    const week = parts[1];
+    const paddedId = `${year}-${week.padStart(2, '0')}`;
+    const unpaddedId = `${year}-${parseInt(week)}`;
+
+    let period = await prisma.orderPeriod.findFirst({
+        where: {
+            weekId: {
+                in: [unpaddedId, paddedId]
+            }
+        },
     });
 
     if (!period) {
@@ -127,6 +138,12 @@ export async function getCurrentOrderPeriod() {
                 endDate,
                 deadline,
             },
+        });
+    } else if (period.weekId !== periodId) {
+        // Update to canonical ID if we found a non-canonical one
+        period = await prisma.orderPeriod.update({
+            where: { id: period.id },
+            data: { weekId: periodId }
         });
     }
 
@@ -149,11 +166,13 @@ export async function getAllOrderPeriods() {
 
 /**
  * Find all non-closed periods with passed deadlines and mark them as closed.
- * This effectively archives them.
+ * Also ensures only ONE period is open at a time (the current one).
  */
 export async function checkAndCloseExpiredPeriods() {
     const now = new Date();
+    const currentId = await getCurrentPeriodId();
 
+    // 1. Close periods past their deadline
     const expiredPeriods = await prisma.orderPeriod.findMany({
         where: {
             isClosed: false,
@@ -171,7 +190,40 @@ export async function checkAndCloseExpiredPeriods() {
         console.log(`Auto-closed expired period: ${period.weekId}`);
     }
 
-    return expiredPeriods.length;
+    // 2. Proactively close or delete any other non-current periods to prevent UI clutter
+    const otherOpenPeriods = await prisma.orderPeriod.findMany({
+        where: {
+            isClosed: false,
+            weekId: {
+                not: currentId
+            }
+        },
+        include: {
+            _count: {
+                select: { orders: true }
+            }
+        }
+    });
+
+    for (const period of otherOpenPeriods) {
+        // If it's completely empty, just delete it to keep things clean
+        if (period._count?.orders === 0) {
+            await prisma.orderPeriod.delete({
+                where: { id: period.id }
+            });
+            console.log(`Deleted empty redundant/stale period: ${period.weekId}`);
+            continue;
+        }
+
+        // If it has orders, close it so it moves to archives
+        await prisma.orderPeriod.update({
+            where: { id: period.id },
+            data: { isClosed: true }
+        });
+        console.log(`Closed redundant/stale period with orders: ${period.weekId}`);
+    }
+
+    return expiredPeriods.length + otherOpenPeriods.length;
 }
 
 /**
