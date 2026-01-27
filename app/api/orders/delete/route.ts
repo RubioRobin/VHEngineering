@@ -3,8 +3,11 @@ import prisma from '@/lib/prisma';
 import { checkAdminAuth } from '@/lib/auth';
 
 export async function POST(request: Request) {
+    let orderId: string | null = null;
     try {
-        const { orderId, userId } = await request.json();
+        const body = await request.json();
+        orderId = body.orderId;
+        const { userId } = body;
 
         if (!orderId) {
             return NextResponse.json({ error: 'Missing orderId' }, { status: 400 });

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { Trash2, Clock, Users, ArrowRight, FolderOpen, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { useToast } from '@/components/providers/ToastProvider';
@@ -15,6 +16,7 @@ export default function ArchivesPage() {
     const [loading, setLoading] = useState(true);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+    const router = useRouter();
     const { showToast, showConfirm } = useToast();
 
     useEffect(() => {
