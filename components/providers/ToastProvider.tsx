@@ -128,13 +128,6 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
                                     </button>
                                 </div>
                             </div>
-                            {/* Progress bar */}
-                            <motion.div
-                                initial={{ width: "100%" }}
-                                animate={{ width: "0%" }}
-                                transition={{ duration: 5, ease: "linear" }}
-                                className="absolute bottom-0 left-0 h-1 bg-black/10"
-                            />
                         </motion.div>
                     ))}
                 </AnimatePresence>
