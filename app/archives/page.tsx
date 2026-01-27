@@ -25,7 +25,10 @@ export default function ArchivesPage() {
 
     const fetchArchives = async () => {
         try {
-            const res = await fetch('/api/archives', { cache: 'no-store' });
+            const res = await fetch('/api/archives', {
+                cache: 'no-store',
+                headers: { 'Pragma': 'no-cache' }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setPeriods(data);
