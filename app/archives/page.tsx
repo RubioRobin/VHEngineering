@@ -98,51 +98,53 @@ export default function ArchivesPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {periods.map((period, index) => (
-                    <motion.div
-                        key={period.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                        <Link href={`/archives/${period.id}`}>
-                            <DashboardCard className="group transition-all cursor-pointer">
-                                <div className="flex flex-col h-full">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <div className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                            Week {period.weekId.split('-')[1]}
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <button
-                                                onClick={(e) => handleDeleteArchive(e, period.id)}
-                                                className="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Verwijder archief"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                            <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                                        </div>
+                    <Link key={period.id} href={`/archives/${period.id}`}>
+                        <DashboardCard
+                            className="group cursor-pointer"
+                            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            transition={{
+                                duration: 0.4,
+                                delay: index * 0.05,
+                                ease: [0.23, 1, 0.32, 1] // Custom cubic-bezier for smoother feel
+                            }}
+                        >
+                            <div className="flex flex-col h-full">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                        Week {period.weekId.split('-')[1]}
                                     </div>
-
-                                    <h3 className="text-xl font-bold text-text-primary mb-4">
-                                        Orderronde {period.weekId}
-                                    </h3>
-
-                                    <div className="space-y-2 mt-auto pt-4 border-t border-border/50">
-                                        <div className="flex items-center gap-2 text-sm text-text-secondary">
-                                            <Clock className="w-4 h-4 text-primary/60" />
-                                            <span>
-                                                {format(new Date(period.startDate), 'd MMM', { locale: nl })} - {format(new Date(period.endDate), 'd MMM yyyy', { locale: nl })}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-sm text-text-secondary">
-                                            <Users className="w-4 h-4 text-primary/60" />
-                                            <span><span className="font-bold">{period._count.orders}</span> bestellingen geplaatst</span>
-                                        </div>
+                                    <div className="flex items-center gap-4">
+                                        <button
+                                            onClick={(e) => handleDeleteArchive(e, period.id)}
+                                            className="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Verwijder archief"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                        <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-primary group-hover:translate-x-1 transition-all" />
                                     </div>
                                 </div>
-                            </DashboardCard>
-                        </Link>
-                    </motion.div>
+
+                                <h3 className="text-xl font-bold text-text-primary mb-4">
+                                    Orderronde {period.weekId}
+                                </h3>
+
+                                <div className="space-y-2 mt-auto pt-4 border-t border-border/50">
+                                    <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                        <Clock className="w-4 h-4 text-primary/60" />
+                                        <span>
+                                            {format(new Date(period.startDate), 'd MMM', { locale: nl })} - {format(new Date(period.endDate), 'd MMM yyyy', { locale: nl })}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                        <Users className="w-4 h-4 text-primary/60" />
+                                        <span><span className="font-bold">{period._count.orders}</span> bestellingen geplaatst</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </DashboardCard>
+                    </Link>
                 ))}
 
                 {periods.length === 0 && (
