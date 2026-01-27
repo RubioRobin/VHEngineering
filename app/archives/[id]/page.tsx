@@ -217,7 +217,7 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: index * 0.05 }}
                         >
-                            <DashboardCard className="p-0 overflow-hidden group">
+                            <DashboardCard className="p-0 overflow-hidden group transition-shadow hover:shadow-md">
                                 <div className="p-4 bg-background/50 border-b border-border flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
