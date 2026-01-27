@@ -98,13 +98,6 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                             <span className="relative z-10 flex items-center justify-center gap-2">
                                 Sluiten
                             </span>
-                            {/* Auto-close progress bar */}
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: "100%" }}
-                                transition={{ duration: 5, ease: "linear" }}
-                                className="absolute bottom-0 left-0 h-1 bg-white/30 z-20"
-                            />
                         </DashboardButton>
                     </div>
                 </div>
