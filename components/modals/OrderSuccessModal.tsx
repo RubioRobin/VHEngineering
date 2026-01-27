@@ -48,7 +48,7 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
             >
 
 
-                <div className="flex flex-col items-center text-center mt-4">
+                <div className="flex flex-col items-center text-center mt-4 pb-2">
                     <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600">
                         <motion.div
                             initial={{ scale: 0 }}
@@ -90,23 +90,24 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                         </div>
                     )}
 
-                    <div className="w-full relative group">
+                    <div className="w-full">
                         <DashboardButton
                             onClick={onClose}
-                            className="w-full bg-emerald-600 hover:bg-emerald-700 py-3 relative overflow-hidden"
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 py-3"
                         >
-                            <span className="relative z-10 flex items-center justify-center gap-2">
-                                Sluiten
-                            </span>
-                            {/* Auto-close progress bar */}
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: "100%" }}
-                                transition={{ duration: 5, ease: "linear" }}
-                                className="absolute bottom-0 left-0 h-1 bg-white/30 z-20"
-                            />
+                            Sluiten
                         </DashboardButton>
                     </div>
+                </div>
+
+                {/* Visible Auto-close progress bar at the very bottom of the card */}
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100">
+                    <motion.div
+                        initial={{ width: "100%" }}
+                        animate={{ width: "0%" }}
+                        transition={{ duration: 5, ease: "linear" }}
+                        className="h-full bg-emerald-500"
+                    />
                 </div>
             </motion.div>
         </div>

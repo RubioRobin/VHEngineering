@@ -44,7 +44,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
 
         setTimeout(() => {
             setToasts(prev => prev.filter(t => t.id !== id));
-        }, 5000);
+        }, 4000);
     };
 
     const showConfirm = (options: ConfirmOptions) => {
@@ -111,30 +111,21 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
                     {toasts.map(toast => (
                         <motion.div
                             key={toast.id}
-                            initial={{ opacity: 0, x: 50, scale: 0.95 }}
+                            initial={{ opacity: 0, x: 100, scale: 0.8 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: 20, scale: 0.95, transition: { duration: 0.2 } }}
-                            className={`${getColors(toast.type)} border rounded-xl shadow-lg overflow-hidden min-w-[320px] max-w-md pointer-events-auto relative`}
+                            exit={{ opacity: 0, x: 100, scale: 0.8 }}
+                            className={`${getColors(toast.type)} border rounded-lg shadow-lg p-4 min-w-[300px] max-w-md pointer-events-auto`}
                         >
-                            <div className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="shrink-0">{getIcon(toast.type)}</div>
-                                    <p className="flex-1 font-semibold text-sm leading-tight">{toast.message}</p>
-                                    <button
-                                        onClick={() => removeToast(toast.id)}
-                                        className="p-1 hover:bg-black/5 rounded-full transition-colors shrink-0"
-                                    >
-                                        <X className="w-4 h-4 opacity-50" />
-                                    </button>
-                                </div>
+                            <div className="flex items-center gap-3">
+                                {getIcon(toast.type)}
+                                <p className="flex-1 font-medium text-sm">{toast.message}</p>
+                                <button
+                                    onClick={() => removeToast(toast.id)}
+                                    className="hover:opacity-70 transition-opacity"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
                             </div>
-                            {/* Progress bar */}
-                            <motion.div
-                                initial={{ width: "100%" }}
-                                animate={{ width: "0%" }}
-                                transition={{ duration: 5, ease: "linear" }}
-                                className="absolute bottom-0 left-0 h-1 bg-black/10"
-                            />
                         </motion.div>
                     ))}
                 </AnimatePresence>
