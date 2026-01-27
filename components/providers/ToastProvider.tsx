@@ -114,7 +114,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
                             initial={{ opacity: 0, x: 50, scale: 0.95 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, x: 20, scale: 0.95, transition: { duration: 0.2 } }}
-                            className={`${getColors(toast.type)} border rounded-xl shadow-lg overflow-hidden min-w-[320px] max-w-md pointer-events-auto relative`}
+                            className={`${getColors(toast.type)} border rounded-full shadow-lg min-w-[320px] max-w-md pointer-events-auto relative`}
                         >
                             <div className="p-4">
                                 <div className="flex items-center gap-3">
