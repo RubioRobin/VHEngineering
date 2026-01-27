@@ -98,8 +98,9 @@ export default function MijnBestellingenPage() {
         setExpandedWeeks(newExpanded);
     };
 
-    // Group orders by week
-    const ordersByWeek = myOrders.reduce((acc: any, order) => {
+    // Group orders by week with defensive checks
+    const ordersByWeek = (myOrders || []).reduce((acc: any, order) => {
+        if (!order) return acc;
         const weekId = order.orderPeriod?.weekId || 'Onbekend';
         if (!acc[weekId]) acc[weekId] = [];
         acc[weekId].push(order);

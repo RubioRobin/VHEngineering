@@ -11,6 +11,7 @@ import { useToast } from '@/components/providers/ToastProvider';
 import { formatName } from '@/lib/utils';
 import { PasswordModal } from '@/components/modals/PasswordModal';
 import { motion } from 'framer-motion';
+import { useOrders } from '@/components/providers/OrdersProvider';
 
 export default function ArchiveDetailPage({ params }: { params: { id: string } }) {
     const [period, setPeriod] = useState<any>(null);
@@ -21,6 +22,7 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
     const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
     const router = useRouter();
     const { showToast, showConfirm } = useToast();
+    const { refreshOrders } = useOrders();
 
     useEffect(() => {
         fetchArchiveDetail();
@@ -98,6 +100,7 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                         if (res.ok) {
                             showToast('Bestelling verwijderd', 'success');
                             fetchArchiveDetail();
+                            refreshOrders();
                         } else {
                             const data = await res.json();
                             showToast(data.error || 'Er is een fout opgetreden.', 'error');

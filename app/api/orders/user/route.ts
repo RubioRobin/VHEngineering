@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         await checkAndCloseExpiredPeriods();
 
         const orders = await prisma.order.findMany({
-            where: { userId },
+            where: { userId: userId as string },
             orderBy: { createdAt: 'desc' },
             include: {
                 orderItems: {
