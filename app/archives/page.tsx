@@ -103,7 +103,7 @@ export default function ArchivesPage() {
                 {periods.map((period, index) => (
                     <Link key={period.id} href={`/archives/${period.id}`}>
                         <DashboardCard
-                            className={`group cursor-pointer ${!period.isClosed ? 'border-primary/30 ring-1 ring-primary/5 shadow-md shadow-primary/5' : ''}`}
+                            className="group cursor-pointer"
                         >
                             <div className="flex flex-col h-full">
                                 <div className="flex justify-between items-center mb-6">
@@ -111,16 +111,6 @@ export default function ArchivesPage() {
                                         <div className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                                             Week {period.weekId.split('-')[1]}
                                         </div>
-                                        {!period.isClosed && (
-                                            <div className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tight animate-pulse">
-                                                Lopend
-                                            </div>
-                                        )}
-                                        {period.isClosed && (
-                                            <div className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-tight">
-                                                Gearchiveerd
-                                            </div>
-                                        )}
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <button
