@@ -5,7 +5,8 @@ import { getCurrentOrderPeriod, checkAndCloseExpiredPeriods } from '@/lib/orderP
 
 const TIMEZONE = 'Europe/Amsterdam';
 
-// Local helpers removed in favor of @/lib/orderPeriod
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function POST(request: Request) {
     try {

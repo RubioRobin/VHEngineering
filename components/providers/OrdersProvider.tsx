@@ -40,7 +40,10 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
         if (!hasFetched) setIsLoading(true);
 
         try {
-            const res = await fetch(`/api/orders/user?userId=${user.id}`);
+            const res = await fetch(`/api/orders/user?userId=${user.id}`, {
+                cache: 'no-store',
+                headers: { 'Pragma': 'no-cache' }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setOrders(data.orders || []);
@@ -60,7 +63,10 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
         if (!hasFetchedWeek) setIsWeekLoading(true);
 
         try {
-            const res = await fetch('/api/orders');
+            const res = await fetch('/api/orders', {
+                cache: 'no-store',
+                headers: { 'Pragma': 'no-cache' }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setWeekOrders(data.orders || []);
@@ -78,12 +84,23 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
         fetchOrders();
     }, [fetchOrders]);
 
-    const refreshOrders = async () => {
+    const refreshOrders = useCallback(async () => {
         await Promise.all([
             fetchOrders(true),
             fetchWeekOrders(true)
         ]);
-    };
+    }, [fetchOrders, fetchWeekOrders]);
+
+    // Polling for live updates (every 10 seconds)
+    useEffect(() => {
+        if (!user) return;
+
+        const interval = setInterval(() => {
+            refreshOrders();
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, [user, refreshOrders]);
 
     return (
         <OrdersContext.Provider value={{ orders, weekOrders, isLoading, isWeekLoading, refreshOrders, fetchWeekOrders }}>
