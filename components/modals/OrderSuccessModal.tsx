@@ -26,8 +26,15 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                 origin: { y: 0.6 },
                 colors: ['#10B981', '#3B82F6', '#F59E0B']
             });
+
+            // Auto close after 5 seconds
+            const timer = setTimeout(() => {
+                onClose();
+            }, 5000);
+
+            return () => clearTimeout(timer);
         }
-    }, [isOpen]);
+    }, [isOpen, onClose]);
 
     if (!isOpen) return null;
 
@@ -55,7 +62,7 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">Bestelling geplaatst!</h2>
 
                     {orderData && (
-                        <div className="w-full bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
+                        <div className="w-full bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100 text-left">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-gray-500 text-sm">Aantal items</span>
                                 <span className="font-semibold text-gray-800">{orderData.itemCount}</span>
@@ -77,18 +84,29 @@ export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessMo
                             )}
 
                             <div className="flex justify-between items-center pt-2 border-t border-gray-200 mt-2">
-                                <span className="text-gray-600 font-medium">Totaal</span>
+                                <span className="text-gray-600 font-medium text-sm">Totaal</span>
                                 <span className="font-bold text-emerald-600">€ {orderData.totalAmount.toFixed(2)}</span>
                             </div>
                         </div>
                     )}
 
-                    <DashboardButton
-                        onClick={onClose}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 py-3"
-                    >
-                        Sluiten
-                    </DashboardButton>
+                    <div className="w-full relative group">
+                        <DashboardButton
+                            onClick={onClose}
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 py-3 relative overflow-hidden"
+                        >
+                            <span className="relative z-10 flex items-center justify-center gap-2">
+                                Sluiten
+                            </span>
+                            {/* Auto-close progress bar */}
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: "100%" }}
+                                transition={{ duration: 5, ease: "linear" }}
+                                className="absolute bottom-0 left-0 h-1 bg-white/30 z-20"
+                            />
+                        </DashboardButton>
+                    </div>
                 </div>
             </motion.div>
         </div>
