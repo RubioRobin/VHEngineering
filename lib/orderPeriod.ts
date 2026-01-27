@@ -95,7 +95,7 @@ export async function getCurrentPeriodId(): Promise<string> {
     const year = getISOWeekYear(zonedDeadline);
     const week = getISOWeek(zonedDeadline);
 
-    return `${year}-${String(week).padStart(2, '0')}`;
+    return `${year}-${week}`;
 }
 
 /**

@@ -1,17 +1,13 @@
 import { NextResponse } from 'next/server';
 import { generateOrdersExcel } from '@/lib/excel';
-import { getISOWeek, getYear } from 'date-fns';
+import { getISOWeek } from 'date-fns';
+import { getCurrentPeriodId } from '@/lib/orderPeriod';
 
 export const dynamic = 'force-dynamic'; // Ensure no caching
 
-const getCurrentWeekId = () => {
-    const now = new Date();
-    return `${getYear(now)}-${getISOWeek(now)}`;
-};
-
 export async function GET() {
     try {
-        const weekId = getCurrentWeekId();
+        const weekId = await getCurrentPeriodId();
         const buffer = await generateOrdersExcel(weekId);
 
         return new NextResponse(new Uint8Array(buffer), {

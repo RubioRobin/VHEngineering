@@ -20,8 +20,7 @@ export async function POST(request: Request) {
 
         // Check if deadline has passed
         const now = new Date();
-        const zonedNow = toZonedTime(now, TIMEZONE);
-        if (period.deadline < zonedNow) {
+        if (period.deadline < now) {
             return NextResponse.json({
                 error: 'De besteldeadline is verstreken. Bestellingen voor deze week zijn gesloten.'
             }, { status: 400 });
