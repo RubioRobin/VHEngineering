@@ -66,27 +66,20 @@ export async function POST(request: NextRequest) {
 
         // Sync current period deadline immediately
         try {
-            // Re-import dynamically to get fresh settings? 
-            // Actually getNextDeadline fetches from DB so it will see the new values we just upserted above.
-            const { getNextDeadline, getCurrentPeriodId } = await import('@/lib/orderPeriod');
+            const { getNextDeadline, getCurrentOrderPeriod } = await import('@/lib/orderPeriod');
 
             const newDeadline = await getNextDeadline();
-            const currentWeekId = await getCurrentPeriodId();
-
-            // Check if period exists
-            const period = await prisma.orderPeriod.findUnique({
-                where: { weekId: currentWeekId }
-            });
+            const period = await getCurrentOrderPeriod();
 
             if (period) {
-                // Only update if the period deadline is in the future
-                // (prevent accidentally re-opening a past period if we mess with settings)
-                if (new Date(period.deadline) > new Date()) {
+                // IMPORTANT: Only update if the NEW deadline is in the future.
+                // This allows extending a deadline that has already passed.
+                if (new Date(newDeadline) > new Date()) {
                     await prisma.orderPeriod.update({
-                        where: { weekId: currentWeekId },
+                        where: { id: period.id },
                         data: { deadline: newDeadline }
                     });
-                    console.log(`Updated current period ${currentWeekId} deadline to ${newDeadline}`);
+                    console.log(`Updated active period ${period.weekId} deadline to ${newDeadline}`);
                 }
             }
         } catch (syncError) {

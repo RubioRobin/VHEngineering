@@ -1,123 +1,22 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getISOWeek, getYear } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
+import { getCurrentOrderPeriod, checkAndCloseExpiredPeriods } from '@/lib/orderPeriod';
 
 const TIMEZONE = 'Europe/Amsterdam';
 
-// Helper to get current Week ID (e.g., "2024-05")
-const getCurrentWeekId = () => {
-    const now = new Date();
-    const zonedNow = toZonedTime(now, TIMEZONE);
-    return `${getYear(zonedNow)}-${getISOWeek(zonedNow)}`;
-};
-
-// Helper to get admin deadline from global settings
-// Helper to get admin deadline from global settings
-const getAdminDeadline = async (): Promise<Date> => {
-    const setting = await prisma.globalSetting.findUnique({
-        where: { key: 'orderDeadline' }
-    });
-
-    const now = new Date();
-    const zonedNow = toZonedTime(now, TIMEZONE);
-    let targetDate = new Date(zonedNow);
-    let targetDay = 4; // Default: Thursday
-    let targetHours = 14;
-    let targetMinutes = 0;
-
-    if (setting?.value) {
-        const storedDate = new Date(setting.value);
-        // If stored date is in the future, use it directly (manual override for this week)
-        if (storedDate > now) {
-            return storedDate;
-        }
-        // Otherwise, use its pattern (Day of week + Time)
-        targetDay = storedDate.getDay();
-        targetHours = storedDate.getHours();
-        targetMinutes = storedDate.getMinutes();
-    }
-
-    // Calculate next occurrence of target Day + Time
-    let daysUntil = targetDay - zonedNow.getDay();
-
-    // Check if we passed the time today
-    const passedTimeToday = daysUntil === 0 &&
-        (zonedNow.getHours() > targetHours || (zonedNow.getHours() === targetHours && zonedNow.getMinutes() >= targetMinutes));
-
-    if (daysUntil < 0 || passedTimeToday) {
-        daysUntil += 7;
-    }
-
-    const deadline = new Date(zonedNow);
-    deadline.setDate(zonedNow.getDate() + daysUntil);
-    deadline.setHours(targetHours, targetMinutes, 0, 0);
-
-    return deadline;
-};
-
-// Check and close expired periods
-const checkAndCloseExpiredPeriods = async () => {
-    const now = new Date();
-
-    // Find all open periods with passed deadlines
-    const expiredPeriods = await prisma.orderPeriod.findMany({
-        where: {
-            isClosed: false,
-            deadline: {
-                lt: now
-            }
-        }
-    });
-
-    // Close them all
-    for (const period of expiredPeriods) {
-        await prisma.orderPeriod.update({
-            where: { id: period.id },
-            data: { isClosed: true }
-        });
-    }
-};
+// Local helpers removed in favor of @/lib/orderPeriod
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { userName, items, generalComment, userId } = body;
 
-        const weekId = getCurrentWeekId();
-
         // First, check and close any expired periods
         await checkAndCloseExpiredPeriods();
 
-        // Find current open period for this week
-        let period = await prisma.orderPeriod.findFirst({
-            where: {
-                weekId,
-                isClosed: false
-            }
-        });
-
-        // If no open period exists, create one
-        if (!period) {
-            const deadline = await getAdminDeadline();
-
-            // Calculate week boundaries
-            const now = new Date();
-            const startDate = new Date(now);
-            startDate.setHours(0, 0, 0, 0);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 7);
-
-            period = await prisma.orderPeriod.create({
-                data: {
-                    weekId,
-                    startDate,
-                    endDate,
-                    deadline,
-                    isClosed: false
-                }
-            });
-        }
+        // Get or create current period (using shared logic)
+        const period = await getCurrentOrderPeriod();
 
         // Check if deadline has passed
         const now = new Date();
@@ -169,17 +68,11 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
     try {
-        const weekId = getCurrentWeekId();
-
         // Close expired periods first
         await checkAndCloseExpiredPeriods();
 
-        // Fetch current open period
-        const period = await prisma.orderPeriod.findFirst({
-            where: {
-                weekId
-            }
-        });
+        // Fetch current period (using shared logic)
+        const period = await getCurrentOrderPeriod();
 
         if (!period) {
             return NextResponse.json({ orders: [], total: 0 });

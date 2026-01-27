@@ -148,6 +148,33 @@ export async function getAllOrderPeriods() {
 }
 
 /**
+ * Find all non-closed periods with passed deadlines and mark them as closed.
+ * This effectively archives them.
+ */
+export async function checkAndCloseExpiredPeriods() {
+    const now = new Date();
+
+    const expiredPeriods = await prisma.orderPeriod.findMany({
+        where: {
+            isClosed: false,
+            deadline: {
+                lt: now
+            }
+        }
+    });
+
+    for (const period of expiredPeriods) {
+        await prisma.orderPeriod.update({
+            where: { id: period.id },
+            data: { isClosed: true }
+        });
+        console.log(`Auto-closed expired period: ${period.weekId}`);
+    }
+
+    return expiredPeriods.length;
+}
+
+/**
  * Get time remaining until deadline (in milliseconds)
  */
 export async function getTimeUntilDeadline(): Promise<number> {
