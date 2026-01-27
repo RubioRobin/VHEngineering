@@ -30,7 +30,10 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
 
     const fetchArchiveDetail = async () => {
         try {
-            const res = await fetch(`/api/archives/${params.id}`);
+            const res = await fetch(`/api/archives/${params.id}`, {
+                cache: 'no-store',
+                headers: { 'Pragma': 'no-cache' }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setPeriod(data);
@@ -99,8 +102,11 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
 
                         if (res.ok) {
                             showToast('Bestelling verwijderd', 'success');
-                            fetchArchiveDetail();
-                            refreshOrders();
+                            // Await both local and global refreshes to ensure state is clean
+                            await Promise.all([
+                                fetchArchiveDetail(),
+                                refreshOrders()
+                            ]);
                         } else {
                             const data = await res.json();
                             showToast(data.error || 'Er is een fout opgetreden.', 'error');
