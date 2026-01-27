@@ -94,8 +94,8 @@ export default function ArchivesPage() {
         >
             <div className="flex items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-text-primary">Archief</h1>
-                    <p className="text-text-muted">Bekijk bestellingen van voorgaande weken</p>
+                    <h1 className="text-3xl font-bold text-text-primary">Bestelrondes</h1>
+                    <p className="text-text-muted">Overzicht van alle huidige en voorgaande bestelrondes</p>
                 </div>
             </div>
 
@@ -103,25 +103,37 @@ export default function ArchivesPage() {
                 {periods.map((period, index) => (
                     <Link key={period.id} href={`/archives/${period.id}`}>
                         <DashboardCard
-                            className="group cursor-pointer"
+                            className={`group cursor-pointer transition-all ${!period.isClosed ? 'border-primary/30 ring-1 ring-primary/5 shadow-md shadow-primary/5' : ''}`}
                             initial={{ opacity: 0, y: 20, scale: 0.98 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             transition={{
                                 duration: 0.4,
                                 delay: index * 0.05,
-                                ease: [0.23, 1, 0.32, 1] // Custom cubic-bezier for smoother feel
+                                ease: [0.23, 1, 0.32, 1]
                             }}
                         >
                             <div className="flex flex-col h-full">
                                 <div className="flex justify-between items-center mb-6">
-                                    <div className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                        Week {period.weekId.split('-')[1]}
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                            Week {period.weekId.split('-')[1]}
+                                        </div>
+                                        {!period.isClosed && (
+                                            <div className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tight animate-pulse">
+                                                Lopend
+                                            </div>
+                                        )}
+                                        {period.isClosed && (
+                                            <div className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-tight">
+                                                Gearchiveerd
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <button
                                             onClick={(e) => handleDeleteArchive(e, period.id)}
                                             className="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Verwijder archief"
+                                            title="Verwijder ronde"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>

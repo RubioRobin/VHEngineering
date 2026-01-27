@@ -188,7 +188,9 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                     </div>
                     <div>
                         <p className="text-[10px] text-purple-400 uppercase font-black tracking-widest mb-0.5">Status</p>
-                        <p className="font-bold text-purple-900 leading-tight">Gearchiveerd</p>
+                        <p className={`font-bold leading-tight ${!period.isClosed ? 'text-emerald-600' : 'text-purple-900'}`}>
+                            {!period.isClosed ? 'Lopend' : 'Gearchiveerd'}
+                        </p>
                     </div>
                 </DashboardCard>
             </div>
