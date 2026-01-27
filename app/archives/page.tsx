@@ -105,9 +105,17 @@ export default function ArchivesPage() {
                         <DashboardCard
                             className="group cursor-pointer"
                         >
-                            <div className="flex flex-col h-full">
-                                <div className="flex justify-end items-center mb-6">
-                                    <div className="flex items-center gap-4">
+                            <div className="flex flex-col h-full relative">
+                                <div className="flex justify-between items-start mb-4">
+                                    <h3 className="text-xl font-bold text-text-primary">
+                                        Bestelronde {period.weekId}
+                                    </h3>
+                                    <div className="flex items-center gap-2 -mt-1">
+                                        {!period.isClosed && (
+                                            <div className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tight animate-pulse shadow-sm shadow-emerald-200">
+                                                Lopend
+                                            </div>
+                                        )}
                                         <button
                                             onClick={(e) => handleDeleteArchive(e, period.id)}
                                             className="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -118,15 +126,6 @@ export default function ArchivesPage() {
                                         <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-primary group-hover:translate-x-1 transition-all" />
                                     </div>
                                 </div>
-
-                                <h3 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-3">
-                                    Orderronde {period.weekId}
-                                    {!period.isClosed && (
-                                        <div className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tight animate-pulse">
-                                            Lopend
-                                        </div>
-                                    )}
-                                </h3>
 
                                 <div className="space-y-2 mt-auto pt-4 border-t border-border/50">
                                     <div className="flex items-center gap-2 text-sm text-text-secondary">
