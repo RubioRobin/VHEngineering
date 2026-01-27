@@ -149,17 +149,8 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
 
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
                     <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-4xl font-black text-text-primary tracking-tight">Week {period.weekId.split('-')[1]}</h1>
-                            {!period.isClosed ? (
-                                <div className="bg-emerald-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider animate-pulse shadow-lg shadow-emerald-200">
-                                    Lopend
-                                </div>
-                            ) : (
-                                <div className="bg-gray-100 text-gray-400 text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider border border-gray-200">
-                                    Gearchiveerd
-                                </div>
-                            )}
+                        <div className="mb-2">
+                            <h1 className="text-3xl font-bold text-text-primary">Week {period.weekId.split('-')[1]}</h1>
                         </div>
                         <p className="text-text-muted font-medium">Alle bestellingen van ronde <span className="text-text-primary font-bold">{period.weekId}</span></p>
                     </div>
