@@ -176,151 +176,110 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
 
             {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <DashboardCard className="p-6 flex items-center gap-5 bg-gradient-to-br from-white to-gray-50/50 border-gray-100 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-500">
-                        <Calendar className="w-24 h-24" />
-                    </div>
-                    <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary shadow-inner border border-primary/10">
-                        <Calendar className="w-7 h-7" />
+                <DashboardCard className="p-6 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary text-xl font-bold">
+                        {period.orders.length}
                     </div>
                     <div>
-                        <p className="text-[10px] text-primary/60 uppercase font-black tracking-widest mb-1 items-center flex gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary/40" /> Periode
-                        </p>
-                        <p className="text-xl font-black text-text-primary leading-tight">
-                            {format(new Date(period.startDate), 'd MMM', { locale: nl })} - {format(new Date(period.endDate), 'd MMM yyyy', { locale: nl })}
+                        <p className="text-text-muted text-sm">Bestellingen</p>
+                        <p className="text-xl font-bold text-text-primary">Collega's</p>
+                    </div>
+                </DashboardCard>
+
+                <DashboardCard className="p-6 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center text-green-600 text-xl font-bold">
+                        €
+                    </div>
+                    <div>
+                        <p className="text-text-muted text-sm">Totale Waarde</p>
+                        <p className="text-xl font-bold text-text-primary">
+                            € {period.orders.reduce((acc: number, order: any) => acc + order.orderItems.reduce((iAcc: number, item: any) => iAcc + (item.product.price * item.quantity), 0), 0).toFixed(2)}
                         </p>
                     </div>
                 </DashboardCard>
 
-                <DashboardCard className="p-6 flex items-center gap-5 bg-gradient-to-br from-white to-gray-50/50 border-gray-100 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-500">
-                        <ShoppingBag className="w-24 h-24" />
-                    </div>
-                    <div className="w-14 h-14 bg-emerald-500/5 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner border border-emerald-500/10">
-                        <ShoppingBag className="w-7 h-7" />
+                <DashboardCard className={`p-6 flex items-center gap-4 ${!period.isClosed ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50 border-gray-100'}`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${!period.isClosed ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-500/10 text-gray-600'}`}>
+                        <Clock className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-[10px] text-emerald-500/60 uppercase font-black tracking-widest mb-1 items-center flex gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" /> Totaal
+                        <p className="text-text-muted text-sm">Status</p>
+                        <p className={`text-xl font-bold ${!period.isClosed ? 'text-emerald-600' : 'text-text-primary'}`}>
+                            {!period.isClosed ? 'Lopend' : 'Gearchiveerd'}
                         </p>
-                        <p className="text-xl font-black text-text-primary leading-tight">
-                            {period.orders.length} <span className="text-text-muted font-bold text-sm">personen</span>
-                        </p>
-                    </div>
-                </DashboardCard>
-
-                <DashboardCard className="p-6 flex items-center gap-5 bg-gradient-to-br from-white to-gray-50/50 border-gray-100 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform duration-500">
-                        <Clock className="w-24 h-24" />
-                    </div>
-                    <div className="w-14 h-14 bg-amber-500/5 rounded-2xl flex items-center justify-center text-amber-600 shadow-inner border border-amber-500/10">
-                        <Clock className="w-7 h-7" />
-                    </div>
-                    <div>
-                        <p className="text-[10px] text-amber-500/60 uppercase font-black tracking-widest mb-1 items-center flex gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500/40" /> Status
-                        </p>
-                        <div className="flex items-center gap-2">
-                            <p className={`text-xl font-black leading-tight ${!period.isClosed ? 'text-emerald-600' : 'text-text-muted'}`}>
-                                {!period.isClosed ? 'Lopend' : 'Gearchiveerd'}
-                            </p>
-                            {!period.isClosed && <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />}
-                        </div>
                     </div>
                 </DashboardCard>
             </div>
 
             {/* Orders List */}
-            <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                    <h2 className="text-2xl font-black text-text-primary flex items-center gap-3">
-                        <div className="w-2 h-8 bg-primary rounded-full" />
-                        Geplaatste Bestellingen
-                    </h2>
-                    <div className="text-xs font-bold text-text-muted bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">
-                        {period.orders.length} {period.orders.length === 1 ? 'bestelling' : 'bestellingen'}
-                    </div>
-                </div>
+            <div className="space-y-4">
+                <h2 className="text-xl font-bold text-text-primary flex items-center gap-2 mb-4">
+                    <User className="w-5 h-5 text-primary" />
+                    Geplaatste Bestellingen
+                </h2>
 
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {period.orders.map((order: any, index: number) => (
                         <motion.div
                             key={order.id}
-                            initial={{ opacity: 0, y: 15 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: index * 0.05 }}
+                            transition={{ duration: 0.3, delay: index * 0.05 }}
                         >
-                            <DashboardCard className="p-0 overflow-hidden hover:shadow-xl transition-all border-gray-100 group rounded-[2.5rem]">
-                                <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
-                                    {/* User Info Section */}
-                                    <div className="p-8 lg:w-72 bg-gray-50/50 flex flex-col justify-center items-center lg:items-start text-center lg:text-left gap-4">
-                                        <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-primary font-black text-3xl shadow-sm border border-gray-100 group-hover:scale-105 transition-transform duration-500">
+                            <DashboardCard className="p-0 overflow-hidden group">
+                                <div className="p-4 bg-background/50 border-b border-border flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
                                             {order.personName.charAt(0).toUpperCase()}
                                         </div>
-                                        <div>
-                                            <h3 className="font-black text-2xl text-text-primary tracking-tight">{order.personName}</h3>
-                                            <div className="flex items-center gap-2 text-[10px] text-text-muted font-bold uppercase tracking-widest mt-1">
-                                                <Clock className="w-3 h-3" />
-                                                <span>{format(new Date(order.createdAt), 'EEEE HH:mm', { locale: nl })}</span>
-                                            </div>
-                                        </div>
-                                        {/* Row Delete Button (for admin) */}
+                                        <span className="font-semibold text-text-primary">{order.personName}</span>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-sm text-text-muted">
+                                            {format(new Date(order.createdAt), 'EEEE HH:mm', { locale: nl })}
+                                        </span>
                                         <button
                                             onClick={() => handleDeleteOrder(order.id)}
-                                            className="mt-2 p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                                            className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                                             title="Verwijder bestelling"
                                         >
-                                            <Trash2 className="w-5 h-5" />
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
+                                </div>
 
-                                    {/* Items Section */}
-                                    <div className="flex-1 p-8 bg-white">
-                                        <div className="space-y-4">
-                                            {order.orderItems.map((item: any) => (
-                                                <div key={item.id} className="flex justify-between items-center group/item hover:bg-gray-50/80 p-3 -m-3 rounded-2xl transition-colors">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center text-primary text-sm font-black">
-                                                            {item.quantity}x
-                                                        </div>
-                                                        <div>
-                                                            <span className="font-bold text-text-primary lg:text-lg">{formatName(item.product.name)}</span>
-                                                            {item.comment && (
-                                                                <div className="flex items-center gap-2 mt-0.5">
-                                                                    <div className="w-1 h-3 bg-amber-400 rounded-full" />
-                                                                    <p className="text-xs text-amber-600 font-bold italic">{item.comment}</p>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <span className="font-black text-text-primary">
-                                                        € {(item.product.price * item.quantity).toFixed(2)}
-                                                    </span>
+                                <div className="p-4 space-y-3">
+                                    {order.orderItems.map((item: any) => (
+                                        <div key={item.id} className="flex justify-between items-start text-sm">
+                                            <div className="flex gap-2">
+                                                <span className="font-bold w-6 text-center bg-gray-100 rounded text-text-primary">
+                                                    {item.quantity}x
+                                                </span>
+                                                <div>
+                                                    <p className="text-text-primary">{formatName(item.product.name)}</p>
+                                                    {item.comment && (
+                                                        <p className="text-xs text-orange-500 italic">Opmerking: {item.comment}</p>
+                                                    )}
                                                 </div>
-                                            ))}
-                                        </div>
-
-                                        {order.generalComment && (
-                                            <div className="mt-8 pt-6 border-t border-dashed border-gray-200">
-                                                <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <div className="w-4 h-0.5 bg-primary/30 rounded-full" /> Algemene Opmerking
-                                                </p>
-                                                <p className="text-sm text-text-secondary italic font-medium bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                                    &quot;{order.generalComment}&quot;
-                                                </p>
                                             </div>
-                                        )}
-                                    </div>
-
-                                    {/* Total Section */}
-                                    <div className="p-8 lg:w-48 bg-gray-50/30 flex flex-col justify-center items-center text-center gap-2">
-                                        <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">Totaalbedrag</p>
-                                        <div className="bg-gradient-to-br from-primary to-primary-dark text-white px-6 py-2.5 rounded-[1.5rem] shadow-xl shadow-primary/20 transform group-hover:scale-110 transition-transform duration-500">
-                                            <p className="text-2xl font-black">
-                                                € {order.orderItems.reduce((acc: number, item: any) => acc + (item.product.price * item.quantity), 0).toFixed(2)}
-                                            </p>
+                                            <span className="text-text-secondary">€ {(item.quantity * item.product.price).toFixed(2)}</span>
                                         </div>
+                                    ))}
+
+                                    {order.generalComment && (
+                                        <div className="mt-4 pt-3 border-t border-dashed border-border text-xs">
+                                            <span className="font-semibold text-text-secondary">Algemene opmerking:</span>
+                                            <p className="text-text-primary italic">"{order.generalComment}"</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="p-3 bg-gray-50 border-t border-border flex justify-end items-center text-sm font-semibold">
+                                    <div className="text-right">
+                                        <span className="text-text-secondary mr-2">Totaal:</span>
+                                        <span className="text-primary text-lg">
+                                            € {order.orderItems.reduce((acc: number, item: any) => acc + (item.product.price * item.quantity), 0).toFixed(2)}
+                                        </span>
                                     </div>
                                 </div>
                             </DashboardCard>
@@ -328,14 +287,10 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                     ))}
 
                     {period.orders.length === 0 && (
-                        <div className="py-32 text-center bg-gray-50/50 rounded-[3rem] border-4 border-dashed border-gray-100 flex flex-col items-center justify-center gap-6">
-                            <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center text-gray-200 shadow-inner">
-                                <ShoppingBag className="w-12 h-12" />
-                            </div>
-                            <div>
-                                <h3 className="text-2xl font-black text-gray-400 italic">Geen bestellingen gevonden</h3>
-                                <p className="text-gray-400 font-medium max-w-xs mx-auto mt-2">Deze ronde bevat op dit moment nog geen bestellingen.</p>
-                            </div>
+                        <div className="col-span-full py-20 text-center bg-white rounded-3xl border-2 border-dashed border-gray-100">
+                            <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-gray-500 italic">Geen bestellingen gevonden</h3>
+                            <p className="text-gray-400 max-w-sm mx-auto mt-2">Deze ronde bevat op dit moment nog geen bestellingen.</p>
                         </div>
                     )}
                 </div>
