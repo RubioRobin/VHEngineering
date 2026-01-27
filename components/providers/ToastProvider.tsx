@@ -44,7 +44,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
 
         setTimeout(() => {
             setToasts(prev => prev.filter(t => t.id !== id));
-        }, 5000);
+        }, 3500);
     };
 
     const showConfirm = (options: ConfirmOptions) => {
@@ -111,10 +111,10 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
                     {toasts.map(toast => (
                         <motion.div
                             key={toast.id}
-                            initial={{ opacity: 0, x: 50, scale: 0.95 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: 20, scale: 0.95, transition: { duration: 0.2 } }}
-                            className={`${getColors(toast.type)} border rounded-full shadow-lg min-w-[320px] max-w-md pointer-events-auto relative`}
+                            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.3, ease: "easeInOut" } }}
+                            className={`${getColors(toast.type)} border rounded-xl shadow-lg min-w-[320px] max-w-md pointer-events-auto relative`}
                         >
                             <div className="p-4">
                                 <div className="flex items-center gap-3">
