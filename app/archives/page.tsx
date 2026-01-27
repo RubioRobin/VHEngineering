@@ -103,14 +103,7 @@ export default function ArchivesPage() {
                 {periods.map((period, index) => (
                     <Link key={period.id} href={`/archives/${period.id}`}>
                         <DashboardCard
-                            className={`transition-shadow hover:shadow-md ${!period.isClosed ? 'border-primary/30 ring-1 ring-primary/5 shadow-sm' : ''}`}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                                duration: 0.3,
-                                delay: index * 0.05,
-                                ease: "easeOut"
-                            }}
+                            className={`group cursor-pointer ${!period.isClosed ? 'border-primary/30 ring-1 ring-primary/5 shadow-md shadow-primary/5' : ''}`}
                         >
                             <div className="flex flex-col h-full">
                                 <div className="flex justify-between items-center mb-6">
