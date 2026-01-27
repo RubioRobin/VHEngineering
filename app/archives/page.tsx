@@ -105,51 +105,41 @@ export default function ArchivesPage() {
                         transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
                         <Link href={`/archives/${period.id}`}>
-                            <DashboardCard className="group hover:border-primary/50 transition-all cursor-pointer p-0 overflow-hidden relative border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1">
-                                <div className="p-6 h-full flex flex-col">
+                            <DashboardCard className="group transition-all cursor-pointer">
+                                <div className="flex flex-col h-full">
                                     <div className="flex justify-between items-center mb-6">
-                                        <div className="bg-primary/5 text-primary text-[10px] sm:text-xs font-black px-3 py-1.5 rounded-xl uppercase tracking-widest border border-primary/10">
+                                        <div className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                                             Week {period.weekId.split('-')[1]}
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <button
                                                 onClick={(e) => handleDeleteArchive(e, period.id)}
-                                                className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                                className="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                 title="Verwijder archief"
                                             >
-                                                <Trash2 className="w-4.5 h-4.5" />
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
-                                            <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                                                <ArrowRight className="w-4 h-4" />
-                                            </div>
+                                            <ArrowRight className="w-5 h-5 text-text-muted group-hover:text-primary group-hover:translate-x-1 transition-all" />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-1.5 mb-6">
-                                        <h3 className="text-xl font-black text-text-primary group-hover:text-primary transition-colors">
-                                            Orderronde {period.weekId}
-                                        </h3>
-                                        <div className="h-1 w-12 bg-primary/20 rounded-full group-hover:w-20 transition-all"></div>
-                                    </div>
+                                    <h3 className="text-xl font-bold text-text-primary mb-4">
+                                        Orderronde {period.weekId}
+                                    </h3>
 
-                                    <div className="space-y-3 mt-auto pt-4 border-t border-gray-50">
-                                        <div className="flex items-center gap-3 text-sm text-text-secondary font-medium">
-                                            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500">
-                                                <Clock className="w-4 h-4" />
-                                            </div>
+                                    <div className="space-y-2 mt-auto pt-4 border-t border-border/50">
+                                        <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                            <Clock className="w-4 h-4 text-primary/60" />
                                             <span>
                                                 {format(new Date(period.startDate), 'd MMM', { locale: nl })} - {format(new Date(period.endDate), 'd MMM yyyy', { locale: nl })}
                                             </span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-sm text-text-muted font-medium">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
-                                                <Users className="w-4 h-4" />
-                                            </div>
-                                            <span><b className="text-emerald-600 font-bold">{period._count.orders}</b> bestellingen geplaatst</span>
+                                        <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                            <Users className="w-4 h-4 text-primary/60" />
+                                            <span><span className="font-bold">{period._count.orders}</span> bestellingen geplaatst</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/0 via-primary/40 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </DashboardCard>
                         </Link>
                     </motion.div>
