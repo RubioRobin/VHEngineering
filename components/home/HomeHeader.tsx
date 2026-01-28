@@ -72,7 +72,7 @@ export const HomeHeader = ({ deadline, lastOrder, onReorder }: HomeHeaderProps) 
                             <div className="flex items-center gap-3 opacity-90">
                                 <ClockIcon />
                                 <span className="text-sm font-medium uppercase tracking-wider">
-                                    {timeLeft && (timeLeft.d === 0 && timeLeft.h < 4) ? '🚨 SPOED!' : 'Bestellen Sluit Over'}
+                                    {timeLeft && (timeLeft.d === 0 && timeLeft.h < 4) ? 'SPOED!' : 'Bestellen Sluit Over'}
                                 </span>
                             </div>
                             <div className="mt-4">
