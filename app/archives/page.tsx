@@ -93,7 +93,7 @@ export default function ArchivesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="space-y-8 px-6 py-8 max-w-[1800px] mx-auto"
+            className="space-y-8 px-6 py-8 max-w-[2400px] mx-auto transition-all duration-300"
         >
             <div className="flex items-center gap-4">
                 <div>
@@ -102,7 +102,7 @@ export default function ArchivesPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6">
                 {periods.map((period, index) => (
                     <Link key={period.id} href={`/archives/${period.id}`}>
                         <DashboardCard

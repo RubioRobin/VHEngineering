@@ -8,6 +8,10 @@ const config: Config = {
     ],
     theme: {
         extend: {
+            screens: {
+                '3xl': '1920px',
+                '4xl': '2560px',
+            },
             colors: {
                 // SaaS Dashboard Palette
                 background: '#F6F8FF', // Soft Blue-White

@@ -28,7 +28,7 @@ export const ProductGrid = ({
     getCategory
 }: ProductGridProps) => {
     return (
-        <div className="space-y-12 max-w-[1800px] mx-auto px-6">
+        <div className="space-y-12 max-w-[2400px] mx-auto px-6 transition-all duration-300">
             <AnimatePresence mode="wait">
                 {/* If searching or favorites: Show flat list */}
                 {(searchQuery || showOnlyFavorites) ? (
@@ -38,7 +38,7 @@ export const ProductGrid = ({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.2 }}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-8 gap-6 mt-8"
                     >
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map((product) => (
@@ -106,7 +106,7 @@ export const ProductGrid = ({
                                             </div>
                                         )}
 
-                                        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${selectedCategory ? 'mt-6' : ''}`}>
+                                        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-8 gap-6 ${selectedCategory ? 'mt-6' : ''}`}>
                                             {productsInCat.map((product) => (
                                                 <ProductCard
                                                     key={product.id}

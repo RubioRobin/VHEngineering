@@ -50,7 +50,7 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="space-y-8 px-6 py-8 max-w-[1800px] mx-auto">
+        <div className="space-y-8 px-6 py-8 max-w-[2400px] mx-auto transition-all duration-300">
             <h1 className="text-3xl font-bold text-text-primary">Instellingen</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

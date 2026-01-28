@@ -61,7 +61,7 @@ export const HomeHeader = ({ deadline, lastOrder, onReorder }: HomeHeaderProps) 
 
     return (
         <div className="bg-white pt-6 pb-6">
-            <div className="max-w-[1800px] mx-auto px-6">
+            <div className="max-w-[2400px] mx-auto px-6">
                 <div className="flex flex-col md:flex-row items-stretch gap-6">
                     {/* Timer Card */}
                     <DashboardCard className={`flex-1 text-white border-none shadow-lg ${timeLeft && (timeLeft.d === 0 && timeLeft.h < 4)
