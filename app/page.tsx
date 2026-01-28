@@ -305,9 +305,6 @@ export default function HomePage() {
                 deadline={deadline}
                 lastOrder={lastOrder}
                 onReorder={handleReorder}
-                products={products}
-                onAddToCart={handleAddToCart}
-                weekOrders={weekOrders}
             />
 
             {/* Filter Bar */}
