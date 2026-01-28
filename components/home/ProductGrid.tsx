@@ -1,9 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { ProductSkeleton } from '@/components/ui/Skeleton';
 
 interface ProductGridProps {
     filteredProducts: any[];
@@ -15,7 +12,6 @@ interface ProductGridProps {
     onAddToCart: (product: any, quantity: number) => void;
     onToggleFavorite: (id: string) => void;
     getCategory: (product: any) => string;
-    isLoading?: boolean;
 }
 
 export const ProductGrid = ({
@@ -27,19 +23,8 @@ export const ProductGrid = ({
     isDeadlinePassed,
     onAddToCart,
     onToggleFavorite,
-    getCategory,
-    isLoading = false
+    getCategory
 }: ProductGridProps) => {
-    if (isLoading) {
-        return (
-            <div className="max-w-[2400px] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-8 gap-6 mt-8">
-                {[...Array(12)].map((_, i) => (
-                    <ProductSkeleton key={i} />
-                ))}
-            </div>
-        );
-    }
-
     return (
         <div className="space-y-12 max-w-[2400px] mx-auto px-6 transition-all duration-300">
             <AnimatePresence mode="wait">

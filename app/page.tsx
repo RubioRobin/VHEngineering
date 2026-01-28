@@ -268,6 +268,13 @@ export default function HomePage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    if (loading) {
+        return (
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            </div>
+        );
+    }
 
     // Get unique categories for dropdown
     const categories = Array.from(new Set(products.map(p => getCategory(p))))
@@ -330,7 +337,6 @@ export default function HomePage() {
                 onAddToCart={handleAddToCart}
                 onToggleFavorite={toggleFavorite}
                 getCategory={getCategory}
-                isLoading={loading}
             />
         </div>
     );
