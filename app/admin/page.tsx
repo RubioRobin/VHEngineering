@@ -712,6 +712,7 @@ export default function AdminPage() {
                                     </div>
                                 </div>
                                 <button
+                                    onClick={() => handleDeleteEmail(subscriber.id)}
                                     className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                                     disabled={deletingEmailId === subscriber.id}
                                 >
@@ -721,10 +722,10 @@ export default function AdminPage() {
                         ))
                     )}
                 </div>
-            </DashboardCard>
+            </DashboardCard >
 
             {/* Email Template Editor */}
-            <DashboardCard className="p-6 col-span-1 lg:col-span-2 border-purple-100 bg-purple-50/50">
+            < DashboardCard className="p-6 col-span-1 lg:col-span-2 border-purple-100 bg-purple-50/50" >
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4 text-purple-600">
                         <Edit3 className="w-8 h-8" />
@@ -750,51 +751,53 @@ export default function AdminPage() {
                     </div>
                 </div>
 
-                {!showPreview ? (
-                    <div className="space-y-4">
-                        {/* Subject */}
-                        <div>
-                            <label className="block text-sm font-medium text-text-primary mb-2">
-                                Email onderwerp
-                            </label>
-                            <input
-                                type="text"
-                                value={emailSubject}
-                                onChange={(e) => setEmailSubject(e.target.value)}
-                                placeholder="Vergeet niet te bestellen!"
-                                className="w-full px-4 py-2 bg-white border border-border rounded-lg focus:border-primary outline-none"
-                            />
-                        </div>
+                {
+                    !showPreview ? (
+                        <div className="space-y-4">
+                            {/* Subject */}
+                            <div>
+                                <label className="block text-sm font-medium text-text-primary mb-2">
+                                    Email onderwerp
+                                </label>
+                                <input
+                                    type="text"
+                                    value={emailSubject}
+                                    onChange={(e) => setEmailSubject(e.target.value)}
+                                    placeholder="Vergeet niet te bestellen!"
+                                    className="w-full px-4 py-2 bg-white border border-border rounded-lg focus:border-primary outline-none"
+                                />
+                            </div>
 
-                        {/* Body Text */}
-                        <div>
-                            <label className="block text-sm font-medium text-text-primary mb-2">
-                                Email tekst
-                            </label>
-                            <textarea
-                                value={emailBodyText}
-                                onChange={(e) => setEmailBodyText(e.target.value)}
-                                rows={8}
-                                placeholder="Hallo {{name}}!&#10;&#10;Dit is je reminder om je broodje te bestellen..."
-                                className="w-full px-4 py-3 bg-white border border-border rounded-lg focus:border-primary outline-none font-mono text-sm"
-                            />
+                            {/* Body Text */}
+                            <div>
+                                <label className="block text-sm font-medium text-text-primary mb-2">
+                                    Email tekst
+                                </label>
+                                <textarea
+                                    value={emailBodyText}
+                                    onChange={(e) => setEmailBodyText(e.target.value)}
+                                    rows={8}
+                                    placeholder="Hallo {{name}}!&#10;&#10;Dit is je reminder om je broodje te bestellen..."
+                                    className="w-full px-4 py-3 bg-white border border-border rounded-lg focus:border-primary outline-none font-mono text-sm"
+                                />
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="bg-white border border-border rounded-lg p-6">
-                        <h3 className="text-lg font-bold text-text-primary mb-4">Email preview</h3>
-                        <div className="border-b border-border pb-3 mb-4">
-                            <p className="text-xs text-text-muted">Subject:</p>
-                            <p className="text-base font-semibold text-text-primary">{emailSubject || '(Geen onderwerp)'}</p>
+                    ) : (
+                        <div className="bg-white border border-border rounded-lg p-6">
+                            <h3 className="text-lg font-bold text-text-primary mb-4">Email preview</h3>
+                            <div className="border-b border-border pb-3 mb-4">
+                                <p className="text-xs text-text-muted">Subject:</p>
+                                <p className="text-base font-semibold text-text-primary">{emailSubject || '(Geen onderwerp)'}</p>
+                            </div>
+                            <div className="prose prose-sm max-w-none">
+                                <pre className="whitespace-pre-wrap font-sans text-sm text-text-secondary bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                    {emailBodyText.replace(/\{\{name\}\}/g, 'Jan') || '(Geen inhoud)'}
+                                </pre>
+                            </div>
                         </div>
-                        <div className="prose prose-sm max-w-none">
-                            <pre className="whitespace-pre-wrap font-sans text-sm text-text-secondary bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                {emailBodyText.replace(/\{\{name\}\}/g, 'Jan') || '(Geen inhoud)'}
-                            </pre>
-                        </div>
-                    </div>
-                )}
-            </DashboardCard>
-        </div>
+                    )
+                }
+            </DashboardCard >
+        </div >
     );
 }
