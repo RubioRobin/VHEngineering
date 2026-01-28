@@ -1,5 +1,7 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 
 interface ProductGridProps {
