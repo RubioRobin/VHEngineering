@@ -20,29 +20,38 @@ interface OrderSuccessModalProps {
 export const OrderSuccessModal = ({ isOpen, onClose, orderData }: OrderSuccessModalProps) => {
     const hasFired = useRef(false);
 
+    const onCloseRef = useRef(onClose);
+
+    useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
     useEffect(() => {
         if (isOpen && !hasFired.current) {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#10B981', '#3B82F6', '#F59E0B']
-            });
+            try {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#10B981', '#3B82F6', '#F59E0B']
+                });
+            } catch (e) {
+                console.error("Confetti error:", e);
+            }
             hasFired.current = true;
 
             // Auto close after 5 seconds
             const timer = setTimeout(() => {
-                onClose();
+                onCloseRef.current();
             }, 5000);
 
             return () => {
                 clearTimeout(timer);
-                // We keep hasFired.current true until it's closed
             };
         } else if (!isOpen) {
             hasFired.current = false;
         }
-    }, [isOpen, onClose]);
+    }, [isOpen]);
 
     return (
         <AnimatePresence>
