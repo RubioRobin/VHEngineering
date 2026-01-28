@@ -89,35 +89,35 @@ const ProductCard = ({ product, onAddToCart, disabled, isFavorite = false, onTog
                     </h3>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-border flex items-center gap-3">
+                <div className="mt-auto pt-4 border-t border-border flex items-center gap-2">
                     {/* Add Button - First now */}
                     <DashboardButton
                         onClick={handleAdd}
                         disabled={disabled}
-                        className="flex-1 rounded-xl py-2.5 text-sm font-semibold shadow-none hover:shadow-md transition-all active:scale-95"
+                        className="flex-1 h-10 rounded-xl px-4 text-sm font-semibold shadow-none hover:shadow-md transition-all active:scale-95"
                         icon={<ShoppingCart className="w-4 h-4" />}
                     >
                         Toevoegen
                     </DashboardButton>
 
                     {/* Compact Quantity Selector - Second now */}
-                    <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-border/60">
+                    <div className="flex items-center bg-gray-50 rounded-xl border border-border/60 h-10">
                         <button
                             onClick={handleDecrement}
-                            className="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            className="w-10 h-full flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-l-xl transition-colors disabled:opacity-50"
                             disabled={disabled}
                         >
-                            <Minus className="w-5 h-5" />
+                            <Minus className="w-4 h-4" />
                         </button>
-                        <span className="font-bold text-sm text-text-primary min-w-[1.5rem] text-center">
+                        <span className="font-bold text-sm text-text-primary min-w-[1.2rem] text-center px-1">
                             {quantity}
                         </span>
                         <button
                             onClick={handleIncrement}
-                            className="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-lg transition-colors disabled:opacity-50"
+                            className="w-10 h-full flex items-center justify-center text-text-secondary hover:text-primary hover:bg-white rounded-r-xl transition-colors disabled:opacity-50"
                             disabled={disabled}
                         >
-                            <Plus className="w-5 h-5" />
+                            <Plus className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
