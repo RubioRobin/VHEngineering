@@ -293,19 +293,6 @@ export default function HomePage() {
                 orderData={lastOrderDetails}
             />
 
-            {/* Deadline Sticky Bar (Appears 4 hours before deadline) */}
-            {deadline && !isDeadlinePassed && differenceInHours(deadline, new Date()) < 4 && (
-                <motion.div
-                    initial={{ y: -50 }}
-                    animate={{ y: 0 }}
-                    className="fixed top-0 left-0 right-0 z-40 bg-orange-500 text-white py-2 px-4 shadow-md flex justify-center items-center text-sm font-bold"
-                >
-                    <Clock className="w-4 h-4 mr-2 animate-pulse" />
-                    <span>
-                        Let op! Deadline over {differenceInHours(deadline, new Date())}u {differenceInMinutes(deadline, new Date()) % 60}m
-                    </span>
-                </motion.div>
-            )}
 
             {/* Back to Top Button */}
             <motion.button
