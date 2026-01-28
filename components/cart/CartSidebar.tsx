@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'; // Correct import for App Router
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CartItem, { CartItemData } from '@/components/CartItem'; // Adjust path if needed
+import { useOrders } from '@/components/providers/OrdersProvider';
 import { useUser } from '@/components/providers/UserProvider'; // Assuming this exists
 
 interface CartSidebarProps {
@@ -50,6 +51,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
 
     // Load user info on mount
     const { user, login } = useUser();
+    const { refreshOrders } = useOrders();
 
     // ...
 
@@ -186,6 +188,9 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                 }))
             };
             window.dispatchEvent(new CustomEvent('order-success', { detail: orderDetails }));
+
+            // Refresh orders immediately so they show up in My Orders and Overview
+            refreshOrders();
 
             onClose(); // Close sidebar
         } catch (err: any) {
