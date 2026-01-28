@@ -46,7 +46,12 @@ async function getDeadlineSettings() {
  */
 export async function getNextDeadline(): Promise<Date> {
     const config = await getDeadlineSettings();
-    const now = toZonedTime(new Date(), TIMEZONE);
+    let now;
+    try {
+        now = toZonedTime(new Date(), TIMEZONE);
+    } catch (e) {
+        now = new Date(); // Fallback to UTC/local if timezone fails
+    }
 
     // Get next occurrence of deadline day
     let deadlineDate: Date;

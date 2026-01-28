@@ -79,6 +79,14 @@ export async function getDeadlineInfo(): Promise<DeadlineInfo> {
 
     } catch (e) {
         console.error('Error fetching deadline info:', e);
+        // Fallback to safe defaults to prevent crash
+        return {
+            time: '00:00',
+            label: 'VANDAAG',
+            isToday: true,
+            isTomorrow: false,
+            fullDate: 'Vandaag'
+        };
     }
 
     return { time: '14:00', label: 'VANDAAG', isToday: true, isTomorrow: false, fullDate: 'Vandaag' };
