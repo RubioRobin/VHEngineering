@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DashboardCard } from '@/components/ui/DashboardCard';
-import { Trash2, User, RotateCcw } from 'lucide-react';
+import { Trash2, User, RotateCcw, Loader2 } from 'lucide-react';
 import { useUser } from '@/components/providers/UserProvider';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
@@ -10,7 +10,6 @@ import { formatName } from '@/lib/utils';
 import { nl } from 'date-fns/locale';
 
 import { useOrders } from '@/components/providers/OrdersProvider';
-import { DashboardCardSkeleton } from '@/components/ui/Skeleton';
 
 export default function MijnBestellingenPage() {
     const { orders: myOrders, isLoading: loading, refreshOrders: fetchMyOrders } = useOrders();
@@ -117,8 +116,8 @@ export default function MijnBestellingenPage() {
 
             {loading ? (
                 <div className="space-y-4">
-                    {[...Array(3)].map((_, i) => (
-                        <DashboardCardSkeleton key={i} />
+                    {[1, 2].map((i) => (
+                        <div key={i} className="h-40 bg-gray-100 rounded-xl animate-pulse" />
                     ))}
                 </div>
             ) : myOrders.length === 0 ? (
