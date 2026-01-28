@@ -3,8 +3,8 @@
 import { Plus, Minus, ShoppingCart, Heart } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
-import { DashboardButton } from "./ui/DashboardButton";
-import { useUser } from "./providers/UserProvider";
+import { DashboardButton } from "@/components/ui/DashboardButton";
+import { useUser } from "@/components/providers/UserProvider";
 import { formatName } from "@/lib/utils";
 import { motion } from "framer-motion";
 

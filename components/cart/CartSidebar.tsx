@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation'; // Correct import for App Router
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import CartItem, { CartItemData } from '@/components/CartItem'; // Adjust path if needed
+import CartItem, { CartItemData } from './CartItem';
 import { useOrders } from '@/components/providers/OrdersProvider';
 import { useUser } from '@/components/providers/UserProvider'; // Assuming this exists
 

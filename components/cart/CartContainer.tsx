@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import CartItem, { CartItemData } from '@/components/CartItem';
+import CartItem, { CartItemData } from './CartItem';
 
 export default function CartContainer() {
     const router = useRouter();

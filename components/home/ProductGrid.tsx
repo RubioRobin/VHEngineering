@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
-import ProductCard from '@/components/ProductCard';
+import ProductCard from './ProductCard';
 
 interface ProductGridProps {
     filteredProducts: any[];

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import nextDynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
 
-const CartContainer = nextDynamic(() => import('@/components/CartContainer'), {
+const CartContainer = nextDynamic(() => import('@/components/cart/CartContainer'), {
     ssr: false,
     loading: () => (
         <div className="min-h-[60vh] flex items-center justify-center">
