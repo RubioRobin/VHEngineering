@@ -8,6 +8,7 @@ interface DashboardCardProps extends HTMLMotionProps<"div"> {
     children: React.ReactNode;
     hoverEffect?: boolean;
     noPadding?: boolean;
+    className?: string; // Explicitly added for better compatibility
 }
 
 export const DashboardCard = ({ children, className, hoverEffect = true, noPadding = false, ...props }: DashboardCardProps) => {

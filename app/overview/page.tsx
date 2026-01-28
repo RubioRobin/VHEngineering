@@ -12,6 +12,7 @@ import { useUser } from '@/components/providers/UserProvider';
 import { useToast } from '@/components/providers/ToastProvider';
 import { formatName } from '@/lib/utils';
 import { useOrders } from '@/components/providers/OrdersProvider';
+import { DashboardCardSkeleton } from '@/components/ui/Skeleton';
 
 interface OrderItem {
     id: string;
@@ -104,7 +105,17 @@ export default function OverviewPage() {
     const totalWithShipping = totalProductRevenue + (orders.length > 0 ? SHIPPING_COST : 0);
 
     if (loading) {
-        return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
+        return (
+            <div className="space-y-8 px-6 py-8 max-w-[2400px] mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[...Array(3)].map((_, i) => <DashboardCardSkeleton key={i} />)}
+                </div>
+                <DashboardCardSkeleton />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[...Array(4)].map((_, i) => <DashboardCardSkeleton key={i} />)}
+                </div>
+            </div>
+        );
     }
 
     return (

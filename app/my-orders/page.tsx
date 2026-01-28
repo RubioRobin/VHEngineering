@@ -10,6 +10,7 @@ import { formatName } from '@/lib/utils';
 import { nl } from 'date-fns/locale';
 
 import { useOrders } from '@/components/providers/OrdersProvider';
+import { DashboardCardSkeleton } from '@/components/ui/Skeleton';
 
 export default function MijnBestellingenPage() {
     const { orders: myOrders, isLoading: loading, refreshOrders: fetchMyOrders } = useOrders();
@@ -116,8 +117,8 @@ export default function MijnBestellingenPage() {
 
             {loading ? (
                 <div className="space-y-4">
-                    {[1, 2].map((i) => (
-                        <div key={i} className="h-40 bg-gray-100 rounded-xl animate-pulse" />
+                    {[...Array(3)].map((_, i) => (
+                        <DashboardCardSkeleton key={i} />
                     ))}
                 </div>
             ) : myOrders.length === 0 ? (
