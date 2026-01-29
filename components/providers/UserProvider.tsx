@@ -5,34 +5,49 @@ import { User } from "@prisma/client";
 
 interface UserContextType {
     user: User | null;
+    adminShadowUser: string | null;
+    isAdmin: boolean;
     isLoading: boolean;
     login: (name: string, department?: string) => Promise<void>;
     logout: () => void;
+    setAdminShadowUser: (name: string) => void;
+    clearAdminShadowUser: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [adminShadowUser, setShadowUser] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Load user from local storage on mount
+    // Load user and shadow user from storage on mount
     useEffect(() => {
-        const loadUser = async () => {
+        const loadSession = async () => {
             const storedUser = localStorage.getItem("vh_user");
             if (storedUser) {
                 try {
                     const parsed = JSON.parse(storedUser);
-                    // Verify if user still exists in backend
-                    // simplified: just trust local storage for now, or re-fetch
                     setUser(parsed);
                 } catch (e) {
                     localStorage.removeItem("vh_user");
                 }
             }
+
+            const storedShadow = sessionStorage.getItem("vh_admin_shadow");
+            if (storedShadow) {
+                setShadowUser(storedShadow);
+            }
+
+            const adminToken = localStorage.getItem("vh_admin_token");
+            if (adminToken) {
+                setIsAdmin(true);
+            }
+
             setIsLoading(false);
         };
-        loadUser();
+        loadSession();
     }, []);
 
     const login = async (name: string, department?: string) => {
@@ -59,11 +74,34 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     const logout = () => {
         setUser(null);
+        setShadowUser(null);
+        setIsAdmin(false);
         localStorage.removeItem("vh_user");
+        localStorage.removeItem("vh_admin_token"); // Also clear admin token on logout
+        sessionStorage.removeItem("vh_admin_shadow");
+    };
+
+    const setAdminShadowUser = (name: string) => {
+        setShadowUser(name);
+        sessionStorage.setItem("vh_admin_shadow", name);
+    };
+
+    const clearAdminShadowUser = () => {
+        setShadowUser(null);
+        sessionStorage.removeItem("vh_admin_shadow");
     };
 
     return (
-        <UserContext.Provider value={{ user, isLoading, login, logout }}>
+        <UserContext.Provider value={{
+            user,
+            adminShadowUser,
+            isAdmin,
+            isLoading,
+            login,
+            logout,
+            setAdminShadowUser,
+            clearAdminShadowUser
+        }}>
             {children}
         </UserContext.Provider>
     );

@@ -50,14 +50,15 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
     };
 
     // Load user info on mount
-    const { user, login } = useUser();
+    const { user, login, adminShadowUser, clearAdminShadowUser } = useUser();
     const { refreshOrders } = useOrders();
-
-    // ...
 
     // Load user info on mount or when user changes
     useEffect(() => {
-        if (user) {
+        if (adminShadowUser) {
+            setPersonName(adminShadowUser);
+            setDepartment('');
+        } else if (user) {
             setPersonName(user.name);
             setDepartment(user.department || '');
         } else {
@@ -66,7 +67,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
             setDepartment(localStorage.getItem('department') || '');
         }
         setClientToken(localStorage.getItem('clientToken') || '');
-    }, [user]);
+    }, [user, adminShadowUser]);
 
     const handleUpdateQuantity = (id: string, quantity: number) => {
         const updated = cartItems.map((item) =>
@@ -121,15 +122,18 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
         }
 
         // Save user info
-        localStorage.setItem('personName', personName.trim());
-        localStorage.setItem('department', department.trim());
+        if (!adminShadowUser) {
+            localStorage.setItem('personName', personName.trim());
+            localStorage.setItem('department', department.trim());
+        }
 
         try {
             // Ensure we have a valid UserId, even if the user didn't explicitly login via the modal
-            let activeUserId = user?.id;
+            // If shadow mode is active, we do NOT want to link this order to the admin's ID
+            let activeUserId = adminShadowUser ? null : user?.id;
 
-            if (!activeUserId) {
-                // Auto-create/find user to ensure order history works
+            if (!activeUserId && !adminShadowUser) {
+                // Auto-create/find user to ensure order history works (only for real users)
                 try {
                     const userRes = await fetch("/api/user", {
                         method: "POST",
@@ -153,7 +157,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userName: personName,
-                    userId: activeUserId, // Use the resolved ID
+                    userId: activeUserId, // Use the resolved ID (null if shadow)
                     department,
                     clientToken: currentToken,
                     items: cartItems.map((item) => ({
@@ -173,6 +177,12 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
             // Success
             localStorage.removeItem('cart');
             setCartItems([]);
+
+            // Clear shadow mode on success
+            if (adminShadowUser) {
+                clearAdminShadowUser();
+            }
+
             // Update global cart state
             window.dispatchEvent(new Event('cart-updated'));
 

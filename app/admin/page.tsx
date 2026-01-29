@@ -6,12 +6,15 @@ import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { ProductManager } from '@/components/admin/ProductManager';
 import { AdminLoginModal } from '@/components/admin/AdminLoginModal';
-import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut, Check, Loader2, Euro, User, RotateCcw } from 'lucide-react';
+import { useUser } from '@/components/providers/UserProvider';
+import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut, Check, Loader2, Euro, User, RotateCcw, ShoppingBag } from 'lucide-react';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
 export default function AdminPage() {
+    const { setAdminShadowUser } = useUser();
+    const router = useRouter();
     // Auth State
     const [adminToken, setAdminToken] = useState<string | null>(null);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -565,6 +568,15 @@ export default function AdminPage() {
         return <AdminLoginModal onLogin={verifyLogin} />;
     }
 
+    const handleManualOrder = () => {
+        const name = prompt('Voor welke collega wil je een bestelling plaatsen?');
+        if (name && name.trim()) {
+            setAdminShadowUser(name.trim());
+            showToast(`Shadow-modus geactiveerd voor ${name}`, 'success');
+            router.push('/');
+        }
+    };
+
     return (
         <div className="space-y-8 px-6 py-8 max-w-[2400px] mx-auto transition-all duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -572,13 +584,22 @@ export default function AdminPage() {
                     <h1 className="text-3xl font-bold text-text-primary">Admin beheer</h1>
                     <p className="text-text-muted mt-2">Beheer deadline en email notificaties</p>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all shadow-sm self-start sm:self-center"
-                >
-                    <LogOut className="w-4 h-4" />
-                    Uitloggen
-                </button>
+                <div className="flex items-center gap-3 self-start sm:self-center">
+                    <DashboardButton
+                        onClick={handleManualOrder}
+                        className="bg-accent hover:bg-accent-dark text-white"
+                        icon={<ShoppingBag className="w-4 h-4" />}
+                    >
+                        Bestel voor collega
+                    </DashboardButton>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all shadow-sm"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Uitloggen
+                    </button>
+                </div>
             </div>
 
             {/* Top Row: 2 Columns */}

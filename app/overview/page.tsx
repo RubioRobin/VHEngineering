@@ -39,8 +39,9 @@ const FALLBACK_SHIPPING_COST = 1.95;
 
 export default function OverviewPage() {
     const { weekOrders: orders, currentPeriod, isWeekLoading: loading, fetchWeekOrders } = useOrders();
-    const { user } = useUser();
+    const { user, isAdmin, setAdminShadowUser } = useUser();
     const { showToast } = useToast();
+    const router = useRouter();
 
     const [isExporting, setIsExporting] = useState(false);
 
@@ -59,8 +60,14 @@ export default function OverviewPage() {
             .catch(err => console.error('Failed to fetch settings:', err));
     }, [fetchWeekOrders]);
 
-
-
+    const handleManualOrder = () => {
+        const name = prompt('Voor welke collega wil je een bestelling plaatsen?');
+        if (name && name.trim()) {
+            setAdminShadowUser(name.trim());
+            showToast(`Shadow-modus geactiveerd voor ${name}`, 'success');
+            router.push('/');
+        }
+    };
 
     const getTop5Products = () => {
         const productCounts: Record<string, { name: string; count: number; price: number }> = {};
@@ -143,14 +150,25 @@ export default function OverviewPage() {
 
     return (
         <div className="space-y-8 px-6 py-8 max-w-[2400px] mx-auto transition-all duration-300">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-text-primary">Week overzicht</h1>
                     <p className="text-text-secondary">Alle bestellingen voor deze week</p>
                 </div>
-                <DashboardButton onClick={handleExport} isLoading={isExporting} icon={<Download className="w-4 h-4" />}>
-                    Export naar Excel
-                </DashboardButton>
+                <div className="flex items-center gap-3">
+                    {isAdmin && (
+                        <DashboardButton
+                            onClick={handleManualOrder}
+                            className="bg-accent hover:bg-accent-dark text-white"
+                            icon={<ShoppingBag className="w-4 h-4" />}
+                        >
+                            Plaats handmatige bestelling
+                        </DashboardButton>
+                    )}
+                    <DashboardButton onClick={handleExport} isLoading={isExporting} icon={<Download className="w-4 h-4" />}>
+                        Export naar Excel
+                    </DashboardButton>
+                </div>
             </div>
 
             {/* Stats */}

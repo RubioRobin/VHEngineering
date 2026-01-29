@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, X, Loader2, Ban } from 'lucide-react';
 import { DashboardButton } from '../ui/DashboardButton';
 import { useToast } from '../providers/ToastProvider';
+import { useUser } from '../providers/UserProvider';
 
 interface NotParticipatingModalProps {
     isOpen: boolean;
@@ -13,14 +14,24 @@ interface NotParticipatingModalProps {
 }
 
 export const NotParticipatingModal = ({ isOpen, onClose, onSuccess }: NotParticipatingModalProps) => {
+    const { user, adminShadowUser } = useUser();
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { showToast } = useToast();
 
+    // Reset/Sync name when modal opens or user/shadow changes
+    useEffect(() => {
+        if (isOpen) {
+            setName(adminShadowUser || (user ? user.name : ''));
+        }
+    }, [isOpen, user, adminShadowUser]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name.trim()) {
-            showToast('Vul aueb je naam in', 'error');
+        const submitName = adminShadowUser || (user ? user.name : name);
+
+        if (!submitName.trim()) {
+            showToast('Vul a.u.b. je naam in', 'error');
             return;
         }
 
@@ -30,14 +41,20 @@ export const NotParticipatingModal = ({ isOpen, onClose, onSuccess }: NotPartici
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    userName: name.trim(),
+                    userName: submitName.trim(),
+                    userId: adminShadowUser ? null : user?.id,
                     items: [],
                     notParticipating: true
                 }),
             });
 
             if (res.ok) {
-                showToast('Je hebt je afgemeld voor deze week', 'success');
+                showToast(
+                    adminShadowUser
+                        ? `Afgemeld voor deze week: ${adminShadowUser}`
+                        : 'Je hebt je afgemeld voor deze week',
+                    'success'
+                );
                 onSuccess();
                 onClose();
             } else {
@@ -50,6 +67,9 @@ export const NotParticipatingModal = ({ isOpen, onClose, onSuccess }: NotPartici
             setIsLoading(false);
         }
     };
+
+    const hasIdentity = !!adminShadowUser || !!user;
+    const displayName = adminShadowUser || user?.name;
 
     return (
         <AnimatePresence>
@@ -85,22 +105,30 @@ export const NotParticipatingModal = ({ isOpen, onClose, onSuccess }: NotPartici
                                 Laat de organisator weten dat je deze week overslaat. Je wordt dan niet meegerekend voor de bezorgkosten.
                             </p>
 
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-semibold text-gray-700 ml-1">Jouw Naam</label>
-                                    <div className="relative">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                        <input
-                                            autoFocus
-                                            type="text"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            placeholder="Bijv. Jan de Vries"
-                                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500 focus:bg-white rounded-2xl outline-none transition-all font-medium"
-                                            disabled={isLoading}
-                                        />
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {hasIdentity ? (
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                        <p className="text-gray-700 text-center font-medium">
+                                            Wil je {adminShadowUser ? 'een collega' : 'jezelf'} afmelden als <span className="font-bold text-gray-900">{displayName}</span>?
+                                        </p>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-semibold text-gray-700 ml-1">Jouw Naam</label>
+                                        <div className="relative">
+                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <input
+                                                autoFocus
+                                                type="text"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                placeholder="Bijv. Jan de Vries"
+                                                className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-red-500 focus:bg-white rounded-2xl outline-none transition-all font-medium"
+                                                disabled={isLoading}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
 
                                 <DashboardButton
                                     type="submit"
@@ -108,7 +136,7 @@ export const NotParticipatingModal = ({ isOpen, onClose, onSuccess }: NotPartici
                                     isLoading={isLoading}
                                     icon={<Ban className="w-5 h-5" />}
                                 >
-                                    Bevestig afmelding
+                                    {hasIdentity ? 'Ja, ik eet niet mee' : 'Bevestig afmelding'}
                                 </DashboardButton>
                             </form>
                         </div>
