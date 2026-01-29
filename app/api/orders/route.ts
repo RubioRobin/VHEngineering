@@ -86,12 +86,13 @@ export async function GET(request: Request) {
                     include: {
                         product: true
                     }
-                }
+                },
+                orderPeriod: true
             },
             orderBy: { createdAt: 'desc' }
         });
 
-        return NextResponse.json({ orders });
+        return NextResponse.json({ orders, period });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
     }

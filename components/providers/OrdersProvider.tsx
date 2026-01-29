@@ -7,6 +7,7 @@ import { useToast } from "./ToastProvider";
 interface OrdersContextType {
     orders: any[];
     weekOrders: any[];
+    currentPeriod: any;
     isLoading: boolean;
     isWeekLoading: boolean;
     refreshOrders: () => Promise<void>;
@@ -18,6 +19,7 @@ const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
     const [orders, setOrders] = useState<any[]>([]);
     const [weekOrders, setWeekOrders] = useState<any[]>([]);
+    const [currentPeriod, setCurrentPeriod] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isWeekLoading, setIsWeekLoading] = useState(false);
     const { user } = useUser();
@@ -70,6 +72,7 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
             if (res.ok) {
                 const data = await res.json();
                 setWeekOrders(data.orders || []);
+                setCurrentPeriod(data.period || null);
                 setHasFetchedWeek(true);
             }
         } catch (error) {
@@ -103,7 +106,7 @@ export const OrdersProvider = ({ children }: { children: React.ReactNode }) => {
     }, [user, refreshOrders]);
 
     return (
-        <OrdersContext.Provider value={{ orders, weekOrders, isLoading, isWeekLoading, refreshOrders, fetchWeekOrders }}>
+        <OrdersContext.Provider value={{ orders, weekOrders, currentPeriod, isLoading, isWeekLoading, refreshOrders, fetchWeekOrders }}>
             {children}
         </OrdersContext.Provider>
     );

@@ -38,7 +38,7 @@ interface Order {
 const FALLBACK_SHIPPING_COST = 1.95;
 
 export default function OverviewPage() {
-    const { weekOrders: orders, isWeekLoading: loading, fetchWeekOrders } = useOrders();
+    const { weekOrders: orders, currentPeriod, isWeekLoading: loading, fetchWeekOrders } = useOrders();
     const { user } = useUser();
     const { showToast } = useToast();
 
@@ -78,7 +78,7 @@ export default function OverviewPage() {
         });
 
         // Add Jesse's fixed order if active
-        if (orders.length > 0 && orders[0].orderPeriod?.jesseParticipating) {
+        if (currentPeriod?.jesseParticipating) {
             const jesseItems = [
                 { name: 'Pistolet kip-kerrie', price: 5.00 },
                 { name: 'Milano chili-kip speciaal', price: 5.40 }
@@ -96,7 +96,7 @@ export default function OverviewPage() {
             .slice(0, 5);
     };
 
-    const jesseParticipating = orders.length > 0 && orders[0].orderPeriod?.jesseParticipating;
+    const jesseParticipating = currentPeriod?.jesseParticipating || false;
     const participatingOrders = orders.filter((o: Order) => !o.notParticipating);
     const nonParticipatingOrders = orders.filter((o: Order) => o.notParticipating);
     const participantsCount = participatingOrders.length + (jesseParticipating ? 1 : 0);
