@@ -47,11 +47,19 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
     }) as OrderWithDetails[];
 
     // Fetch period details (to check for Jesse)
-    // We try to find the period by canonical ID or partial match if needed, but since we query orders by weekId link, checking the period directly via weekId is safest.
-    // However, periodId passed here is the weekId string (e.g. 2025-05).
-    // Let's try to find the exact period record.
+    // We try to find the period by canonical ID or partial match if needed.
+    const parts = periodId.split('-');
+    const year = parts[0];
+    const week = parts[1] || '0';
+    const paddedId = `${year}-${week.padStart(2, '0')}`;
+    const unpaddedId = `${year}-${parseInt(week)}`;
+
     const period = await prisma.orderPeriod.findFirst({
-        where: { weekId: periodId }
+        where: {
+            weekId: {
+                in: [periodId, paddedId, unpaddedId]
+            }
+        }
     });
 
     // Create workbook
