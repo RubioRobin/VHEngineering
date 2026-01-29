@@ -59,3 +59,23 @@ export async function DELETE(request: Request) {
         return NextResponse.json({ error: 'Failed to delete email' }, { status: 500 });
     }
 }
+// PATCH - Update email subscriber status
+export async function PATCH(request: Request) {
+    try {
+        const { id, active } = await request.json();
+
+        if (!id) {
+            return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+        }
+
+        const subscriber = await prisma.emailSubscriber.update({
+            where: { id },
+            data: { active }
+        });
+
+        return NextResponse.json({ subscriber });
+    } catch (error) {
+        console.error('Error updating email:', error);
+        return NextResponse.json({ error: 'Failed to update email' }, { status: 500 });
+    }
+}

@@ -281,6 +281,35 @@ export default function AdminPage() {
         }
     };
 
+
+    const handleToggleActive = async (id: string, currentActive: boolean) => {
+        // Optimistic update
+        setEmailList(prev => prev.map(email =>
+            email.id === id ? { ...email, active: !currentActive } : email
+        ));
+
+        try {
+            const res = await fetch('/api/admin/emails', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                },
+                body: JSON.stringify({ id, active: !currentActive })
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) handleLogout();
+                showToast('Fout bij updaten status', 'error');
+                // Revert on failure
+                fetchEmails();
+            }
+        } catch (error) {
+            showToast('Netwerkfout', 'error');
+            fetchEmails();
+        }
+    };
+
     const handleDeleteEmail = async (id: string) => {
         showConfirm({
             message: 'Email verwijderen uit de lijst?',
@@ -700,25 +729,44 @@ export default function AdminPage() {
                         </div>
                     ) : (
                         emailList.map((subscriber) => (
-                            <div key={subscriber.id} className="group flex items-center justify-between p-3 bg-white hover:bg-blue-50/50 rounded-xl border border-blue-100/50 hover:border-blue-200 transition-all shadow-sm hover:shadow-md">
+                            <div key={subscriber.id} className={`group flex items-center justify-between p-3 bg-white hover:bg-blue-50/50 rounded-xl border transition-all shadow-sm hover:shadow-md ${!subscriber.active ? 'opacity-60 border-gray-200 bg-gray-50' : 'border-blue-100/50 hover:border-blue-200'}`}>
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
-                                        {(subscriber.name || subscriber.email)[0].toUpperCase()}
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-colors ${subscriber.active ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}>
+                                        {(subscriber.name || subscriber.email || '?')[0].toUpperCase()}
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-800">{subscriber.email}</p>
-                                        {subscriber.name && (
-                                            <p className="text-xs text-blue-400 font-medium">{subscriber.name}</p>
-                                        )}
+                                        <p className={`font-medium ${subscriber.active ? 'text-gray-800' : 'text-gray-500 line-through'}`}>{subscriber.email}</p>
+                                        <div className="flex items-center gap-2">
+                                            {subscriber.name && (
+                                                <p className="text-xs text-blue-400 font-medium">{subscriber.name}</p>
+                                            )}
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${subscriber.active ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                                                {subscriber.active ? 'Actief' : 'Niet actief'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => handleDeleteEmail(subscriber.id)}
-                                    className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                    disabled={deletingEmailId === subscriber.id}
-                                >
-                                    {deletingEmailId === subscriber.id ? <Loader2 className="w-4 h-4 animate-spin text-red-500" /> : <Trash2 className="w-4 h-4" />}
-                                </button>
+                                <div className="flex items-center gap-3">
+                                    {/* Toggle Switch */}
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={subscriber.active ?? true}
+                                            onChange={() => handleToggleActive(subscriber.id, subscriber.active ?? true)}
+                                        />
+                                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+
+                                    <button
+                                        onClick={() => handleDeleteEmail(subscriber.id)}
+                                        className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                        disabled={deletingEmailId === subscriber.id}
+                                        title="Verwijderen uit database"
+                                    >
+                                        {deletingEmailId === subscriber.id ? <Loader2 className="w-4 h-4 animate-spin text-red-500" /> : <Trash2 className="w-4 h-4" />}
+                                    </button>
+                                </div>
                             </div>
                         ))
                     )}
