@@ -6,7 +6,7 @@ import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { ProductManager } from '@/components/admin/ProductManager';
 import { AdminLoginModal } from '@/components/admin/AdminLoginModal';
-import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut, Check, Loader2 } from 'lucide-react';
+import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut, Check, Loader2, Euro } from 'lucide-react';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -47,10 +47,14 @@ export default function AdminPage() {
     const [refreshing, setRefreshing] = useState(false);
     const [isResettingWeek, setIsResettingWeek] = useState(false);
     const [isSavingHeadline, setIsSavingHeadline] = useState(false);
+    const [isSavingDeliveryCost, setIsSavingDeliveryCost] = useState(false);
     const [isAddingEmail, setIsAddingEmail] = useState(false);
     const [isSendingTestEmail, setIsSendingTestEmail] = useState(false);
     const [isSavingTemplate, setIsSavingTemplate] = useState(false);
     const [deletingEmailId, setDeletingEmailId] = useState<string | null>(null);
+
+    // Delivery Cost
+    const [deliveryCost, setDeliveryCost] = useState<number>(1.95);
 
     // Recurring settings (Initialize with CURRENT TIME)
     const [deadlinesSettings, setDeadlineSettings] = useState(() => {
@@ -168,6 +172,9 @@ export default function AdminPage() {
                     hour: data.hour ?? 14,
                     minute: data.minute ?? 0
                 });
+                if (data.deliveryCost !== undefined) {
+                    setDeliveryCost(data.deliveryCost);
+                }
             }
         } catch (error) {
             console.error('Error fetching recursive settings:', error);
@@ -393,6 +400,34 @@ export default function AdminPage() {
             showToast('Netwerkfout', 'error');
         } finally {
             setIsSavingHeadline(false);
+        }
+    };
+
+    const handleSaveDeliveryCost = async () => {
+        if (!adminToken) return;
+
+        setIsSavingDeliveryCost(true);
+        try {
+            const res = await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                },
+                body: JSON.stringify({ deliveryCost })
+            });
+
+            if (res.ok) {
+                showToast('Bezorgkosten opgeslagen!', 'success');
+            } else {
+                if (res.status === 401) handleLogout();
+                const data = await res.json();
+                showToast(data.error || 'Fout bij opslaan', 'error');
+            }
+        } catch (error) {
+            showToast('Netwerkfout', 'error');
+        } finally {
+            setIsSavingDeliveryCost(false);
         }
     };
 
@@ -635,6 +670,37 @@ export default function AdminPage() {
                     </DashboardButton>
                 </DashboardCard>
 
+                {/* Delivery Cost Management */}
+                <DashboardCard className="p-6 border-orange-100 bg-orange-50/50 flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center gap-4 mb-4 text-orange-600">
+                            <Euro className="w-8 h-8" />
+                            <h2 className="text-xl font-bold">Bezorgkosten</h2>
+                        </div>
+                        <p className="text-text-secondary mb-4 text-sm">
+                            Kosten per bestelling (wordt gedeeld door aantal deelnemers).
+                        </p>
+                        <div className="relative mb-4">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">€</span>
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={deliveryCost}
+                                onChange={(e) => setDeliveryCost(parseFloat(e.target.value))}
+                                className="w-full pl-8 pr-4 py-2 bg-white border border-orange-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none font-bold text-gray-800"
+                            />
+                        </div>
+                    </div>
+                    <DashboardButton
+                        onClick={handleSaveDeliveryCost}
+                        className="w-full bg-orange-600 hover:bg-orange-700 font-semibold"
+                        isLoading={isSavingDeliveryCost}
+                    >
+                        Opslaan
+                    </DashboardButton>
+                </DashboardCard>
+
                 {/* Assortment Management */}
                 <DashboardCard className="p-6 border-cyan-100 bg-cyan-50/50 flex flex-col justify-between">
                     <div>
@@ -747,16 +813,14 @@ export default function AdminPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    {/* Toggle Switch */}
-                                    <label className="relative inline-flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={subscriber.active ?? true}
-                                            onChange={() => handleToggleActive(subscriber.id, subscriber.active ?? true)}
-                                        />
-                                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                                    </label>
+                                    {/* Standard Checkbox for better visibility */}
+                                    <input
+                                        type="checkbox"
+                                        className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 shadow-sm cursor-pointer"
+                                        checked={subscriber.active ?? true}
+                                        onChange={() => handleToggleActive(subscriber.id, subscriber.active ?? true)}
+                                        title={subscriber.active ? "Actief (krijgt mail)" : "Niet actief (krijgt geen mail)"}
+                                    />
 
                                     <button
                                         onClick={() => handleDeleteEmail(subscriber.id)}

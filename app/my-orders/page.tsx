@@ -16,6 +16,14 @@ export default function MijnBestellingenPage() {
     const { user } = useUser();
     const { showToast, showConfirm } = useToast();
     const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(new Set());
+    const [deliveryCost, setDeliveryCost] = useState<number>(1.95);
+
+    useEffect(() => {
+        fetch('/api/settings')
+            .then(res => res.json())
+            .then(data => setDeliveryCost(data.deliveryCost || 1.95))
+            .catch(err => console.error('Failed to fetch settings:', err));
+    }, []);
 
     // Auto-expand most recent week when orders load
     useEffect(() => {
@@ -78,15 +86,16 @@ export default function MijnBestellingenPage() {
         showToast('Toegevoegd aan winkelmandje!', 'success');
     };
 
-    const SHIPPING_COST = 1.95;
+    // const SHIPPING_COST = 1.95; // Old hardcoded value
 
     const calculateTotal = (orderItems: any[], participantsCount: number = 1) => {
         const itemsTotal = orderItems.reduce((acc, item) => {
             const price = item.product?.price || 0;
             return acc + (item.quantity * price);
         }, 0);
-        return itemsTotal + (participantsCount > 0 ? SHIPPING_COST / participantsCount : 0);
+        return itemsTotal + (participantsCount > 0 ? deliveryCost / participantsCount : 0);
     };
+
 
     const toggleWeek = (weekId: string) => {
         const newExpanded = new Set(expandedWeeks);
@@ -175,7 +184,7 @@ export default function MijnBestellingenPage() {
                                 {isExpanded && (
                                     <div className="border-t border-border bg-gray-50/30 pb-3">
                                         {weekOrders.map((order: any, idx: number) => {
-                                            const shippingShare = SHIPPING_COST / participantsCount;
+                                            const shippingShare = deliveryCost / participantsCount;
                                             return (
                                                 <div
                                                     key={order.id}

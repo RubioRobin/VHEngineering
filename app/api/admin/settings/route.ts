@@ -16,9 +16,19 @@ export async function GET(request: NextRequest) {
     //     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // }
 
+
     try {
         const config = await getDeadlineConfig();
-        return NextResponse.json(config);
+
+        // Fetch delivery cost
+        const deliverySetting = await prisma.globalSetting.findUnique({
+            where: { key: 'DELIVERY_COST' }
+        });
+
+        return NextResponse.json({
+            ...config,
+            deliveryCost: deliverySetting ? parseFloat(deliverySetting.value) : 1.95
+        });
     } catch (error) {
         console.error('Error fetching settings:', error);
         return NextResponse.json(
@@ -39,22 +49,24 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { day, hour, minute } = await request.json();
+        const { day, hour, minute, deliveryCost } = await request.json();
 
-        // Validate values
-        if (day < 0 || day > 6 || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-            return NextResponse.json(
-                { error: 'Ongeldige waarden voor deadline' },
-                { status: 400 }
-            );
+        const settings = [];
+
+        // Update deadline if provided
+        if (day !== undefined) {
+            if (day < 0 || day > 6 || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                return NextResponse.json({ error: 'Ongeldige waarden voor deadline' }, { status: 400 });
+            }
+            settings.push({ key: 'DEADLINE_DAY', value: day.toString() });
+            settings.push({ key: 'DEADLINE_HOUR', value: hour.toString() });
+            settings.push({ key: 'DEADLINE_MINUTE', value: minute.toString() });
         }
 
-        // Update in database
-        const settings = [
-            { key: 'DEADLINE_DAY', value: day.toString() },
-            { key: 'DEADLINE_HOUR', value: hour.toString() },
-            { key: 'DEADLINE_MINUTE', value: minute.toString() },
-        ];
+        // Update delivery cost if provided
+        if (deliveryCost !== undefined) {
+            settings.push({ key: 'DELIVERY_COST', value: deliveryCost.toString() });
+        }
 
         for (const setting of settings) {
             await prisma.globalSetting.upsert({
@@ -64,27 +76,25 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Sync current period deadline immediately
-        try {
-            const { getNextDeadline, getCurrentOrderPeriod } = await import('@/lib/orderPeriod');
+        // Sync current period deadline immediately if deadline changed
+        if (day !== undefined) {
+            try {
+                const { getNextDeadline, getCurrentOrderPeriod } = await import('@/lib/orderPeriod');
+                const newDeadline = await getNextDeadline();
+                const period = await getCurrentOrderPeriod();
 
-            const newDeadline = await getNextDeadline();
-            const period = await getCurrentOrderPeriod();
-
-            if (period) {
-                // IMPORTANT: Only update if the NEW deadline is in the future.
-                // This allows extending a deadline that has already passed.
-                if (new Date(newDeadline) > new Date()) {
-                    await prisma.orderPeriod.update({
-                        where: { id: period.id },
-                        data: { deadline: newDeadline }
-                    });
-                    console.log(`Updated active period ${period.weekId} deadline to ${newDeadline}`);
+                if (period) {
+                    if (new Date(newDeadline) > new Date()) {
+                        await prisma.orderPeriod.update({
+                            where: { id: period.id },
+                            data: { deadline: newDeadline }
+                        });
+                        console.log(`Updated active period ${period.weekId} deadline to ${newDeadline}`);
+                    }
                 }
+            } catch (syncError) {
+                console.error('Error syncing active period deadline:', syncError);
             }
-        } catch (syncError) {
-            console.error('Error syncing active period deadline:', syncError);
-            // Don't fail the request, just log
         }
 
         return NextResponse.json({ message: 'Instellingen succesvol bijgewerkt' });
@@ -96,3 +106,4 @@ export async function POST(request: NextRequest) {
         );
     }
 }
+
