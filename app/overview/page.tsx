@@ -12,6 +12,7 @@ import { useUser } from '@/components/providers/UserProvider';
 import { useToast } from '@/components/providers/ToastProvider';
 import { formatName } from '@/lib/utils';
 import { useOrders } from '@/components/providers/OrdersProvider';
+import { useRouter } from 'next/navigation';
 
 interface OrderItem {
     id: string;
