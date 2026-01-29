@@ -159,7 +159,20 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
     // Check if Jesse is participating
     // Check if Jesse is participating (using period status if available, fallback to global)
     // If period exists, trust its flag. If not (shouldn't happen if orders exist), fallback to false or global.
-    const jesseParticipating = period ? period.jesseParticipating : false;
+    // Check if Jesse is participating (using period status if available, fallback to global)
+    let jesseParticipating = period ? period.jesseParticipating : false;
+
+    // Fallback: If false (maybe older period record or just created before toggle), check global setting as a safety net.
+    // Ideally we only do this for the *current* or recent periods, but for now, if the user wants it, they want it.
+    // However, to respect history, we should probably only do this if period.jesseParticipating is strictly false/undefined?
+    // Let's just fetch global setting if local is false, and assume if global is TRUE, it should override for now to fix the user's issue.
+    // A better long term fix is ensuring the period record is updated correctly.
+    if (!jesseParticipating) {
+        const globalJesse = await prisma.globalSetting.findUnique({ where: { key: 'JESSE_PARTICIPATING' } });
+        if (globalJesse?.value === 'true') {
+            jesseParticipating = true;
+        }
+    }
 
     if (jesseParticipating) {
         const jesseItems = [
