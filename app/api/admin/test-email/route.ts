@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sendReminderToAll, getDeadlineInfo } from '@/lib/email';
+import prisma from '@/lib/prisma';
 
 // POST - Send test email to all active subscribers
 export async function POST() {
@@ -37,7 +38,11 @@ export async function POST() {
             failed: result.failed,
             total: result.total,
             details: result.results,
-            debugWithDeadline: debugDeadline
+            debugWithDeadline: debugDeadline,
+            allSubscribersDebug: await (async () => {
+                const all = await prisma.emailSubscriber.findMany();
+                return all.map(s => ({ email: s.email, active: s.active }));
+            })()
         });
     } catch (error: any) {
         console.error('[TestEmail] Critical error:', error);

@@ -404,6 +404,7 @@ export default function AdminPage() {
 
             if (res.ok) {
                 showToast((data.message || 'Emails verzonden!') + ' (Let op: kan soms even duren)', 'success');
+                alert(`Debug Info:\n\nEmails in Database: ${data.allSubscribersDebug?.length}\nActive Emails: ${data.allSubscribersDebug?.filter((s: any) => s.active).length}\n\nSent to: ${data.sent}\nFailed: ${data.failed}\n\nList:\n${data.allSubscribersDebug?.map((s: any) => `${s.email} (${s.active ? 'Active' : 'Inactive'})`).join('\n')}`);
             } else {
                 if (res.status === 401) handleLogout();
                 console.error('Test email failed:', data);
