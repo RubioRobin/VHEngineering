@@ -11,6 +11,7 @@ import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, Aler
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { ManualOrderModal } from '@/components/modals/ManualOrderModal';
 
 export default function AdminPage() {
     const { setAdminShadowUser } = useUser();
@@ -18,6 +19,7 @@ export default function AdminPage() {
     // Auth State
     const [adminToken, setAdminToken] = useState<string | null>(null);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+    const [isManualOrderModalOpen, setIsManualOrderModalOpen] = useState(false);
 
     // Session Timeout Logic
     useEffect(() => {
@@ -569,12 +571,13 @@ export default function AdminPage() {
     }
 
     const handleManualOrder = () => {
-        const name = prompt('Voor welke collega wil je een bestelling plaatsen?');
-        if (name && name.trim()) {
-            setAdminShadowUser(name.trim());
-            showToast(`Shadow-modus geactiveerd voor ${name}`, 'success');
-            router.push('/');
-        }
+        setIsManualOrderModalOpen(true);
+    };
+
+    const handleManualOrderConfirm = (name: string) => {
+        setAdminShadowUser(name);
+        showToast(`Shadow-modus geactiveerd voor ${name}`, 'success');
+        router.push('/');
     };
 
     return (
@@ -1087,6 +1090,12 @@ export default function AdminPage() {
                     )
                 }
             </DashboardCard >
+
+            <ManualOrderModal
+                isOpen={isManualOrderModalOpen}
+                onClose={() => setIsManualOrderModalOpen(false)}
+                onConfirm={handleManualOrderConfirm}
+            />
         </div >
     );
 }

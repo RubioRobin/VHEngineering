@@ -13,6 +13,7 @@ import { useToast } from '@/components/providers/ToastProvider';
 import { formatName } from '@/lib/utils';
 import { useOrders } from '@/components/providers/OrdersProvider';
 import { useRouter } from 'next/navigation';
+import { ManualOrderModal } from '@/components/modals/ManualOrderModal';
 
 interface OrderItem {
     id: string;
@@ -41,8 +42,9 @@ const FALLBACK_SHIPPING_COST = 1.95;
 export default function OverviewPage() {
     const { weekOrders: orders, currentPeriod, isWeekLoading: loading, fetchWeekOrders } = useOrders();
     const { user, isAdmin, setAdminShadowUser } = useUser();
-    const { showToast } = useToast();
+B    const { showToast } = useToast();
     const router = useRouter();
+    const [isManualOrderModalOpen, setIsManualOrderModalOpen] = useState(false);
 
     const [isExporting, setIsExporting] = useState(false);
 
@@ -62,12 +64,13 @@ export default function OverviewPage() {
     }, [fetchWeekOrders]);
 
     const handleManualOrder = () => {
-        const name = prompt('Voor welke collega wil je een bestelling plaatsen?');
-        if (name && name.trim()) {
-            setAdminShadowUser(name.trim());
-            showToast(`Shadow-modus geactiveerd voor ${name}`, 'success');
-            router.push('/');
-        }
+        setIsManualOrderModalOpen(true);
+    };
+
+    const handleManualOrderConfirm = (name: string) => {
+        setAdminShadowUser(name);
+        showToast(`Shadow-modus geactiveerd voor ${name}`, 'success');
+        router.push('/');
     };
 
     const getTop5Products = () => {
@@ -347,6 +350,12 @@ export default function OverviewPage() {
                     </div>
                 </div>
             )}
+
+            <ManualOrderModal
+                isOpen={isManualOrderModalOpen}
+                onClose={() => setIsManualOrderModalOpen(false)}
+                onConfirm={handleManualOrderConfirm}
+            />
         </div>
     );
 }
