@@ -1,4 +1,4 @@
-import { addDays, nextFriday, setHours, setMinutes, setSeconds, startOfWeek, endOfWeek, getISOWeek, getISOWeekYear, isAfter, isBefore } from 'date-fns';
+import { addDays, addHours, nextFriday, setHours, setMinutes, setSeconds, startOfWeek, endOfWeek, getISOWeek, getISOWeekYear, isAfter, isBefore } from 'date-fns';
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import prisma from './prisma';
 const TIMEZONE = 'Europe/Amsterdam';
@@ -42,7 +42,8 @@ async function getDeadlineSettings() {
 }
 
 /**
- * Get the next deadline based on database settings
+ * Get the deadline associated with the currently active order period.
+ * The period switches to the next week on Monday morning (06:00).
  */
 export async function getNextDeadline(): Promise<Date> {
     const config = await getDeadlineSettings();
@@ -50,35 +51,25 @@ export async function getNextDeadline(): Promise<Date> {
     try {
         now = toZonedTime(new Date(), TIMEZONE);
     } catch (e) {
-        now = new Date(); // Fallback to UTC/local if timezone fails
+        now = new Date();
     }
 
-    // Get next occurrence of deadline day
-    let deadlineDate: Date;
+    // Determine the "active" date using a 6-hour offset.
+    // This keeps the previous week's period active until Monday 06:00.
+    const activeDate = addHours(now, -6);
 
-    if (now.getDay() === config.day) {
-        // Today is the deadline day
-        const todayAtDeadline = setSeconds(setMinutes(setHours(now, config.hour), config.minute), 0);
-        if (isBefore(now, todayAtDeadline)) {
-            deadlineDate = todayAtDeadline;
-        } else {
-            // Already past deadline, get next week
-            deadlineDate = addDays(now, 7);
-        }
-    } else {
-        // Find next occurrence of the day
-        // This is a simplified logic that works for weekly cycles
-        deadlineDate = new Date(now);
-        let daysUntil = (config.day - now.getDay() + 7) % 7;
-        if (daysUntil === 0) daysUntil = 7;
-        deadlineDate.setDate(now.getDate() + daysUntil);
-    }
+    // Find the Monday of the ISO week containing the active date
+    const monday = startOfWeek(activeDate, { weekStartsOn: 1 });
 
-    // Set time to configured deadline
-    const deadline = setSeconds(setMinutes(setHours(deadlineDate, config.hour), config.minute), 0);
+    // The deadline is config.day of that week.
+    // config.day: 0=Sun, 1=Mon, ..., 5=Fri, 6=Sat
+    let daysToAdd = config.day - 1;
+    if (daysToAdd < 0) daysToAdd += 7; // Sunday fallback
+
+    const deadlineDate = setSeconds(setMinutes(setHours(addDays(monday, daysToAdd), config.hour), config.minute), 0);
 
     // Convert back to UTC for storage
-    return fromZonedTime(deadline, TIMEZONE);
+    return fromZonedTime(deadlineDate, TIMEZONE);
 }
 
 /**
