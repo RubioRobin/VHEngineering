@@ -6,7 +6,7 @@ import { DashboardCard } from '@/components/ui/DashboardCard';
 import { DashboardButton } from '@/components/ui/DashboardButton';
 import { ProductManager } from '@/components/admin/ProductManager';
 import { AdminLoginModal } from '@/components/admin/AdminLoginModal';
-import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut, Check, Loader2, Euro } from 'lucide-react';
+import { Clock, Mail, Trash2, Plus, Send, Edit3, Eye, RefreshCcw, Settings, AlertTriangle, Database, Calendar, ChevronUp, ChevronDown, Info, LogOut, Check, Loader2, Euro, User, RotateCcw } from 'lucide-react';
 import { useToast } from '@/components/providers/ToastProvider';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -48,13 +48,21 @@ export default function AdminPage() {
     const [isResettingWeek, setIsResettingWeek] = useState(false);
     const [isSavingHeadline, setIsSavingHeadline] = useState(false);
     const [isSavingDeliveryCost, setIsSavingDeliveryCost] = useState(false);
+    const [isSavingJesseStatus, setIsSavingJesseStatus] = useState(false);
     const [isAddingEmail, setIsAddingEmail] = useState(false);
     const [isSendingTestEmail, setIsSendingTestEmail] = useState(false);
     const [isSavingTemplate, setIsSavingTemplate] = useState(false);
     const [deletingEmailId, setDeletingEmailId] = useState<string | null>(null);
 
-    // Delivery Cost
+    // Delivery Cost & Jesse
     const [deliveryCost, setDeliveryCost] = useState<number>(1.95);
+    const [jesseParticipating, setJesseParticipating] = useState(false);
+
+    // Email List Item Editing
+    const [editingSubId, setEditingSubId] = useState<string | null>(null);
+    const [editEmail, setEditEmail] = useState('');
+    const [editName, setEditName] = useState('');
+    const [isUpdatingSub, setIsUpdatingSub] = useState(false);
 
     // Recurring settings (Initialize with CURRENT TIME)
     const [deadlinesSettings, setDeadlineSettings] = useState(() => {
@@ -174,6 +182,9 @@ export default function AdminPage() {
                 });
                 if (data.deliveryCost !== undefined) {
                     setDeliveryCost(data.deliveryCost);
+                }
+                if (data.jesseParticipating !== undefined) {
+                    setJesseParticipating(data.jesseParticipating);
                 }
             }
         } catch (error) {
@@ -428,6 +439,66 @@ export default function AdminPage() {
             showToast('Netwerkfout', 'error');
         } finally {
             setIsSavingDeliveryCost(false);
+        }
+    };
+
+    const handleSaveJesseStatus = async (val: boolean) => {
+        if (!adminToken) return;
+
+        setJesseParticipating(val);
+        setIsSavingJesseStatus(true);
+        try {
+            const res = await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                },
+                body: JSON.stringify({ jesseParticipating: val })
+            });
+
+            if (res.ok) {
+                showToast(`Jesse's status bijgewerkt: ${val ? 'Doet mee' : 'Doet niet mee'}`, 'success');
+            } else {
+                if (res.status === 401) handleLogout();
+                showToast('Fout bij opslaan status', 'error');
+                fetchRecursiveSettings(); // Revert
+            }
+        } catch (error) {
+            showToast('Netwerkfout', 'error');
+            fetchRecursiveSettings();
+        } finally {
+            setIsSavingJesseStatus(false);
+        }
+    };
+
+    const handleUpdateSubscriber = async (id: string) => {
+        if (!adminToken) return;
+        if (!editEmail) return;
+
+        setIsUpdatingSub(true);
+        try {
+            const res = await fetch('/api/admin/emails', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                },
+                body: JSON.stringify({ id, email: editEmail, name: editName })
+            });
+
+            if (res.ok) {
+                showToast('Gegevens bijgewerkt!', 'success');
+                setEditingSubId(null);
+                fetchEmails();
+            } else {
+                if (res.status === 401) handleLogout();
+                showToast('Fout bij bijwerken', 'error');
+            }
+        } catch (error) {
+            showToast('Netwerkfout', 'error');
+        } finally {
+            setIsUpdatingSub(false);
         }
     };
 
@@ -701,6 +772,33 @@ export default function AdminPage() {
                     </DashboardButton>
                 </DashboardCard>
 
+                {/* Jesse's Fixed Order Management */}
+                <DashboardCard className="p-6 border-indigo-100 bg-indigo-50/50 flex flex-col justify-between">
+                    <div>
+                        <div className="flex items-center gap-4 mb-4 text-indigo-600">
+                            <User className="w-8 h-8" />
+                            <h2 className="text-xl font-bold">Vaste bestelling Jesse</h2>
+                        </div>
+                        <p className="text-text-secondary mb-4 text-sm">
+                            Voeg automatisch Jesse's bestelling toe aan de lijst.<br />
+                            (Pistolet kip-kerrie + Milano chili-kip speciaal)
+                        </p>
+                        <div className="flex items-center gap-3 p-3 bg-white/60 rounded-lg border border-indigo-100">
+                            <input
+                                type="checkbox"
+                                id="jesse-participating"
+                                checked={jesseParticipating}
+                                onChange={(e) => handleSaveJesseStatus(e.target.checked)}
+                                className="w-5 h-5 text-indigo-600 rounded cursor-pointer"
+                            />
+                            <label htmlFor="jesse-participating" className="font-semibold text-gray-700 cursor-pointer">
+                                Jesse eet mee deze week
+                            </label>
+                            {isSavingJesseStatus && <Loader2 className="w-4 h-4 animate-spin text-indigo-500" />}
+                        </div>
+                    </div>
+                </DashboardCard>
+
                 {/* Assortment Management */}
                 <DashboardCard className="p-6 border-cyan-100 bg-cyan-50/50 flex flex-col justify-between">
                     <div>
@@ -796,27 +894,74 @@ export default function AdminPage() {
                     ) : (
                         emailList.map((subscriber) => (
                             <div key={subscriber.id} className={`group flex items-center justify-between p-3 bg-white hover:bg-blue-50/50 rounded-xl border transition-all shadow-sm hover:shadow-md ${!subscriber.active ? 'opacity-60 border-gray-200 bg-gray-50' : 'border-blue-100/50 hover:border-blue-200'}`}>
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-colors ${subscriber.active ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}>
+                                <div className="flex items-center gap-4 flex-1">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-colors shrink-0 ${subscriber.active ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}>
                                         {(subscriber.name || subscriber.email || '?')[0].toUpperCase()}
                                     </div>
-                                    <div>
-                                        <p className={`font-medium ${subscriber.active ? 'text-gray-800' : 'text-gray-500 line-through'}`}>{subscriber.email}</p>
-                                        <div className="flex items-center gap-2">
-                                            {subscriber.name && (
-                                                <p className="text-xs text-blue-400 font-medium">{subscriber.name}</p>
-                                            )}
-                                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${subscriber.active ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
-                                                {subscriber.active ? 'Actief' : 'Niet actief'}
-                                            </span>
+
+                                    {editingSubId === subscriber.id ? (
+                                        <div className="flex flex-col md:flex-row gap-2 flex-1">
+                                            <input
+                                                type="email"
+                                                value={editEmail}
+                                                onChange={(e) => setEditEmail(e.target.value)}
+                                                className="px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-blue-500 outline-none flex-1"
+                                                placeholder="Email"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={editName}
+                                                onChange={(e) => setEditName(e.target.value)}
+                                                className="px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-blue-500 outline-none flex-1"
+                                                placeholder="Naam"
+                                            />
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => handleUpdateSubscriber(subscriber.id)}
+                                                    className="p-1.5 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                                    title="Opslaan"
+                                                >
+                                                    {isUpdatingSub ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingSubId(null)}
+                                                    className="p-1.5 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors"
+                                                    title="Annuleren"
+                                                >
+                                                    <RotateCcw className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div
+                                            className="cursor-pointer group/info flex-1"
+                                            onClick={() => {
+                                                setEditingSubId(subscriber.id);
+                                                setEditEmail(subscriber.email);
+                                                setEditName(subscriber.name || '');
+                                            }}
+                                            title="Klik om te bewerken"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <p className={`font-medium ${subscriber.active ? 'text-gray-800' : 'text-gray-500 line-through'}`}>{subscriber.email}</p>
+                                                <Edit3 className="w-3 h-3 text-blue-300 opacity-0 group-hover/info:opacity-100 transition-opacity" />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {subscriber.name && (
+                                                    <p className="text-xs text-blue-400 font-medium">{subscriber.name}</p>
+                                                )}
+                                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${subscriber.active ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                                                    {subscriber.active ? 'Actief' : 'Niet actief'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    {/* Standard Checkbox for better visibility */}
+                                    {/* Smaller standard Checkbox per user request */}
                                     <input
                                         type="checkbox"
-                                        className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 shadow-sm cursor-pointer"
+                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 shadow-sm cursor-pointer"
                                         checked={subscriber.active ?? true}
                                         onChange={() => handleToggleActive(subscriber.id, subscriber.active ?? true)}
                                         title={subscriber.active ? "Actief (krijgt mail)" : "Niet actief (krijgt geen mail)"}

@@ -25,9 +25,15 @@ export async function GET(request: NextRequest) {
             where: { key: 'DELIVERY_COST' }
         });
 
+        // Fetch Jesse status
+        const jesseSetting = await prisma.globalSetting.findUnique({
+            where: { key: 'JESSE_PARTICIPATING' }
+        });
+
         return NextResponse.json({
             ...config,
-            deliveryCost: deliverySetting ? parseFloat(deliverySetting.value) : 1.95
+            deliveryCost: deliverySetting ? parseFloat(deliverySetting.value) : 1.95,
+            jesseParticipating: jesseSetting ? jesseSetting.value === 'true' : false
         });
     } catch (error) {
         console.error('Error fetching settings:', error);
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { day, hour, minute, deliveryCost } = await request.json();
+        const { day, hour, minute, deliveryCost, jesseParticipating } = await request.json();
 
         const settings = [];
 
@@ -66,6 +72,11 @@ export async function POST(request: NextRequest) {
         // Update delivery cost if provided
         if (deliveryCost !== undefined) {
             settings.push({ key: 'DELIVERY_COST', value: deliveryCost.toString() });
+        }
+
+        // Update Jesse status if provided
+        if (jesseParticipating !== undefined) {
+            settings.push({ key: 'JESSE_PARTICIPATING', value: jesseParticipating.toString() });
         }
 
         for (const setting of settings) {

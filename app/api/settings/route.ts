@@ -6,16 +6,20 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const setting = await prisma.globalSetting.findUnique({
+        const deliverySetting = await prisma.globalSetting.findUnique({
             where: { key: 'DELIVERY_COST' }
         });
 
-        // Default to 1.95 if not set
-        const deliveryCost = setting ? parseFloat(setting.value) : 1.95;
+        const jesseSetting = await prisma.globalSetting.findUnique({
+            where: { key: 'JESSE_PARTICIPATING' }
+        });
 
-        return NextResponse.json({ deliveryCost });
+        return NextResponse.json({
+            deliveryCost: deliverySetting ? parseFloat(deliverySetting.value) : 1.95,
+            jesseParticipating: jesseSetting ? jesseSetting.value === 'true' : false
+        });
     } catch (error) {
         console.error('Error fetching settings:', error);
-        return NextResponse.json({ deliveryCost: 1.95 }); // Fallback
+        return NextResponse.json({ deliveryCost: 1.95, jesseParticipating: false });
     }
 }

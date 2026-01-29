@@ -139,6 +139,24 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
         price: number | null;
     }>();
 
+    // Check if Jesse is participating
+    const jesseSetting = await prisma.globalSetting.findUnique({ where: { key: 'JESSE_PARTICIPATING' } });
+    if (jesseSetting?.value === 'true') {
+        const jesseItems = [
+            { name: "Pistolet kip-kerrie", quantity: 1, price: 5 },
+            { name: "Milano chili-kip speciaal", quantity: 1, price: 5.4 }
+        ];
+
+        jesseItems.forEach(item => {
+            sandwichTotals.set(item.name, {
+                name: item.name,
+                quantity: 1,
+                comments: ["Jesse vaste bestelling"],
+                price: item.price
+            });
+        });
+    }
+
     orders.forEach(order => {
         order.orderItems.forEach(item => {
             const key = formatName(item.product.name);
