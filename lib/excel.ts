@@ -135,6 +135,45 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
         });
     });
 
+    // Check if Jesse is participating (using period status if available, fallback to global)
+    // If period exists, trust its flag. If not (shouldn't happen if orders exist), fallback to false or global.
+    let jesseParticipating = period ? period.jesseParticipating : false;
+
+    // Fallback: Check global setting if local is false
+    if (!jesseParticipating) {
+        const globalJesse = await prisma.globalSetting.findUnique({ where: { key: 'JESSE_PARTICIPATING' } });
+        if (globalJesse?.value === 'true') {
+            jesseParticipating = true;
+        }
+    }
+
+    if (jesseParticipating) {
+        const jesseItems = [
+            { name: "Pistolet kip-kerrie", quantity: 1, price: 5 },
+            { name: "Milano chili-kip speciaal", quantity: 1, price: 5.4 }
+        ];
+
+        jesseItems.forEach(item => {
+            const row = personSheet.addRow({
+                name: 'Jesse',
+                department: 'Engineering',
+                sandwich: item.name,
+                quantity: item.quantity,
+                comment: '-',
+                price: item.price,
+                orderedAt: new Date().toLocaleDateString('nl-NL'), // Just use current date or period close date
+            });
+
+            row.getCell('quantity').alignment = { horizontal: 'center' };
+            row.getCell('price').numFmt = '"€" #,##0.00';
+
+            row.eachCell((cell) => {
+                addBorders(cell);
+                cell.alignment = { ...cell.alignment, vertical: 'middle' };
+            });
+        });
+    }
+
     // ===== TAB 2: Totaallijst =====
     const totalsSheet = workbook.addWorksheet('Totaallijst');
 
@@ -156,23 +195,8 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
         price: number | null;
     }>();
 
-    // Check if Jesse is participating
-    // Check if Jesse is participating (using period status if available, fallback to global)
-    // If period exists, trust its flag. If not (shouldn't happen if orders exist), fallback to false or global.
-    // Check if Jesse is participating (using period status if available, fallback to global)
-    let jesseParticipating = period ? period.jesseParticipating : false;
+    // Check if Jesse is participating - reusing the logic from above
 
-    // Fallback: If false (maybe older period record or just created before toggle), check global setting as a safety net.
-    // Ideally we only do this for the *current* or recent periods, but for now, if the user wants it, they want it.
-    // However, to respect history, we should probably only do this if period.jesseParticipating is strictly false/undefined?
-    // Let's just fetch global setting if local is false, and assume if global is TRUE, it should override for now to fix the user's issue.
-    // A better long term fix is ensuring the period record is updated correctly.
-    if (!jesseParticipating) {
-        const globalJesse = await prisma.globalSetting.findUnique({ where: { key: 'JESSE_PARTICIPATING' } });
-        if (globalJesse?.value === 'true') {
-            jesseParticipating = true;
-        }
-    }
 
     if (jesseParticipating) {
         const jesseItems = [
@@ -184,7 +208,7 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
             sandwichTotals.set(item.name, {
                 name: item.name,
                 quantity: 1,
-                comments: ["Jesse vaste bestelling"],
+                comments: [], // User requested no comment
                 price: item.price
             });
         });
