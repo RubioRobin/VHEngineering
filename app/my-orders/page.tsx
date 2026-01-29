@@ -88,8 +88,9 @@ export default function MijnBestellingenPage() {
 
     // const SHIPPING_COST = 1.95; // Old hardcoded value
 
-    const calculateTotal = (orderItems: any[], participantsCount: number = 1) => {
-        const itemsTotal = orderItems.reduce((acc, item) => {
+    const calculateTotal = (order: any, participantsCount: number = 1) => {
+        if (order.notParticipating) return 0;
+        const itemsTotal = (order.orderItems || []).reduce((acc: number, item: any) => {
             const price = item.product?.price || 0;
             return acc + (item.quantity * price);
         }, 0);
@@ -140,9 +141,10 @@ export default function MijnBestellingenPage() {
                         const isExpanded = expandedWeeks.has(weekId);
                         const firstOrder = weekOrders[0];
                         const jesseParticipating = firstOrder?.orderPeriod?.jesseParticipating ?? false;
-                        const participantsCount = (firstOrder?.orderPeriod?._count?.orders || 0) + (jesseParticipating ? 1 : 0);
+                        // Use the participating orders list from the API
+                        const participantsCount = (firstOrder?.orderPeriod?.orders?.length || 0) + (jesseParticipating ? 1 : 0);
                         const weekTotal = weekOrders.reduce((sum: number, order: any) =>
-                            sum + calculateTotal(order.orderItems || [], participantsCount), 0
+                            sum + calculateTotal(order, participantsCount), 0
                         );
 
                         return (
@@ -231,17 +233,19 @@ export default function MijnBestellingenPage() {
                                                                 {format(new Date(order.createdAt), 'EEEE d MMMM, HH:mm', { locale: nl })}
                                                             </p>
                                                             <p className="text-xs text-text-muted mt-0.5">
-                                                                Totaal inc. € {shippingShare.toFixed(2)} bezorgkosten
+                                                                {order.notParticipating ? 'Geen kosten deze week' : `Totaal inc. € ${shippingShare.toFixed(2)} bezorgkosten`}
                                                             </p>
                                                         </div>
                                                         <div className="flex items-center gap-2 w-full md:w-auto">
-                                                            <button
-                                                                onClick={() => handleReorder(order)}
-                                                                className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all font-medium shadow-sm hover:shadow flex-1 md:flex-none"
-                                                            >
-                                                                <RotateCcw className="w-4 h-4" />
-                                                                Opnieuw bestellen
-                                                            </button>
+                                                            {!order.notParticipating && (
+                                                                <button
+                                                                    onClick={() => handleReorder(order)}
+                                                                    className="flex items-center justify-center gap-1.5 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all font-medium shadow-sm hover:shadow flex-1 md:flex-none"
+                                                                >
+                                                                    <RotateCcw className="w-4 h-4" />
+                                                                    Opnieuw bestellen
+                                                                </button>
+                                                            )}
                                                             <button
                                                                 onClick={() => handleDeleteOrder(order.id)}
                                                                 className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
@@ -254,25 +258,33 @@ export default function MijnBestellingenPage() {
 
                                                     {/* Order Items - Compact List */}
                                                     <div className="space-y-2">
-                                                        {order.orderItems?.map((item: any) => (
-                                                            <div key={item.id} className="flex justify-between items-center text-sm py-1">
-                                                                <span className="text-text-secondary flex items-center gap-2">
-                                                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-primary/10 text-primary text-xs font-bold">
-                                                                        {item.quantity}
-                                                                    </span>
-                                                                    <span>{formatName(item.product.name)}</span>
-                                                                </span>
-                                                                <span className="text-text-primary font-semibold ml-4">
-                                                                    € {(item.quantity * item.product.price).toFixed(2)}
-                                                                </span>
+                                                        {order.notParticipating ? (
+                                                            <div className="py-4 text-center bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                                                                <p className="text-sm text-gray-500 italic">Je hebt aangegeven deze week niet mee te eten.</p>
                                                             </div>
-                                                        ))}
+                                                        ) : (
+                                                            <>
+                                                                {order.orderItems?.map((item: any) => (
+                                                                    <div key={item.id} className="flex justify-between items-center text-sm py-1">
+                                                                        <span className="text-text-secondary flex items-center gap-2">
+                                                                            <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-primary/10 text-primary text-xs font-bold">
+                                                                                {item.quantity}
+                                                                            </span>
+                                                                            <span>{formatName(item.product.name)}</span>
+                                                                        </span>
+                                                                        <span className="text-text-primary font-semibold ml-4">
+                                                                            € {(item.quantity * item.product.price).toFixed(2)}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
 
-                                                        {/* Shipping Share Item */}
-                                                        <div className="flex justify-between items-center text-sm py-1 border-t border-dashed border-border/50 mt-1 pt-2 italic text-text-muted">
-                                                            <span>Bezorgkosten (aandeel {participantsCount} pers.)</span>
-                                                            <span className="font-medium">€ {shippingShare.toFixed(2)}</span>
-                                                        </div>
+                                                                {/* Shipping Share Item */}
+                                                                <div className="flex justify-between items-center text-sm py-1 border-t border-dashed border-border/50 mt-1 pt-2 italic text-text-muted">
+                                                                    <span>Bezorgkosten (aandeel {participantsCount} pers.)</span>
+                                                                    <span className="font-medium">€ {shippingShare.toFixed(2)}</span>
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </div>
 
                                                     {/* Total per Order - only if multiple orders in week */}
@@ -280,7 +292,7 @@ export default function MijnBestellingenPage() {
                                                         <div className="mt-3 pt-3 border-t border-border flex justify-between items-center">
                                                             <span className="text-xs font-bold text-text-muted tracking-wider">Subtotaal</span>
                                                             <span className="text-base font-bold text-text-primary">
-                                                                € {calculateTotal(order.orderItems || [], participantsCount).toFixed(2)}
+                                                                € {calculateTotal(order, participantsCount).toFixed(2)}
                                                             </span>
                                                         </div>
                                                     )}

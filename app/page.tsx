@@ -15,6 +15,7 @@ import { HomeHeader } from '@/components/home/HomeHeader';
 import { ProductFilterBar } from '@/components/home/ProductFilterBar';
 import { ProductGrid } from '@/components/home/ProductGrid';
 import { OrderSuccessModal } from '@/components/modals/OrderSuccessModal';
+import { NotParticipatingModal } from '@/components/modals/NotParticipatingModal';
 import { differenceInHours, differenceInMinutes } from 'date-fns';
 import { Clock } from 'lucide-react';
 
@@ -49,6 +50,7 @@ export default function HomePage() {
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showNotParticipatingModal, setShowNotParticipatingModal] = useState(false);
     const [lastOrderDetails, setLastOrderDetails] = useState<{
         orderId: string,
         totalAmount: number,
@@ -292,6 +294,14 @@ export default function HomePage() {
                 onClose={() => setShowSuccessModal(false)}
                 orderData={lastOrderDetails}
             />
+            <NotParticipatingModal
+                isOpen={showNotParticipatingModal}
+                onClose={() => setShowNotParticipatingModal(false)}
+                onSuccess={() => {
+                    // Refresh orders list to show user appearing in non-participating list
+                    window.dispatchEvent(new Event('orders-updated'));
+                }}
+            />
 
 
             {/* Back to Top Button */}
@@ -312,6 +322,7 @@ export default function HomePage() {
                 deadline={deadline}
                 lastOrder={lastOrder}
                 onReorder={handleReorder}
+                onNotParticipating={() => setShowNotParticipatingModal(true)}
             />
 
             {/* Filter Bar */}

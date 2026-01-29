@@ -187,7 +187,7 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <DashboardCard className="p-6 flex items-center gap-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary text-xl font-bold">
-                        {period.orders.length + (period.jesseParticipating ? 1 : 0)}
+                        {(period.orders.filter((o: any) => !o.notParticipating).length + (period.jesseParticipating ? 1 : 0))}
                     </div>
                     <div>
                         <p className="text-text-muted text-sm">Bestellingen</p>
@@ -202,7 +202,7 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                     <div>
                         <p className="text-text-muted text-sm">Totale Waarde (inc. Jesse)</p>
                         <p className="text-xl font-bold text-text-primary">
-                            € {(period.orders.reduce((acc: number, order: any) => acc + order.orderItems.reduce((iAcc: number, item: any) => iAcc + (item.product.price * item.quantity), 0), 0) + (period.jesseParticipating ? 10.40 : 0)).toFixed(2)}
+                            € {(period.orders.filter((o: any) => !o.notParticipating).reduce((acc: number, order: any) => acc + order.orderItems.reduce((iAcc: number, item: any) => iAcc + (item.product.price * item.quantity), 0), 0) + (period.jesseParticipating ? 10.40 : 0)).toFixed(2)}
                         </p>
                     </div>
                 </DashboardCard>
@@ -214,7 +214,7 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                     <div>
                         <p className="text-text-muted text-sm">Bezorging p.p.</p>
                         <p className="text-xl font-bold text-text-primary">
-                            € {(deliveryCost / (period.orders.length + (period.jesseParticipating ? 1 : 0))).toFixed(2)}
+                            € {(deliveryCost / (period.orders.filter((o: any) => !o.notParticipating).length + (period.jesseParticipating ? 1 : 0))).toFixed(2)}
                         </p>
                     </div>
                 </DashboardCard>
@@ -261,23 +261,23 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
 
                                     <div className="flex justify-between items-center text-xs text-indigo-400 mt-2 pt-2 border-t border-dashed border-indigo-100">
                                         <span>Bezorgkosten (aandeel)</span>
-                                        <span>€ {(deliveryCost / (period.orders.length + (period.jesseParticipating ? 1 : 0))).toFixed(2)}</span>
+                                        <span>€ {(deliveryCost / (period.orders.filter((o: any) => !o.notParticipating).length + (period.jesseParticipating ? 1 : 0))).toFixed(2)}</span>
                                     </div>
                                 </div>
 
                                 <div className="p-3 bg-indigo-50 border-t border-indigo-100 flex justify-end items-center text-sm font-semibold">
                                     <div className="text-right">
                                         <span className="text-indigo-600 mr-2">Totaal:</span>
-                                        <span className="text-indigo-900 text-lg">€ {(10.40 + (deliveryCost / (period.orders.length + (period.jesseParticipating ? 1 : 0)))).toFixed(2)}</span>
+                                        <span className="text-indigo-900 text-lg">€ {(10.40 + (deliveryCost / (period.orders.filter((o: any) => !o.notParticipating).length + (period.jesseParticipating ? 1 : 0)))).toFixed(2)}</span>
                                     </div>
                                 </div>
                             </DashboardCard>
                         </motion.div>
                     )}
 
-                    {period.orders.map((order: any, index: number) => {
-                        const participantsCount = period.orders.length + (period.jesseParticipating ? 1 : 0);
-                        const shippingPerPerson = deliveryCost / participantsCount;
+                    {period.orders.filter((o: any) => !o.notParticipating).map((order: any, index: number) => {
+                        const participatingCount = period.orders.filter((o: any) => !o.notParticipating).length + (period.jesseParticipating ? 1 : 0);
+                        const shippingPerPerson = deliveryCost / participatingCount;
                         return (
                             <motion.div
                                 key={order.id}
@@ -346,7 +346,7 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                         );
                     })}
 
-                    {period.orders.length === 0 && (
+                    {period.orders.filter((o: any) => !o.notParticipating).length === 0 && (
                         <div className="col-span-full py-20 text-center bg-white rounded-3xl border-2 border-dashed border-gray-100">
                             <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                             <h3 className="text-lg font-medium text-gray-500 italic">Geen bestellingen gevonden</h3>
@@ -355,6 +355,29 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                     )}
                 </div>
             </div>
+
+            {/* Non-participants Section */}
+            {period.orders.filter((o: any) => o.notParticipating).length > 0 && (
+                <div className="space-y-4 pt-8 border-t border-border">
+                    <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
+                        <span className="text-2xl">🚫</span> {period.orders.filter((o: any) => o.notParticipating).length} {period.orders.filter((o: any) => o.notParticipating).length === 1 ? 'Collega at' : 'Collega\'s aten'} niet mee
+                    </h2>
+                    <div className="flex flex-wrap gap-3">
+                        {period.orders.filter((o: any) => o.notParticipating).map((order: any) => (
+                            <div
+                                key={order.id}
+                                className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-full flex items-center gap-2 group hover:bg-white hover:border-gray-300 transition-all shadow-sm"
+                                title={`Afgemeld op ${format(new Date(order.createdAt), 'EEEE HH:mm', { locale: nl })}`}
+                            >
+                                <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-[10px] font-bold group-hover:bg-gray-300 transition-colors">
+                                    {order.personName.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="text-sm font-medium text-gray-700">{order.personName}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <PasswordModal
                 isOpen={showPasswordModal}

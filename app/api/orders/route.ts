@@ -11,7 +11,7 @@ export const revalidate = 0;
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { userName, items, generalComment, userId } = body;
+        const { userName, items, generalComment, userId, notParticipating } = body;
 
         // First, check and close any expired periods
         await checkAndCloseExpiredPeriods();
@@ -42,8 +42,9 @@ export async function POST(request: Request) {
                 userId: userId,
                 department: department,
                 generalComment,
+                notParticipating: !!notParticipating,
                 orderPeriodId: period.id,
-                orderItems: {
+                orderItems: notParticipating ? undefined : {
                     create: items.map((item: any) => ({
                         productId: item.productId,
                         quantity: item.quantity,

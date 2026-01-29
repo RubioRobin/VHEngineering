@@ -14,6 +14,7 @@ interface HomeHeaderProps {
     deadline: Date | null;
     lastOrder: any;
     onReorder: () => void;
+    onNotParticipating: () => void;
 }
 
 const ClockIcon = () => (
@@ -23,7 +24,7 @@ const ClockIcon = () => (
     </svg>
 );
 
-export const HomeHeader = ({ deadline, lastOrder, onReorder }: HomeHeaderProps) => {
+export const HomeHeader = ({ deadline, lastOrder, onReorder, onNotParticipating }: HomeHeaderProps) => {
     // Timer State
     const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
 
@@ -97,7 +98,7 @@ export const HomeHeader = ({ deadline, lastOrder, onReorder }: HomeHeaderProps) 
                     </DashboardCard>
 
                     {/* Recent Order - Reorder */}
-                    {lastOrder && (
+                    {lastOrder ? (
                         <DashboardCard className="flex-1 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
                             <div className="mb-3">
                                 <h3 className="text-lg font-bold text-text-primary">Bestel opnieuw</h3>
@@ -116,11 +117,35 @@ export const HomeHeader = ({ deadline, lastOrder, onReorder }: HomeHeaderProps) 
                                 )}
                             </div>
 
+                            <div className="flex gap-2">
+                                <DashboardButton
+                                    onClick={onReorder}
+                                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 shadow-lg"
+                                >
+                                    Opnieuw
+                                </DashboardButton>
+                                <DashboardButton
+                                    onClick={onNotParticipating}
+                                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-500 font-bold py-4 border border-gray-200"
+                                >
+                                    Eet niet mee
+                                </DashboardButton>
+                            </div>
+                        </DashboardCard>
+                    ) : (
+                        <DashboardCard className="flex-1 bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-100">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-bold text-indigo-900">Nog geen bestelling</h3>
+                                <p className="text-sm text-indigo-700 mt-1">
+                                    Heb je deze week al wat gekozen? Of eet je niet mee?
+                                </p>
+                            </div>
+
                             <DashboardButton
-                                onClick={onReorder}
-                                className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 shadow-lg"
+                                onClick={onNotParticipating}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 shadow-lg shadow-indigo-200"
                             >
-                                Opnieuw bestellen
+                                Ik eet niet mee
                             </DashboardButton>
                         </DashboardCard>
                     )}

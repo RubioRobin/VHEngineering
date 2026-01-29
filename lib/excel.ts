@@ -9,6 +9,7 @@ interface OrderWithDetails {
     personName: string;
     department: string | null;
     createdAt: Date;
+    notParticipating: boolean;
     orderItems: {
         id: string;
         quantity: number;
@@ -94,7 +95,7 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
 
     styleHeader(personSheet.getRow(1));
 
-    orders.forEach(order => {
+    orders.filter(o => !o.notParticipating).forEach(order => {
         order.orderItems.forEach(item => {
             const row = personSheet.addRow({
                 name: order.personName,
@@ -157,7 +158,7 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
         });
     }
 
-    orders.forEach(order => {
+    orders.filter(o => !o.notParticipating).forEach(order => {
         order.orderItems.forEach(item => {
             const key = formatName(item.product.name);
             const existing = sandwichTotals.get(key);

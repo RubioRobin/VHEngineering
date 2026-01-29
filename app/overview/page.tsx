@@ -29,6 +29,10 @@ interface Order {
     generalComment: string | null;
     createdAt: string;
     orderItems: OrderItem[];
+    notParticipating?: boolean;
+    orderPeriod?: {
+        jesseParticipating: boolean;
+    };
 }
 
 const FALLBACK_SHIPPING_COST = 1.95;
@@ -61,7 +65,9 @@ export default function OverviewPage() {
     const getTop5Products = () => {
         const productCounts: Record<string, { name: string; count: number; price: number }> = {};
 
-        orders.forEach((order: Order) => {
+        const participatingOrders = orders.filter((o: Order) => !o.notParticipating);
+
+        participatingOrders.forEach((order: Order) => {
             order.orderItems.forEach((item: OrderItem) => {
                 const key = item.product.name;
                 if (!productCounts[key]) {
@@ -91,7 +97,9 @@ export default function OverviewPage() {
     };
 
     const jesseParticipating = orders.length > 0 && orders[0].orderPeriod?.jesseParticipating;
-    const participantsCount = orders.length + (jesseParticipating ? 1 : 0);
+    const participatingOrders = orders.filter((o: Order) => !o.notParticipating);
+    const nonParticipatingOrders = orders.filter((o: Order) => o.notParticipating);
+    const participantsCount = participatingOrders.length + (jesseParticipating ? 1 : 0);
     const shippingPerPerson = participantsCount > 0 ? deliveryCost / participantsCount : 0;
 
     const handleExport = async () => {
@@ -126,7 +134,7 @@ export default function OverviewPage() {
         return orderItems.reduce((acc, item) => acc + (item.quantity * item.product.price), 0);
     };
 
-    const totalProductRevenue = orders.reduce((acc, order) => acc + calculateTotal(order.orderItems), 0) + (jesseParticipating ? 10.40 : 0);
+    const totalProductRevenue = participatingOrders.reduce((acc, order) => acc + calculateTotal(order.orderItems), 0) + (jesseParticipating ? 10.40 : 0);
     const totalWithShipping = totalProductRevenue + (participantsCount > 0 ? deliveryCost : 0);
 
     if (loading) {
@@ -241,7 +249,7 @@ export default function OverviewPage() {
                     </motion.div>
                 )}
 
-                {orders.map((order: any) => (
+                {participatingOrders.map((order: any) => (
                     <motion.div key={order.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                         <DashboardCard className="p-0 overflow-hidden">
                             <div className="p-4 bg-background/50 border-b border-border flex items-center justify-between">
@@ -297,6 +305,29 @@ export default function OverviewPage() {
                     </motion.div>
                 ))}
             </div>
+
+            {/* Non-participants Section */}
+            {nonParticipatingOrders.length > 0 && (
+                <div className="space-y-4 pt-8 border-t border-border">
+                    <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
+                        <span className="text-2xl">🚫</span> {nonParticipatingOrders.length} {nonParticipatingOrders.length === 1 ? 'Collega eet' : 'Collega\'s eten'} niet mee
+                    </h2>
+                    <div className="flex flex-wrap gap-3">
+                        {nonParticipatingOrders.map((order: any) => (
+                            <div
+                                key={order.id}
+                                className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-full flex items-center gap-2 group hover:bg-white hover:border-gray-300 transition-all shadow-sm"
+                                title={`Afgemeld op ${format(new Date(order.createdAt), 'EEEE HH:mm', { locale: nl })}`}
+                            >
+                                <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-[10px] font-bold group-hover:bg-gray-300 transition-colors">
+                                    {order.personName.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="text-sm font-medium text-gray-700">{order.personName}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

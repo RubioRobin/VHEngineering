@@ -28,8 +28,9 @@ export async function GET(request: Request) {
                 },
                 orderPeriod: {
                     include: {
-                        _count: {
-                            select: { orders: true }
+                        orders: {
+                            where: { notParticipating: false },
+                            select: { id: true }
                         }
                     }
                 }

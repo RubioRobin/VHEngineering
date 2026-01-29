@@ -70,6 +70,7 @@ model Order {
   orderPeriodId  String
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+  notParticipating Boolean  @default(false)
   orderPeriod    OrderPeriod @relation(fields: [orderPeriodId], references: [id], onDelete: Cascade)
   user           User?       @relation(fields: [userId], references: [id])
   orderItems     OrderItem[]
