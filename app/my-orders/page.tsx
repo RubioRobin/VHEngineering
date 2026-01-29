@@ -139,7 +139,8 @@ export default function MijnBestellingenPage() {
                     {Object.entries(ordersByWeek).map(([weekId, weekOrders]: [string, any]) => {
                         const isExpanded = expandedWeeks.has(weekId);
                         const firstOrder = weekOrders[0];
-                        const participantsCount = firstOrder?.orderPeriod?._count?.orders || 1;
+                        const jesseParticipating = firstOrder?.orderPeriod?.jesseParticipating ?? false;
+                        const participantsCount = (firstOrder?.orderPeriod?._count?.orders || 0) + (jesseParticipating ? 1 : 0);
                         const weekTotal = weekOrders.reduce((sum: number, order: any) =>
                             sum + calculateTotal(order.orderItems || [], participantsCount), 0
                         );
@@ -183,6 +184,39 @@ export default function MijnBestellingenPage() {
                                 {/* Week Orders - Collapsible with Animation */}
                                 {isExpanded && (
                                     <div className="border-t border-border bg-gray-50/30 pb-3">
+                                        {/* Jesse Virtual Order Injection if participating */}
+                                        {weekOrders[0]?.orderPeriod?.jesseParticipating && (
+                                            <div className="px-6 py-4 bg-indigo-50/30 mt-3 mx-3 rounded-lg border border-indigo-100/50 shadow-sm">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">J</div>
+                                                            <p className="text-sm font-semibold text-indigo-900">Jesse (Vaste bestelling)</p>
+                                                        </div>
+                                                        <p className="text-xs text-indigo-400 mt-0.5">Automatisch meegerekend voor kostenverdeling</p>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {[
+                                                        { name: 'Pistolet kip-kerrie', price: 5.00 },
+                                                        { name: 'Milano chili-kip speciaal', price: 5.40 }
+                                                    ].map((item, idx) => (
+                                                        <div key={idx} className="flex justify-between items-center text-sm py-1">
+                                                            <span className="text-indigo-800 flex items-center gap-2">
+                                                                <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-bold">1</span>
+                                                                <span>{formatName(item.name)}</span>
+                                                            </span>
+                                                            <span className="text-indigo-900 font-semibold ml-4">€ {item.price.toFixed(2)}</span>
+                                                        </div>
+                                                    ))}
+                                                    <div className="flex justify-between items-center text-sm py-1 border-t border-dashed border-indigo-100 mt-1 pt-2 italic text-indigo-400">
+                                                        <span>Bezorgkosten (aandeel)</span>
+                                                        <span className="font-medium">€ {(deliveryCost / participantsCount).toFixed(2)}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {weekOrders.map((order: any, idx: number) => {
                                             const shippingShare = deliveryCost / participantsCount;
                                             return (

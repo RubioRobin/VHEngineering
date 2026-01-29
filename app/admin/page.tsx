@@ -900,33 +900,41 @@ export default function AdminPage() {
                                     </div>
 
                                     {editingSubId === subscriber.id ? (
-                                        <div className="flex flex-col md:flex-row gap-2 flex-1">
-                                            <input
-                                                type="email"
-                                                value={editEmail}
-                                                onChange={(e) => setEditEmail(e.target.value)}
-                                                className="px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-blue-500 outline-none flex-1"
-                                                placeholder="Email"
-                                            />
-                                            <input
-                                                type="text"
-                                                value={editName}
-                                                onChange={(e) => setEditName(e.target.value)}
-                                                className="px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-blue-500 outline-none flex-1"
-                                                placeholder="Naam"
-                                            />
-                                            <div className="flex gap-1">
+                                        <div className="flex flex-col md:flex-row gap-2 flex-1 bg-blue-50/50 p-2 rounded-lg border border-blue-200">
+                                            <div className="flex-1 space-y-2">
+                                                <div className="relative">
+                                                    <Mail className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400" />
+                                                    <input
+                                                        type="email"
+                                                        value={editEmail}
+                                                        onChange={(e) => setEditEmail(e.target.value)}
+                                                        className="w-full pl-8 pr-2 py-1.5 text-sm border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-medium text-gray-800 shadow-sm"
+                                                        placeholder="Email address"
+                                                    />
+                                                </div>
+                                                <div className="relative">
+                                                    <User className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400" />
+                                                    <input
+                                                        type="text"
+                                                        value={editName}
+                                                        onChange={(e) => setEditName(e.target.value)}
+                                                        className="w-full pl-8 pr-2 py-1.5 text-sm border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-medium text-gray-800 shadow-sm"
+                                                        placeholder="Name (optional)"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex md:flex-col gap-1 justify-center">
                                                 <button
                                                     onClick={() => handleUpdateSubscriber(subscriber.id)}
-                                                    className="p-1.5 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                                                    title="Opslaan"
+                                                    className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm flex items-center justify-center"
+                                                    title="Save"
                                                 >
                                                     {isUpdatingSub ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                                                 </button>
                                                 <button
                                                     onClick={() => setEditingSubId(null)}
-                                                    className="p-1.5 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors"
-                                                    title="Annuleren"
+                                                    className="p-2 bg-gray-100 text-gray-500 rounded-lg hover:bg-gray-200 transition-all flex items-center justify-center"
+                                                    title="Cancel"
                                                 >
                                                     <RotateCcw className="w-4 h-4" />
                                                 </button>

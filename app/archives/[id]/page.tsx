@@ -20,12 +20,21 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [deleteAction, setDeleteAction] = useState<'archive' | 'order' | null>(null);
     const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+    const [deliveryCost, setDeliveryCost] = useState(1.95);
     const router = useRouter();
     const { showToast, showConfirm } = useToast();
     const { refreshOrders } = useOrders();
 
     useEffect(() => {
         fetchArchiveDetail();
+
+        // Fetch current delivery cost
+        fetch('/api/settings')
+            .then(res => res.json())
+            .then(data => {
+                if (data.deliveryCost) setDeliveryCost(data.deliveryCost);
+            })
+            .catch(err => console.error('Failed to fetch settings:', err));
     }, []);
 
     const fetchArchiveDetail = async () => {
@@ -178,11 +187,11 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <DashboardCard className="p-6 flex items-center gap-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary text-xl font-bold">
-                        {period.orders.length}
+                        {period.orders.length + (period.jesseParticipating ? 1 : 0)}
                     </div>
                     <div>
                         <p className="text-text-muted text-sm">Bestellingen</p>
-                        <p className="text-xl font-bold text-text-primary">Collega's</p>
+                        <p className="text-xl font-bold text-text-primary">Deelnemers</p>
                     </div>
                 </DashboardCard>
 
@@ -191,21 +200,21 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                         €
                     </div>
                     <div>
-                        <p className="text-text-muted text-sm">Totale Waarde</p>
+                        <p className="text-text-muted text-sm">Totale Waarde (inc. Jesse)</p>
                         <p className="text-xl font-bold text-text-primary">
-                            € {period.orders.reduce((acc: number, order: any) => acc + order.orderItems.reduce((iAcc: number, item: any) => iAcc + (item.product.price * item.quantity), 0), 0).toFixed(2)}
+                            € {(period.orders.reduce((acc: number, order: any) => acc + order.orderItems.reduce((iAcc: number, item: any) => iAcc + (item.product.price * item.quantity), 0), 0) + (period.jesseParticipating ? 10.40 : 0)).toFixed(2)}
                         </p>
                     </div>
                 </DashboardCard>
 
-                <DashboardCard className={`p-6 flex items-center gap-4 ${!period.isClosed ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50 border-gray-100'}`}>
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${!period.isClosed ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-500/10 text-gray-600'}`}>
-                        <Clock className="w-6 h-6" />
+                <DashboardCard className="p-6 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center text-orange-600 font-bold">
+                        €
                     </div>
                     <div>
-                        <p className="text-text-muted text-sm">Status</p>
-                        <p className={`text-xl font-bold ${!period.isClosed ? 'text-emerald-600' : 'text-text-primary'}`}>
-                            {!period.isClosed ? 'Lopend' : 'Gearchiveerd'}
+                        <p className="text-text-muted text-sm">Bezorging p.p.</p>
+                        <p className="text-xl font-bold text-text-primary">
+                            € {(deliveryCost / (period.orders.length + (period.jesseParticipating ? 1 : 0))).toFixed(2)}
                         </p>
                     </div>
                 </DashboardCard>
@@ -219,72 +228,122 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                 </h2>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {period.orders.map((order: any, index: number) => (
-                        <motion.div
-                            key={order.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.3, delay: index * 0.05 }}
-                        >
-                            <DashboardCard className="p-0 overflow-hidden group">
-                                <div className="p-4 bg-background/50 border-b border-border flex items-center justify-between">
+                    {/* Jesse Order Injection */}
+                    {period.jesseParticipating && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                            <DashboardCard className="p-0 overflow-hidden border-indigo-200 bg-indigo-50/20">
+                                <div className="p-4 bg-indigo-50/50 border-b border-indigo-100 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                                            {order.personName.charAt(0).toUpperCase()}
+                                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                                            J
                                         </div>
-                                        <span className="font-semibold text-text-primary">{order.personName}</span>
+                                        <span className="font-semibold text-indigo-900 text-lg">Jesse</span>
+                                        <span className="text-[10px] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-full font-bold uppercase tracking-wider">Vaste bestelling</span>
                                     </div>
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-sm text-text-muted">
-                                            {format(new Date(order.createdAt), 'EEEE HH:mm', { locale: nl })}
-                                        </span>
-                                        <button
-                                            onClick={() => handleDeleteOrder(order.id)}
-                                            className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                                            title="Verwijder bestelling"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                                    <span className="text-xs text-indigo-400 font-medium italic">Automatisch</span>
                                 </div>
 
                                 <div className="p-4 space-y-3">
-                                    {order.orderItems.map((item: any) => (
-                                        <div key={item.id} className="flex justify-between items-start text-sm">
+                                    {[
+                                        { name: 'Pistolet kip-kerrie', price: 5.00 },
+                                        { name: 'Milano chili-kip speciaal', price: 5.40 }
+                                    ].map((item, idx) => (
+                                        <div key={idx} className="flex justify-between items-start text-sm">
                                             <div className="flex gap-2">
-                                                <span className="font-bold w-6 text-center bg-gray-100 rounded text-text-primary">
-                                                    {item.quantity}x
+                                                <span className="font-bold w-6 text-center bg-indigo-100/50 rounded text-indigo-700">
+                                                    1x
                                                 </span>
-                                                <div>
-                                                    <p className="text-text-primary">{formatName(item.product.name)}</p>
-                                                    {item.comment && (
-                                                        <p className="text-xs text-orange-500 italic">Opmerking: {item.comment}</p>
-                                                    )}
-                                                </div>
+                                                <p className="text-indigo-900">{formatName(item.name)}</p>
                                             </div>
-                                            <span className="text-text-secondary">€ {(item.quantity * item.product.price).toFixed(2)}</span>
+                                            <span className="text-indigo-700">€ {item.price.toFixed(2)}</span>
                                         </div>
                                     ))}
 
-                                    {order.generalComment && (
-                                        <div className="mt-4 pt-3 border-t border-dashed border-border text-xs">
-                                            <span className="font-semibold text-text-secondary">Algemene opmerking:</span>
-                                            <p className="text-text-primary italic">"{order.generalComment}"</p>
-                                        </div>
-                                    )}
+                                    <div className="flex justify-between items-center text-xs text-indigo-400 mt-2 pt-2 border-t border-dashed border-indigo-100">
+                                        <span>Bezorgkosten (aandeel)</span>
+                                        <span>€ {(deliveryCost / (period.orders.length + (period.jesseParticipating ? 1 : 0))).toFixed(2)}</span>
+                                    </div>
                                 </div>
 
-                                <div className="p-3 bg-gray-50 border-t border-border flex justify-end items-center text-sm font-semibold">
+                                <div className="p-3 bg-indigo-50 border-t border-indigo-100 flex justify-end items-center text-sm font-semibold">
                                     <div className="text-right">
-                                        <span className="text-text-secondary mr-2">Totaal:</span>
-                                        <span className="text-primary text-lg">
-                                            € {order.orderItems.reduce((acc: number, item: any) => acc + (item.product.price * item.quantity), 0).toFixed(2)}
-                                        </span>
+                                        <span className="text-indigo-600 mr-2">Totaal:</span>
+                                        <span className="text-indigo-900 text-lg">€ {(10.40 + (deliveryCost / (period.orders.length + (period.jesseParticipating ? 1 : 0)))).toFixed(2)}</span>
                                     </div>
                                 </div>
                             </DashboardCard>
                         </motion.div>
-                    ))}
+                    )}
+
+                    {period.orders.map((order: any, index: number) => {
+                        const participantsCount = period.orders.length + (period.jesseParticipating ? 1 : 0);
+                        const shippingPerPerson = deliveryCost / participantsCount;
+                        return (
+                            <motion.div
+                                key={order.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                            >
+                                <DashboardCard className="p-0 overflow-hidden group">
+                                    <div className="p-4 bg-background/50 border-b border-border flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                                                {order.personName.charAt(0).toUpperCase()}
+                                            </div>
+                                            <span className="font-semibold text-text-primary">{order.personName}</span>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-sm text-text-muted">
+                                                {format(new Date(order.createdAt), 'EEEE HH:mm', { locale: nl })}
+                                            </span>
+                                            <button
+                                                onClick={() => handleDeleteOrder(order.id)}
+                                                className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                                title="Verwijder bestelling"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4 space-y-3">
+                                        {order.orderItems.map((item: any) => (
+                                            <div key={item.id} className="flex justify-between items-start text-sm">
+                                                <div className="flex gap-2">
+                                                    <span className="font-bold w-6 text-center bg-gray-100 rounded text-text-primary">
+                                                        {item.quantity}x
+                                                    </span>
+                                                    <div>
+                                                        <p className="text-text-primary">{formatName(item.product.name)}</p>
+                                                        {item.comment && (
+                                                            <p className="text-xs text-orange-500 italic">Opmerking: {item.comment}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <span className="text-text-secondary">€ {(item.quantity * item.product.price).toFixed(2)}</span>
+                                            </div>
+                                        ))}
+
+                                        {order.generalComment && (
+                                            <div className="mt-4 pt-3 border-t border-dashed border-border text-xs">
+                                                <span className="font-semibold text-text-secondary">Algemene opmerking:</span>
+                                                <p className="text-text-primary italic">"{order.generalComment}"</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="p-3 bg-gray-50 border-t border-border flex justify-end items-center text-sm font-semibold">
+                                        <div className="text-right">
+                                            <span className="text-text-secondary mr-2">Totaal:</span>
+                                            <span className="text-primary text-lg">
+                                                € {(order.orderItems.reduce((acc: number, item: any) => acc + (item.product.price * item.quantity), 0) + shippingPerPerson).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </DashboardCard>
+                            </motion.div>
+                        ))}
 
                     {period.orders.length === 0 && (
                         <div className="col-span-full py-20 text-center bg-white rounded-3xl border-2 border-dashed border-gray-100">

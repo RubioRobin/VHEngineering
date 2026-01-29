@@ -55,6 +55,7 @@ model OrderPeriod {
   isClosed      Boolean  @default(false)
   reminderSent  Boolean  @default(false)
   createdAt     DateTime @default(now())
+  jesseParticipating Boolean  @default(false)
   orders    Order[]
 
   @@index([isClosed])

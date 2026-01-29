@@ -119,6 +119,12 @@ export async function getCurrentOrderPeriod() {
     const startDate = fromZonedTime(weekStart, TIMEZONE);
     const endDate = fromZonedTime(weekEnd, TIMEZONE);
 
+    // Get Jesse's participation status from global settings
+    const jesseSetting = await prisma.globalSetting.findUnique({
+        where: { key: 'JESSE_PARTICIPATING' }
+    });
+    const jesseParticipating = jesseSetting?.value === 'true';
+
     // Find or create period
     // Try both canonical and padded for robustness
     const parts = periodId.split('-');
@@ -142,14 +148,28 @@ export async function getCurrentOrderPeriod() {
                 startDate,
                 endDate,
                 deadline,
+                jesseParticipating,
             },
         });
     } else if (period.weekId !== periodId) {
         // Update to canonical ID if we found a non-canonical one
         period = await prisma.orderPeriod.update({
             where: { id: period.id },
-            data: { weekId: periodId }
+            data: {
+                weekId: periodId,
+                // Also update jesse participation for current period if it exists
+                jesseParticipating
+            }
         });
+    } else {
+        // Even if found, we should ensure the current open period's jesse status is updated
+        // to match global settings if it's the current period
+        if (!period.isClosed) {
+            period = await prisma.orderPeriod.update({
+                where: { id: period.id },
+                data: { jesseParticipating }
+            });
+        }
     }
 
     return period;
