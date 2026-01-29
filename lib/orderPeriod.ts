@@ -142,6 +142,32 @@ export async function getCurrentOrderPeriod() {
                 jesseParticipating,
             },
         });
+
+        // --- SELF-HEALING RECOVERY ---
+        // If we just created Week 5, check if there are orphan orders in Week 6 
+        // (caused by the old logic's bug).
+        if (periodId === '2026-5' || periodId === '2026-05') {
+            try {
+                const week6 = await prisma.orderPeriod.findFirst({
+                    where: { weekId: { in: ['2026-6', '2026-06'] } },
+                    include: { _count: { select: { orders: true } } }
+                });
+
+                if (week6 && week6._count.orders > 0) {
+                    console.log(`Self-healing: Moving ${week6._count.orders} orders from 2026-6 to 2026-5`);
+                    await prisma.order.updateMany({
+                        where: { orderPeriodId: week6.id },
+                        data: { orderPeriodId: period.id }
+                    });
+                    // Delete the now-empty buggy period
+                    await prisma.orderPeriod.delete({ where: { id: week6.id } });
+                }
+            } catch (e) {
+                console.error('Self-healing failed:', e);
+            }
+        }
+        // -----------------------------
+
     } else if (period.weekId !== periodId) {
         // Update to canonical ID if we found a non-canonical one
         period = await prisma.orderPeriod.update({
@@ -156,6 +182,31 @@ export async function getCurrentOrderPeriod() {
         // Even if found, we should ensure the current open period's jesse status is updated
         // to match global settings if it's the current period
         if (!period.isClosed) {
+
+            // --- SELF-HEALING FOR EXISTING BUT EMPTY PERIOD ---
+            // Similar to above, but for when the period was already created (empty)
+            // but the orders are in Week 6.
+            if (periodId === '2026-5' || periodId === '2026-05') {
+                try {
+                    const orderCount = await prisma.order.count({ where: { orderPeriodId: period.id } });
+                    if (orderCount === 0) {
+                        const week6 = await prisma.orderPeriod.findFirst({
+                            where: { weekId: { in: ['2026-6', '2026-06'] } },
+                            include: { _count: { select: { orders: true } } }
+                        });
+                        if (week6 && week6._count.orders > 0) {
+                            console.log(`Self-healing (existing): Moving ${week6._count.orders} orders from 2026-6 to 2026-5`);
+                            await prisma.order.updateMany({
+                                where: { orderPeriodId: week6.id },
+                                data: { orderPeriodId: period.id }
+                            });
+                            await prisma.orderPeriod.delete({ where: { id: week6.id } });
+                        }
+                    }
+                } catch (e) { console.error('Self-healing existing failed:', e); }
+            }
+            // --------------------------------------------------
+
             period = await prisma.orderPeriod.update({
                 where: { id: period.id },
                 data: { jesseParticipating }
