@@ -965,25 +965,27 @@ export default function AdminPage() {
                                         </div>
                                     )}
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    {/* Smaller standard Checkbox per user request */}
-                                    <input
-                                        type="checkbox"
-                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 shadow-sm cursor-pointer"
-                                        checked={subscriber.active ?? true}
-                                        onChange={() => handleToggleActive(subscriber.id, subscriber.active ?? true)}
-                                        title={subscriber.active ? "Actief (krijgt mail)" : "Niet actief (krijgt geen mail)"}
-                                    />
+                                {editingSubId !== subscriber.id && (
+                                    <div className="flex items-center gap-3">
+                                        {/* Smaller standard Checkbox per user request */}
+                                        <input
+                                            type="checkbox"
+                                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 shadow-sm cursor-pointer"
+                                            checked={subscriber.active ?? true}
+                                            onChange={() => handleToggleActive(subscriber.id, subscriber.active ?? true)}
+                                            title={subscriber.active ? "Actief (krijgt mail)" : "Niet actief (krijgt geen mail)"}
+                                        />
 
-                                    <button
-                                        onClick={() => handleDeleteEmail(subscriber.id)}
-                                        className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                        disabled={deletingEmailId === subscriber.id}
-                                        title="Verwijderen uit database"
-                                    >
-                                        {deletingEmailId === subscriber.id ? <Loader2 className="w-4 h-4 animate-spin text-red-500" /> : <Trash2 className="w-4 h-4" />}
-                                    </button>
-                                </div>
+                                        <button
+                                            onClick={() => handleDeleteEmail(subscriber.id)}
+                                            className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                            disabled={deletingEmailId === subscriber.id}
+                                            title="Verwijderen uit database"
+                                        >
+                                            {deletingEmailId === subscriber.id ? <Loader2 className="w-4 h-4 animate-spin text-red-500" /> : <Trash2 className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ))
                     )}
