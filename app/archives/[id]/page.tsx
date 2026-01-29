@@ -343,7 +343,8 @@ export default function ArchiveDetailPage({ params }: { params: { id: string } }
                                     </div>
                                 </DashboardCard>
                             </motion.div>
-                        ))}
+                        );
+                    })}
 
                     {period.orders.length === 0 && (
                         <div className="col-span-full py-20 text-center bg-white rounded-3xl border-2 border-dashed border-gray-100">
