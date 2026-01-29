@@ -403,7 +403,7 @@ export default function AdminPage() {
             const data = await res.json();
 
             if (res.ok) {
-                showToast((data.message || 'Test emails verzonden!') + ' (Let op: kan soms even duren)', 'success');
+                showToast((data.message || 'Emails verzonden!') + ' (Let op: kan soms even duren)', 'success');
             } else {
                 if (res.status === 401) handleLogout();
                 console.error('Test email failed:', data);
@@ -655,7 +655,7 @@ export default function AdminPage() {
                         icon={<Send className="w-4 h-4" />}
                         isLoading={isSendingTestEmail}
                     >
-                        Test email versturen
+                        Verstuur mail
                     </DashboardButton>
                 </div>
 
