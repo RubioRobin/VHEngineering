@@ -46,6 +46,14 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
         },
     }) as OrderWithDetails[];
 
+    // Fetch period details (to check for Jesse)
+    // We try to find the period by canonical ID or partial match if needed, but since we query orders by weekId link, checking the period directly via weekId is safest.
+    // However, periodId passed here is the weekId string (e.g. 2025-05).
+    // Let's try to find the exact period record.
+    const period = await prisma.orderPeriod.findFirst({
+        where: { weekId: periodId }
+    });
+
     // Create workbook
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'VH Engineering';
@@ -141,8 +149,11 @@ export async function generateOrdersExcel(periodId: string): Promise<Buffer> {
     }>();
 
     // Check if Jesse is participating
-    const jesseSetting = await prisma.globalSetting.findUnique({ where: { key: 'JESSE_PARTICIPATING' } });
-    if (jesseSetting?.value === 'true') {
+    // Check if Jesse is participating (using period status if available, fallback to global)
+    // If period exists, trust its flag. If not (shouldn't happen if orders exist), fallback to false or global.
+    const jesseParticipating = period ? period.jesseParticipating : false;
+
+    if (jesseParticipating) {
         const jesseItems = [
             { name: "Pistolet kip-kerrie", quantity: 1, price: 5 },
             { name: "Milano chili-kip speciaal", quantity: 1, price: 5.4 }
