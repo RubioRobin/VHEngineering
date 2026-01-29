@@ -42,7 +42,7 @@ const FALLBACK_SHIPPING_COST = 1.95;
 export default function OverviewPage() {
     const { weekOrders: orders, currentPeriod, isWeekLoading: loading, fetchWeekOrders } = useOrders();
     const { user, isAdmin, setAdminShadowUser } = useUser();
-B    const { showToast } = useToast();
+    const { showToast } = useToast();
     const router = useRouter();
     const [isManualOrderModalOpen, setIsManualOrderModalOpen] = useState(false);
 
